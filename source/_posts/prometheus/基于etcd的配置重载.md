@@ -1,5 +1,11 @@
 ---
 title: 基于ETCD的配置热加载
+index_img: /images/prometheus.jpeg
+tags:
+  - prometheus
+categories:
+  - prometheus
+date: 2023-04-08 06:40:12
 ---
 
 ### 启动一个master节点服务
@@ -13,7 +19,7 @@ docker run \
     -p 7979:9090 \
     --network etcd_net \
     --network-alias master \
-    -v /Users/xuweiqiang/Documents/code/book/other/prometheus/etcd_reload_config.yml:/etc/prometheus/prometheus.yml \
+    -v /etcd_reload_config.yml:/etc/prometheus/prometheus.yml \
     prom/prometheus
 ```
 [localhost:7979](http://localhost:7979)
@@ -21,12 +27,13 @@ docker run \
 ### 在etcd设置一个target metrics
 
 ```
-etcdctl set /services/prometheus/example '{"targets":["docker.for.mac.host.internal:6969"],"metrics_path":"/metrics"}'
+etcdctl set /services/prometheus/example \
+'{"targets":["docker.for.mac.host.internal:6969"],"metrics_path":"/metrics"}'
 ```
 
 ### etcd reload配置
 
-```
+``` yml
 # etcd reload config prometheus.yml
 global:
   scrape_interval: 5s

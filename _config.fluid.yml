@@ -1,18 +1,60 @@
 navbar:
   blog_title: xuweiqiang's blog
   menu:
-    - { key: '主题', link: '/', icon: 'iconfont icon-home-fill' }
-    - { key: '列表', link: '/archives/', icon: 'iconfont icon-tags-fill' }
-    - { key: '分类', link: '/categories/', icon: 'iconfont icon-tags-fill' }
-    - { key: '标签', link: '/tags/', icon: 'iconfont icon-tags-fill' }
-    - { key: '关于', link: '/about/', icon: 'iconfont icon-user-fill', name: '联系我' }
+    - { key: '首页', link: '/', icon: 'iconfont icon-home-fill' ,name: '首页'}
+    - { key: '归档', link: '/archives/', icon: 'iconfont icon-tags-fill' ,name: '归档'}
+    - { key: '分类', link: '/categories/', icon: 'iconfont icon-tags-fill' ,name: '分类'}
+    - { key: '标签', link: '/tags/', icon: 'iconfont icon-tags-fill' ,name: '标签'}
+    - { key: '关于', link: '/about/', icon: 'iconfont icon-user-fill', name: '关于' }
 index:
   slogan:
     enable: true
     text: 找寻热爱~
     api:
-      enable: false
+      enable: true
       url: "https://v1.hitokoto.cn/"
       method: "GET"
       headers: {}
       keys: ["hitokoto"]
+about:
+  avatar: /images/super.jpeg
+  name: "xuweiqiang"
+  intro: "Just pure liking"
+  icons:
+    - { class: 'iconfont icon-github-fill', link: 'https://github.com/weiqiangxu', tip: 'GitHub' }
+    - { class: 'iconfont icon-wechat-fill', qrcode: '/images/wechat.jpeg' }
+post:
+  meta:
+    author:  # 作者，优先根据 front-matter 里 author 字段，其次是 hexo 配置中 author 值
+      enable: false
+    date:  # 文章日期，优先根据 front-matter 里 date 字段，其次是 md 文件日期
+      enable: true
+      format: "YYYY-MM-DD, h:mm A"  # 格式参照 ISO-8601 日期格式化
+    wordcount:  # 字数统计
+      enable: false
+      format: "{} 字"  # 显示的文本，{}是数字的占位符（必须包含)，下同
+    min2read:  # 阅读时间
+      enable: false
+      format: "{} 分钟"
+    views:  # 阅读次数
+      enable: false
+      source: "leancloud"  # 统计数据来源，可选：leancloud | busuanzi   注意不蒜子会间歇抽风
+      format: "{} 次"
+code:
+  copy_btn: true
+  highlight:
+    enable: true
+    line_number: true
+    lib: "highlightjs"
+    highlightjs:
+      style: 'Github Gist'
+      bg_color: false
+    prismjs:
+      style: "default"
+      preprocess: true
+fun_features:
+  typing: # 为 subtitle 添加打字机效果
+    enable: false
+    typeSpeed: 70 # 打印速度
+    cursorChar: "_" # 游标字符
+    loop: false # 是否循环播放效果
