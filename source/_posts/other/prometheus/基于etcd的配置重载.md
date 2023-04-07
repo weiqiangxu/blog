@@ -2,7 +2,9 @@
 title: 基于ETCD的配置热加载
 ---
 
-```
+### 启动一个master节点服务
+
+```bash
 docker network create etcd_net
 
 docker run \
@@ -16,9 +18,13 @@ docker run \
 ```
 [localhost:7979](http://localhost:7979)
 
+### 在etcd设置一个target metrics
+
 ```
 etcdctl set /services/prometheus/example '{"targets":["docker.for.mac.host.internal:6969"],"metrics_path":"/metrics"}'
 ```
+
+### etcd reload配置
 
 ```
 # etcd reload config prometheus.yml

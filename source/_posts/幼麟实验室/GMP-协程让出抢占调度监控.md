@@ -1,4 +1,6 @@
-# 协程让出抢占调度
+---
+title: 协程让出抢占调度
+---
 
 ### 关键术语
 1. time.sleep后 _Grunning 和 _Gwaiting，timer之中的回调函数将g变成Grunnable状态放回runq

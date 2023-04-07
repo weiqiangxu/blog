@@ -1,5 +1,5 @@
 ---
-title: prometheus的配置重载方案
+title: 基于docker搭建联邦机制主从同步
 ---
 
 官方提供了 SIGHUP通过向 Prometheus 进程发送 a 或向端点发送 HTTP POST 请求/-/reload 的方式重载配置；

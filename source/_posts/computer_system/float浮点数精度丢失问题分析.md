@@ -1,4 +1,6 @@
-# float浮点数精度丢失
+---
+title: float浮点数精度丢失
+---
 
 [float浮点数精度丢失问题分析](https://zhuanlan.zhihu.com/p/375156201)
 

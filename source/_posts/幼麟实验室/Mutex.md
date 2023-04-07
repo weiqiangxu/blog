@@ -1,7 +1,8 @@
-# mutex
+---
+title: mutex
+---
 
-
-## goroutine 获得锁的逻辑
+### goroutine 获得锁的逻辑
 
 ```
 type mutex struct {

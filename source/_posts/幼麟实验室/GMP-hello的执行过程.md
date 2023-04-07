@@ -1,3 +1,7 @@
+---
+title: GMP-hello的执行过程
+---
+
 ### 关键术语
 1. 进程虚拟地址空间中的代码段
 2. 程序执行入口 runtime.main 创建 main.goroutine （call main.main）

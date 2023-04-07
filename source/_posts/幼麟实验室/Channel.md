@@ -1,4 +1,6 @@
-# channel
+---
+title: channel
+---
 
 1. 分配在堆上
 2. 管道的数据结构是 hchan

@@ -1,3 +1,7 @@
+---
+title: string
+---
+
 ### 术语
 1. unicode
 2. ASCII
