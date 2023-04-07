@@ -1,0 +1,17 @@
+# GMP的让出创建恢复
+
+### 关键术语
+
+1. newproc函数
+
+
+### 协程状态
+
+1. running
+2. runable
+3. waiting
+4. syscall 
+```
+OS系统调用前，先调用runtime·entersyscall函数将自己的状态置为Gsyscall
+```
+5. dead
