@@ -1,16 +1,21 @@
-# telepresence
+---
+title: telepresence基本使用
+tags:
+  - telepresence
+categories:
+  - kubernetes
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
+---
+
+### 常用命令
 
 ```
 telepresence version
 telepresence connect
 ```
 
-[github telepresence](https://github.com/telepresenceio/telepresence)
-
-
-### connect your cluster
-
-[本机连接到远程 Kubernetes 集群](https://kubernetes.io/zh-cn/docs/tasks/debug/debug-cluster/local-debugging/)
+### 集群连接
 
 ```
 $ telepresence connect
@@ -37,4 +42,7 @@ ping login.user.svc.cluster.local
 ```
 
 
+### 参考资料
+[github telepresence](https://github.com/telepresenceio/telepresence)
+[本机连接到远程 Kubernetes 集群](https://kubernetes.io/zh-cn/docs/tasks/debug/debug-cluster/local-debugging/)
 

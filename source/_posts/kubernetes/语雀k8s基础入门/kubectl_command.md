@@ -1,74 +1,80 @@
 ---
-title: kubectl command
+title: kubectl一些常用的命令
+tags:
+  - kubectl
+categories:
+  - kubernetes
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
 ---
 
-# 命令式对象管理
+### 命令式对象管理
 
 1. 查看所有的pod
 
-```
-kubectl get pods
+``` bash
+$ kubectl get pods
 ```
 
 2. 查看某个pod，以yaml格式展示结果
 
-```
-kubectl get pod pod_name -o yaml
+``` bash
+$ kubectl get pod pod_name -o yaml
 ```
 
 3. kubernetes中所有的内容都抽象为资源，可以通过下面的命令进行查看
 
-```
-kubectl api-resources
+``` bash
+$ kubectl api-resources
 ```
 
 4. 创建一个namespace
 
-```
-kubectl create namespace dev
+``` bash
+$ kubectl create namespace dev
 ```
 
 5. 获取namespace
 
-```
-kubectl get namespace
+``` bash
+$ kubectl get namespace
 ```
 
 6. 获取namespace
 
-```
-kubectl get namespace
-kubectl get ns
+``` bash
+$ kubectl get namespace
+$ kubectl get ns
 ```
 
 7. 在刚才创建的namespace下创建并运行一个Nginx的Pod
 
-```
-kubectl run nginx --image=nginx:1.17.1 -n dev
+``` bash
+$ kubectl run nginx --image=nginx:1.17.1 -n dev
 ```
 
 8. 查看名为dev的namespace下的所有Pod，如果不加-n，默认就是default的namespace
 
-```
-kubectl get pods [-n 命名空间的名称]
-kubectl get pods -n dev
+``` bash
+$ kubectl get pods [-n 命名空间的名称]
+$ kubectl get pods -n dev
 ```
 
 9. 删除指定namespace下的指定Pod
 
-```
-kubectl delete pod nginx -n dev
+``` bash
+$ kubectl delete pod nginx -n dev
 ```
 
 10. 删除指定的namespace
 
-```
-kubectl delete namespace dev
+``` bash
+$ kubectl delete namespace dev
 ```
 
 11. 创建一个nginxpod.yaml，内容如下
 
-```
+``` yml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -87,24 +93,25 @@ spec:
 
 12. 执行create命令，创建资源
 
-```
-kubectl create -f nginxpod.yaml
+``` bash
+$ kubectl create -f nginxpod.yaml
 ```
 
 13. 执行get命令，查看资源：
 
-```
-kubectl get -f nginxpod.yaml
+``` bash
+$ kubectl get -f nginxpod.yaml
 ```
 
 14. 执行delete命令，删除资源：
 
-```
-kubectl delete -f nginxpod.yaml
+``` bash
+$ kubectl delete -f nginxpod.yaml
 ```
 
-# 资源管理方式总结
+### 资源管理方式总结
 
+```
 a. 命令式对象管理：直接使用命令去操作kubernetes的资源。
 b. 命令式对象配置：通过命令配置和配置文件去操作kubernetes的资源。
 c. 声明式对象配置：通过apply命令和配置文件去操作kubernetes的资源
@@ -112,41 +119,36 @@ c. 声明式对象配置：通过apply命令和配置文件去操作kubernetes�
 创建和更新资源使用声明式对象配置：kubectl apply -f xxx.yaml。
 删除资源使用命令式对象配置：kubectl delete -f xxx.yaml。
 查询资源使用命令式对象管理：kubectl get(describe) 资源名称。
-
+```
 
 1. 查看Pod的详细信息
 
-```
-kubectl describe pod pod的名称 [-n 命名空间名称]
-kubectl describe pod nginx -n dev
+``` bash
+$ kubectl describe pod pod的名称 [-n 命名空间名称]
+$ kubectl describe pod nginx -n dev
 ```
 
 2. Pod的访问
 
-```
+``` bash
 # 获取Pod的IP
-kubectl get pods [-n dev] -o wide
-```
+$ kubectl get pods [-n dev] -o wide
 
-```
 # 获取nginx的访问信息
-kubectl get pods -n dev -o wide
-```
+$ kubectl get pods -n dev -o wide
 
-```
 # 通过curl访问
-curl ip:端口
-```
+$ curl ip:端口
 
-```
+
 # 删除指定的Pod
-kubectl delete pod pod的名称 [-n 命名空间]
-kubectl delete pod nginx -n dev
+$ kubectl delete pod pod的名称 [-n 命名空间]
+$ kubectl delete pod nginx -n dev
 ```
 
 3. 新建pod-nginx.yaml：
 
-```
+``` yml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -165,19 +167,17 @@ spec:
 
 4. 执行创建和删除命令
 
-```
-kubectl create -f pod-nginx.yaml
-kubectl delete -f pod-nginx.yaml
+``` bash
+$ kubectl create -f pod-nginx.yaml
+$ kubectl delete -f pod-nginx.yaml
 ```
 
 Label是kubernetes的一个重要概念。它的作用就是在资源上添加标识，用来对它们进行区分和选择
 key/value键值对的形式\一个资源对象可以定义任意数量的Label
 
-示例
+示例 pod-nginx.yaml：
 
-pod-nginx.yaml：
-
-```
+``` yml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -200,35 +200,34 @@ spec:
 
 5. 执行创建和删除命令
 
+``` bash
+$ kubectl create -f pod-nginx.yaml
+$ kubectl delete -f pod-nginx.yaml
 ```
-kubectl create -f pod-nginx.yaml
-kubectl delete -f pod-nginx.yaml
-```
 
 
-# Deployment
-
+### Deployment
 
 1. 创建指定名称的deployement
 
-```
-kubectl create deployment xxx [-n 命名空间]
-kubectl create deploy xxx [-n 命名空间]
-示例: 在名称为test的命名空间下创建名为nginx的deployment
-kubectl create deployment nginx --image=nginx:1.17.1 -n test
+``` bash
+$ kubectl create deployment xxx [-n 命名空间]
+$ kubectl create deploy xxx [-n 命名空间]
+# 示例: 在名称为test的命名空间下创建名为nginx的deployment
+$ kubectl create deployment nginx --image=nginx:1.17.1 -n test
 ```
 
 2. 根据指定的deplyment创建Pod
 
-```
-kubectl scale deployment xxx [--replicas=正整数] [-n 命名空间]
-在名称为test的命名空间下根据名为nginx的deployment创建4个Pod
-kubectl scale deployment nginx --replicas=4 -n dev
+``` bash
+$ kubectl scale deployment xxx [--replicas=正整数] [-n 命名空间]
+# 在名称为test的命名空间下根据名为nginx的deployment创建4个Pod
+$ kubectl scale deployment nginx --replicas=4 -n dev
 ```
 
 3. 创建一个deploy-nginx.yaml
 
-```
+``` yml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -254,50 +253,50 @@ spec:
 
 4. 执行创建和删除命令：
 
-```
-kubectl create -f deploy-nginx.yaml
-kubectl delete -f deploy-nginx.yaml
+``` bash
+$ kubectl create -f deploy-nginx.yaml
+$ kubectl delete -f deploy-nginx.yaml
 ```
 
 5. 查看创建的Pod
 
-```
-kubectl get pods [-n 命名空间]
-查看名称为dev的namespace下通过deployment创建的3个Pod
-kubectl get pods -n dev
+``` bash
+$ kubectl get pods [-n 命名空间]
+# 查看名称为dev的namespace下通过deployment创建的3个Pod
+$ kubectl get pods -n dev
 ```
 
 6. 查看deployment的信息
 
+``` bash
+$ kubectl get deployment [-n 命名空间]
+$ kubectl get deploy [-n 命名空间]
+# 示例: 查看名称为dev的namespace下的deployment
+$ kubectl get deployment -n dev
 ```
-kubectl get deployment [-n 命名空间]
-kubectl get deploy [-n 命名空间]
-示例: 查看名称为dev的namespace下的deployment
-kubectl get deployment -n dev
-````
 
 7. 查看deployment的详细信息
 
-```
-kubectl describe deployment xxx [-n 命名空间]
-kubectl describe deploy xxx [-n 命名空间]
-示例:查看名为dev的namespace下的名为nginx的deployment的详细信息
-kubectl describe deployment nginx -n dev
+``` bash
+$ kubectl describe deployment xxx [-n 命名空间]
+$ kubectl describe deploy xxx [-n 命名空间]
+# 示例:查看名为dev的namespace下的名为nginx的deployment的详细信息
+$ kubectl describe deployment nginx -n dev
 ```
 
 
 8. 删除deployment
 
+``` bash
+$ kubectl delete deployment xxx [-n 命名空间]
+$ kubectl delete deploy xxx [-n 命名空间]
+# 示例：删除名为dev的namespace下的名为nginx的deployment
+$ kubectl delete deployment nginx -n dev
 ```
-kubectl delete deployment xxx [-n 命名空间]
-kubectl delete deploy xxx [-n 命名空间]
-示例：删除名为dev的namespace下的名为nginx的deployment
-kubectl delete deployment nginx -n dev
-```
 
 
 
-# Service
+### Service
 
 Pod的IP会随着Pod的重建产生变化
 Pod的IP仅仅是集群内部可见的虚拟的IP，外部无法访问。
@@ -307,8 +306,8 @@ Service可以看做是一组同类的Pod对外的访问接口，借助Service，
 
 1. 暴露Service
 
-```
-# 会产生一个CLUSTER-IP，这个就是service的IP，在Service的生命周期内，这个地址是不会变化的
+``` txt
+### 会产生一个CLUSTER-IP，这个就是service的IP，在Service的生命周期内，这个地址是不会变化的
 kubectl expose deployment xxx --name=服务名 --type=ClusterIP --port=暴露的端口 --target-port=指向集群中的Pod的端口 [-n 命名空间]
 示例：暴露名为test的namespace下的名为nginx的deployment，并设置服务名为svc-nginx1
 kubectl expose deployment nginx --name=svc-nginx1 --type=ClusterIP --port=80 --target-port=80 -n test
@@ -316,10 +315,10 @@ kubectl expose deployment nginx --name=svc-nginx1 --type=ClusterIP --port=80 --t
 
 2. 查看Service
 
-```
-kubectl get service [-n 命名空间] [-o wide]
-示例：查看名为test的命名空间的所有Service
-kubectl get service -n test
+``` bash
+$ kubectl get service [-n 命名空间] [-o wide]
+# 示例：查看名为test的命名空间的所有Service
+$ kubectl get service -n test
 ```
 
 ### 创建集群外部可访问的Service
@@ -327,32 +326,32 @@ kubectl get service -n test
 
 1. 暴露Service
 
-```
+``` bash
 # 会产生一个外部也可以访问的Service
-kubectl expose deployment xxx --name=服务名 --type=NodePort --port=暴露的端口 --target-port=指向集群中的Pod的端口 [-n 命名空间]
-示例：暴露名为test的namespace下的名为nginx的deployment，并设置服务名为svc-nginx2
-kubectl expose deploy nginx --name=svc-nginx2 --type=NodePort --port=80 --target-port=80 -n test
+$ kubectl expose deployment xxx --name=服务名 --type=NodePort --port=暴露的端口 --target-port=指向集群中的Pod的端口 [-n 命名空间]
+# 示例：暴露名为test的namespace下的名为nginx的deployment，并设置服务名为svc-nginx2
+$ kubectl expose deploy nginx --name=svc-nginx2 --type=NodePort --port=80 --target-port=80 -n test
 ```
 
 2. 查看Service
 
-```
-kubectl get service [-n 命名空间] [-o wide]
-示例：查看名为test的命名空间的所有Service
-kubectl get service -n test
+``` bash
+$ kubectl get service [-n 命名空间] [-o wide]
+# 示例：查看名为test的命名空间的所有Service
+$ kubectl get service -n test
 ```
 
 3. 删除服务
 
-```
-kubectl delete service xxx [-n 命名空间]
-示例：删除服务
-kubectl delete service svc-nginx1 -n test
+``` bash
+$ kubectl delete service xxx [-n 命名空间]
+# 示例：删除服务
+$ kubectl delete service svc-nginx1 -n test
 ```
 
 4. 对象配置方式，新建svc-nginx.yaml,内容如下
 
-```
+``` yml
 apiVersion: v1
 kind: Service
 metadata:
@@ -372,14 +371,14 @@ spec:
 
 5. 执行创建和删除命令
 
-```
-kubectl  create  -f  svc-nginx.yaml
-kubectl  delete  -f  svc-nginx.yaml
+``` bash
+$ kubectl  create  -f  svc-nginx.yaml
+$ kubectl  delete  -f  svc-nginx.yaml
 ```
 
 6. 获取pod IP
-```
-kubectl get po -o wide -n github
+``` bash
+$ kubectl get po -o wide -n github
 ```
 
 
