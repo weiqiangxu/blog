@@ -1,5 +1,14 @@
-### 博客园-详细基础入门
+---
+title: kafka基础入门
+tags:
+  - kafka原理
+categories:
+  - kafka
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
+---
 
+### 博客园-详细基础入门
 
 > 高性能，低延迟提交日志存储，复制和传播的专用分布式文件系统 
 

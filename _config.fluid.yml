@@ -7,6 +7,9 @@ navbar:
     - { key: '标签', link: '/tags/', icon: 'iconfont icon-tags-fill' ,name: '标签'}
     - { key: '关于', link: '/about/', icon: 'iconfont icon-user-fill', name: '关于' }
 index:
+  post_sticky:
+    enable: false
+    icon: 'iconfont icon-top'
   slogan:
     enable: true
     text: 找寻热爱~

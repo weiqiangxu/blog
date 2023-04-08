@@ -1,4 +1,15 @@
-# CDN
+---
+title: CDN
+tags:
+  - CDN
+categories:
+  - 分布式
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
+---
+
+
+### CDN
 
 1. CDN是什么
 ```

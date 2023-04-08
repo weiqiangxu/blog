@@ -1,6 +1,14 @@
-# kafka 配置group
+---
+title: kafka的组
+tags:
+  - kafka原理
+categories:
+  - kafka
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
+---
 
-[group配置](https://www.csdn.net/tags/MtjaQg0sODkzNjEtYmxvZwO0O0OO0O0O.html)
+### 相关概念
 
 1. 自动提交
 
@@ -82,3 +90,7 @@ cd /home/kafka/software/kafka_2.10-0.9.0.1/config
 cp consumer.properties consumer1.properties
 vim consumer1.properties
 ```
+
+### 参考资料
+
+[group配置](https://www.csdn.net/tags/MtjaQg0sODkzNjEtYmxvZwO0O0OO0O0O.html)

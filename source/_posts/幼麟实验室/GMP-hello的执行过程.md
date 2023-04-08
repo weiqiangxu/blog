@@ -1,5 +1,11 @@
 ---
 title: GMP-hello的执行过程
+tags:
+  - GO原理
+categories:
+  - go
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
 ---
 
 ### 关键术语

@@ -1,6 +1,14 @@
 ---
-title: channel
+title: Channel
+tags:
+  - GO原理
+categories:
+  - go
+date: 2023-04-08 06:40:12
+index_img: /images/bg/电脑桌面.jpeg
 ---
+
+### channel的特性
 
 1. 分配在堆上
 2. 管道的数据结构是 hchan
@@ -10,7 +18,7 @@ title: channel
 6. 缓冲区buffer之中有sendx发送队列偏移和recevx接收偏移 - 环形缓冲区
 
 
-### 详细描述发送数据到channel - 假设 g1 向 ch1 发送数据
+### channel发送过程做了什么
 
 1. 有没有goroutine在接收数据
 2. 如果缓冲区已经满了，继续发送数据到channel的话会进入发送等待队列 sendq
@@ -20,17 +28,14 @@ title: channel
 6. 唤醒发送队列 ch1 的 sendq 之中的 g1 , g1 此时将数据发送给 ch1
 
 
-### 缓冲区有空余或者有gorotine在接收channel数据的时候才不会发生阻塞
+> 缓冲区有空余或者有gorotine在接收channel数据的时候才不会发生阻塞
 
 ### 多路select
 
-```
+``` txt
 select 监听多个chanel 
-
 被编译器编译为 runtime.selectgo
-```
 
-```
 1. 按序加锁
 2. 乱序轮询
 3. 挂起等待
@@ -39,6 +44,8 @@ select 监听多个chanel
 6. 按序加锁
 ```
 
+### 底层原理
+
 1. 环形缓冲区
 2. 等待队列
 3. 阻塞与非阻塞式操作
@@ -46,10 +53,9 @@ select 监听多个chanel
 5. channel的send被编译器转换为runtime.chansend1()函数调用
 
 
+### 数据结构
 
-### channel的底层
-
-```
+``` txt
 hchan 数据结构
 
 1. "环形"缓冲区 (实际上是一个数组)
