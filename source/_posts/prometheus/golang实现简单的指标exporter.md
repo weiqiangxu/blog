@@ -1,5 +1,5 @@
 ---
-title: golang实现简单的指标exporter.md
+title: golang实现简单的指标exporter
 index_img: /images/prometheus_icon.jpeg
 tags:
   - prometheus
