@@ -1,5 +1,5 @@
 navbar:
-  blog_title: xuweiqiang's blog
+  blog_title: xuweiqiang's Notebook
   menu:
     - { key: '首页', link: '/', icon: 'iconfont icon-home-fill' ,name: '首页'}
     - { key: '归档', link: '/archives/', icon: 'iconfont icon-tags-fill' ,name: '归档'}
