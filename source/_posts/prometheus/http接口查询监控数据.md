@@ -1,6 +1,6 @@
 ---
 title: http接口查询监控数据
-index_img: /images/prometheus.jpeg
+index_img: /images/prometheus_icon.jpeg
 tags:
   - prometheus
   - api
@@ -8,6 +8,7 @@ tags:
 categories:
   - prometheus
 date: 2023-04-10 06:40:12
+excerpt: 使用docker搭建prometheus并且用node exporter采集cpu、指标等，通过http api接口查看监控数据，分别是范围查询和即时查询
 ---
 
 ### 采集node exporter的监控指标

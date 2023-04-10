@@ -1,6 +1,6 @@
 ---
 title: prometheus告警
-index_img: /images/prometheus.jpeg
+index_img: /images/prometheus_icon.jpeg
 tags:
   - prometheus
   - 告警
@@ -71,6 +71,8 @@ $ curl http://localhost:9090/api/v1/alerts
     "status": "success"
 }
 ```
+
+3. 安装altert manager
 
 ### 参考资料
 

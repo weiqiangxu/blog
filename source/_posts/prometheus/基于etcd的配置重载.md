@@ -1,6 +1,6 @@
 ---
 title: 基于ETCD的配置热加载
-index_img: /images/prometheus.jpeg
+index_img: /images/prometheus_icon.jpeg
 tags:
   - prometheus
 categories:

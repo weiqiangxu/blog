@@ -1,6 +1,6 @@
 ---
 title: 本地启动prometheus服务
-index_img: /images/prometheus.jpeg
+index_img: /images/prometheus_icon.jpeg
 banner_img: /images/bg/1.jpg
 tags:
   - prometheus
