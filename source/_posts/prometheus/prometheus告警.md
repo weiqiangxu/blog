@@ -7,6 +7,7 @@ tags:
 categories:
   - prometheus
 date: 2023-04-10 06:40:12
+excerpt: 如何配置常用的告警规则以及自定义告警推送
 ---
 
 1. 如何配置告警规则

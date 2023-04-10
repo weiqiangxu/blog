@@ -61,3 +61,4 @@ fun_features:
     typeSpeed: 70 # 打印速度
     cursorChar: "_" # 游标字符
     loop: false # 是否循环播放效果
+favicon: /images/icon/favicon.svg

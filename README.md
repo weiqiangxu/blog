@@ -12,6 +12,7 @@ categories:
   - gmp
 date: 2013-11-06 06:40:12
 sticky: 100
+excerpt: 摘要
 ```
 
 ### 部署命令
@@ -25,3 +26,5 @@ Hexo d	推送到github
 [weiqiangxu.github.io](https://github.com/weiqiangxu/weiqiangxu.github.io)
 
 [fluid-dev/hexo-theme-fluid](https://github.com/fluid-dev/hexo-theme-fluid)
+
+[https://hexo.fluid-dev.com/docs/](https://hexo.fluid-dev.com/docs/)
