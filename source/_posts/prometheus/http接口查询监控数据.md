@@ -8,10 +8,10 @@ tags:
 categories:
   - prometheus
 date: 2023-04-10 06:40:12
-excerpt: 使用docker搭建prometheus并且用node exporter采集cpu、指标等，通过http api接口查看监控数据，分别是范围查询和即时查询
+excerpt: 使用docker搭建prometheus并且本地运行node exporter，用于采集本机cpu、内存等指标，通过http api接口查看监控数据，分别是范围查询和即时查询
 ---
 
-### 采集node exporter的监控指标
+### 运行本机的node exporter采集指标
 
 [http://127.0.0.1:9090/graph](http://127.0.0.1:9090/graph)
 
@@ -57,6 +57,17 @@ $ kill -HUP pid
 $ curl -X POST http://127.0.0.1/-/reload
 ```
 [http://127.0.0.1:9090/targets?search=](http://10.202.40.237:9090/targets?search=)
+
+#### 使用docker运行node exporter采集指标
+
+``` bash
+docker run -d \
+  --name node_exporter \
+  --network p_net \
+  --network-alias node_exporter \
+  -p 9100:9100 \
+  quay.io/prometheus/node-exporter
+```
 
 #### cpu指标查看
 ``` bash
@@ -158,7 +169,7 @@ sum by(instance) (irate(node_network_transmit_bytes{device!~"bond.*?|lo"}[5m]))
 2. 启动一个容器的prometheus
 
 ``` bash
-# prometheus.yml
+# prometheus.yml 监控本机
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
@@ -170,8 +181,20 @@ scrape_configs:
 ```
 
 ``` bash
+# prometheus.yml 监控容器
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+scrape_configs:
+  - job_name: "node_exporter"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["node_exporter:9100"]
+```
+
+``` bash
 $ docker run \
-    --name master \
+    --name node_exporter_prometheus \
     -d \
     -p 9090:9090 \
     --network p_net \
@@ -257,3 +280,4 @@ curl 'http://localhost:9090/api/v1/query_range?query=node_memory_free_bytes/(102
 [Linux性能之CPU使用率](http://www.west999.com/info/html/caozuoxitong/Linux/20200408/4668695.html)
 [Prometheus Node Exporter 常用监控指标](https://blog.csdn.net/qq_34556414/article/details/126003112)
 [在 HTTP API 中使用 PromQL](https://prometheus.fuckcloudnative.io/di-san-zhang-prometheus/di-4-jie-cha-xun/api)
+[容器监控实践—node-exporter](https://www.jianshu.com/p/e3c9fc929d8a/)
