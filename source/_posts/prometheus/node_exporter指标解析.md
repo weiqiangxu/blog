@@ -1,5 +1,5 @@
 ---
-title: http接口查询监控数据
+title: node_exporter指标解析
 index_img: /images/prometheus_icon.jpeg
 tags:
   - prometheus
@@ -8,7 +8,7 @@ tags:
 categories:
   - prometheus
 date: 2023-04-10 06:40:12
-excerpt: 使用docker搭建prometheus并且本地运行node exporter，用于采集本机cpu、内存等指标，通过http api接口查看监控数据，分别是范围查询和即时查询
+excerpt: 使用docker搭建prometheus和node exporter，解释本机cpu、内存等指标查看方式，以及如何通过http api接口查看监控数据
 ---
 
 ### 运行本机的node exporter采集指标
@@ -281,3 +281,4 @@ curl 'http://localhost:9090/api/v1/query_range?query=node_memory_free_bytes/(102
 [Prometheus Node Exporter 常用监控指标](https://blog.csdn.net/qq_34556414/article/details/126003112)
 [在 HTTP API 中使用 PromQL](https://prometheus.fuckcloudnative.io/di-san-zhang-prometheus/di-4-jie-cha-xun/api)
 [容器监控实践—node-exporter](https://www.jianshu.com/p/e3c9fc929d8a/)
+[Linux 查看磁盘空间](https://www.runoob.com/w3cnote/linux-view-disk-space.html)
