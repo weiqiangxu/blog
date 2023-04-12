@@ -259,8 +259,37 @@ alertmanager的高可用架构是：
 4. Silenced：已被静默，告警规则被设置为不产生告警。
 5. Inhibited：已被禁止，告警规则被设置为禁用告警。
 
+- Alertmanager的Webhook是什么
+
+``` bash
+Alertmanager的Webhook是一种机制，可以通过向指定URL发送HTTP POST请求来将警报发送到外部系统。
+Webhook可用于将警报通知转发到其他应用程序、服务或系统，或将其集成到自动化工作流程中。
+使用Webhook，可以将警报发送到任何支持HTTP接口的服务或应用程序。
+```
+
+- alertmanager如何查看历史告警
+```
+Alertmanager提供了HTTP API，可以通过该API来查询历史告警。
+
+具体来讲，可以通过以下API来获取历史告警：
+
+1. /api/v1/alerts：该API可以用来查询当前和历史告警。
+默认情况下，该API只查询当前处于pending、firing或者silenced状态的告警。
+为了查询历史告警，需要在请求参数中添加start和end参数，指定查询的时间范围。
+
+2. /api/v1/alerts/groups：该API可以用来查询当前和历史告警的分组信息。
+类似于上面的API，需要在请求参数中添加start和end参数来指定查询的时间范围。
+
+3. /api/v1/alerts/<alertname>/<instance>：该API可以用来查询指定告警名称和实例的历史告警。
+类似于上面的API，需要在请求参数中添加start和end参数来指定查询的时间范围。
+
+需要注意的是，默认情况下，Alertmanager只会保留最近2小时的历史告警。
+如果要查询更早期的历史告警，需要对Alertmanager进行配置
+将history配置项设置为一个大于0的值，以指定历史告警的保留时间。
+```
+
 ### 参考资料
 
 [Alertmanager高可用](https://yunlzheng.gitbook.io/prometheus-book/part-ii-prometheus-jin-jie/readmd/alertmanager-high-availability#chuang-jian-alertmanager-ji-qun)
-
 [https://github.com/prometheus/alertmanager](https://github.com/prometheus/alertmanager)
+[webhook的数据标准是什么](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)
