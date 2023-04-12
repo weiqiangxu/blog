@@ -1,7 +1,7 @@
 ---
 title: alertmanager高可用机制
 index_img: /images/prometheus_icon.jpeg
-banner_img: /images/bg/3.jpg
+banner_img: /images/bg/5.jpg
 tags:
   - alertmanager
   - 告警
@@ -231,6 +231,17 @@ alerting:
       - 127.0.0.1:9095
 ```
 
+### 总结
+
+alertmanager的高可用架构是：
+
+1. 多台实例之间启用集群通讯模式；
+2. prometheus各自向自己宿主机的alertmanager实例发送告警信息；
+3. 使用alertmanager路由将不同的告警（标签区分）发给不同的接受者；
+4. 使用alertmanager分组将告警合并；
+5. alertmanager自带的Firing有降噪作用；
+
+
 - alertmanager接收到告警之后处理流程怎么样的
 
 ``` bash
@@ -239,6 +250,14 @@ alerting:
 
 等待时间称为“等待聚合”（wait_for_aggregate）时间，可以在Alertmanager配置文件的route部分进行配置;
 ```
+
+- prometheus的alert有多少种状态
+
+1. Unfiring：告警规则触发，但没有达到告警阈值，未达到告警状态。
+2. Firing：告警规则触发，已达到告警阈值，处于告警状态。
+3. Pending：正在等待确认，已发送告警通知但还未确认。
+4. Silenced：已被静默，告警规则被设置为不产生告警。
+5. Inhibited：已被禁止，告警规则被设置为禁用告警。
 
 ### 参考资料
 

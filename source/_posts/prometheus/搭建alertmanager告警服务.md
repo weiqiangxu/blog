@@ -307,17 +307,12 @@ route:
 但是超过了这个时间（5min），有同一个组的告警到达，会在等待group_wait时间后立刻发送告警
 ```
 
-
-
 ### 主从多台alertmanager之下如何滤重告警
 ``` 
 多套Alertmanager。但是由于Alertmanager之间不存在并不了解彼此的存在，因此则会出现告警通知被不同的Alertmanager重复发送多次的问题
 
 Alertmanager引入了Gossip机制
 ```
-
-
-
 
 
 ### 参考资料
