@@ -99,25 +99,8 @@ Push-based同步告警发送状态
 
 > 当一个Alertmanager实例将告警通知发送给Receiver时，它会将该通知标记为“暂停发送”，同时向其他实例发送消息，告诉它们“我已经发送了这个告警通知，你们不用再发送了”。这种方式可以确保告警通知在多个实例之间被正确地合并，避免重复发送。剩余多个Alertmanager实例同时接收到相同的告警信息，并且它们之间的通信还没有完成，那么它们都会标记该告警信息为“暂停发送”，并在通信完成之后再决定由哪个实例发送该告警通知。因此，在Alertmanager中，重复发送同一告警通知的情况应该是非常少见的。
 
-<!-- ``` bash
-# 流程图解读
 
-1. 某个Alertmanager接收到告警，会等待一段时间（默认为30秒）看其他Alertmanager节点是否接到该告警
-2. 等待聚合时间结束后，Alertmanager集群仍然没有收到该告警的聚合，则它将发送给接收器（receiver）
-等待时间称为“等待聚合”（wait_for_aggregate）时间，可以在Alertmanager配置文件的route部分进行配置;
-``` -->
-
-<!-- ![alertmanager接收到告警之后如何处置](/images/am-notifi-pipeline.png) -->
-
-<!-- ![prometheus发送给alertmanager后告警流程](/images/am-gossip.png) -->
-
-
-
-### alertmanager集群只有最早接收到告警alertmanager节点才会发送给接收器是吗，其他节点不会发送给接收器是是吗
-
-
-
-### docker搭建alertmanager集群
+### 十、docker搭建alertmanager集群
 
 ``` yml
 # 集群模式下 alertmanager 绑定的 IP 地址和端口号
@@ -213,7 +196,7 @@ $ go install github.com/prometheus/alertmanager/examples/webhook
 $ webhook
 ```
 
-### 测试发送告警
+### 十一、测试发送告警
 
 ``` bash
 alerts1='[
@@ -234,7 +217,7 @@ curl -XPOST -d"$alerts1" http://localhost:9094/api/v1/alerts
 curl -XPOST -d"$alerts1" http://localhost:9095/api/v1/alerts
 ```
 
-### prometheus集群与alertmanager集群
+### 十二、prometheus配置
 
 ``` yml
 # 总的一句话就是：每个prometheus往alertmanager集群的所有机器发送告警
@@ -248,16 +231,13 @@ alerting:
       - 127.0.0.1:9095
 ```
 
-### 0.0.0.0和localhost和127.0.0.1之间什么关系
+- alertmanager接收到告警之后处理流程怎么样的
 
-``` txt
-0.0.0.0、localhost和127.0.0.1都是指向本地主机的IP地址，但是它们之间有所区别。
+``` bash
+1. 某个Alertmanager接收到告警，会等待一段时间（默认为30秒）看其他Alertmanager节点是否接到该告警
+2. 等待聚合时间结束后，Alertmanager集群仍然没有收到该告警的聚合，则它将发送给接收器（receiver）
 
-- 0.0.0.0是一种未指定特定网络地址的地址，在网络编程中通常用于表示所有的IP地址（包括本地主机和其他主机）
-- localhost是一个特殊的域名，它指向本地主机（即127.0.0.1），通常用于测试和开发等目的
-- 127.0.0.1是本机回环地址，即指向本地主机的IP地址，通常用于本地通信和测试等目的
-
-因此，这三者都是指向本地主机的地址，但是使用场景和用途略有区别
+等待时间称为“等待聚合”（wait_for_aggregate）时间，可以在Alertmanager配置文件的route部分进行配置;
 ```
 
 ### 参考资料
