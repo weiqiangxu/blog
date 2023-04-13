@@ -1,6 +1,6 @@
 ---
 title: 如何优雅的依据结构体拼接URL
-index_img: /images/bg/编程界面.jpeg
+index_img: /images/bg/文章通用.png
 tags:
   - golang
 categories:

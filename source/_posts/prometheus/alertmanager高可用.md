@@ -262,13 +262,41 @@ alertmanager的高可用架构是：
 - Alertmanager的Webhook是什么
 
 ``` bash
-Alertmanager的Webhook是一种机制，可以通过向指定URL发送HTTP POST请求来将警报发送到外部系统。
+Alertmanager的Webhook是一种机制，可以通过向指定URL发送HTTP、POST请求来将警报发送到外部系统。
 Webhook可用于将警报通知转发到其他应用程序、服务或系统，或将其集成到自动化工作流程中。
 使用Webhook，可以将警报发送到任何支持HTTP接口的服务或应用程序。
 ```
+``` go 
+package main
+
+import (
+    "time"
+    "io/ioutil"
+    "net/http"
+    "fmt"
+)
+
+type MyHandler struct{}
+
+func (am *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    body, err := ioutil.ReadAll(r.Body)
+    if err != nil {
+        fmt.Printf("read body err, %v\n", err)
+        return
+    }
+    fmt.Println(time.Now())
+    fmt.Printf("%s\n\n", string(body))
+}
+
+func main() {
+    http.Handle("/webhook", &MyHandler{})
+    http.ListenAndServe(":10000", nil)
+}
+```
 
 - alertmanager如何查看历史告警
-```
+
+``` txt
 Alertmanager提供了HTTP API，可以通过该API来查询历史告警。
 
 具体来讲，可以通过以下API来获取历史告警：
@@ -288,8 +316,12 @@ Alertmanager提供了HTTP API，可以通过该API来查询历史告警。
 将history配置项设置为一个大于0的值，以指定历史告警的保留时间。
 ```
 
+
+
 ### 参考资料
 
 [Alertmanager高可用](https://yunlzheng.gitbook.io/prometheus-book/part-ii-prometheus-jin-jie/readmd/alertmanager-high-availability#chuang-jian-alertmanager-ji-qun)
+
 [https://github.com/prometheus/alertmanager](https://github.com/prometheus/alertmanager)
+
 [webhook的数据标准是什么](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)
