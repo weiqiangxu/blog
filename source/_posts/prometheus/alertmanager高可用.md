@@ -9,6 +9,7 @@ tags:
 categories:
   - prometheus
 date: 2023-04-12 18:40:12
+excerpt: Alertmanager使用Gossip机制来解决消息在多台Alertmanager之间的传递问题，使用docker搭建集群验证告警滤重功能
 ---
 
 ### 一、官方推荐的高可用架构

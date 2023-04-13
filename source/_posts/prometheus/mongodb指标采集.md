@@ -8,10 +8,12 @@ tags:
   - golang
 categories:
   - prometheus
-date: 2023-04-12 18:40:12
+date: 2022-04-12 18:40:12
+excerpt: 采集golang/mongodb-driver的查询数据相关的性能指标
 ---
 
 ### 一、定义prometheus指标
+
 ``` go
 package tool
 
@@ -190,7 +192,6 @@ func main() {
     http.ListenAndServe(":2112", nil)
 }
 ```
-
 
 ### 相关资料
 

@@ -23,8 +23,9 @@ Hexo s	开启本地预览
 Hexo d	推送到github
 ```
 
+### 文档收藏
+
 [weiqiangxu.github.io](https://github.com/weiqiangxu/weiqiangxu.github.io)
-
 [fluid-dev/hexo-theme-fluid](https://github.com/fluid-dev/hexo-theme-fluid)
-
 [https://hexo.fluid-dev.com/docs/](https://hexo.fluid-dev.com/docs/)
+[markdown语法](https://www.imooc.com/wiki/markdownlesson/markdownoverview.html)
