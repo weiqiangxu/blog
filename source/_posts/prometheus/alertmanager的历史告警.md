@@ -134,6 +134,10 @@ receivers:
   - to: '435861851@qq.com' # 如果想发送多个人就以 ',' 做分割
     send_resolved: true
     html: '{{ template "email.html" . }}'   #使用自定义的模板发送
+- name: 'web.hook'
+  # webhook URL
+  webhook_configs:
+  - url: 'http://127.0.0.1:7979/webhook'
 ```
 
 ``` html
@@ -213,6 +217,15 @@ $ docker run -d \
 ]
 ```
 
+``` yml
+receivers:
+# webhook配置
+- name: 'web.hook'
+  # webhook URL
+  webhook_configs:
+  - url: 'http://127.0.0.1:9111/alertmanager/hook'
+```
+
 ### 五、prometheus 的 http api
 
 [官方手册 querying/api](https://prometheus.io/docs/prometheus/latest/querying/api/)
@@ -223,6 +236,7 @@ POST /api/v1/query
 GET /api/v1/query_range
 POST /api/v1/query_range
 ```
+
 
 ### 参考资料
 
