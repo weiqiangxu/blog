@@ -10,56 +10,10 @@ date: 2023-04-10 18:40:12
 excerpt: 使用docker和自定义指标搭建promethus服务、alertmanager服务，试用邮件告警功能
 ---
 
-### 启动prometheus
+### 一、启动alert manager
 
-1. 如何配置告警规则
-``` yml
-# my global config
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s 
-groups:
-- name: example
-  rules:
-  # 配置请求响应时常超过0.5s就告警
-  - alert: HighRequestLatency
-    expr: job:request_latency_seconds:mean5m{job="myjob"} > 0.5
-    for: 10m
-    labels:
-      severity: page
-    annotations:
-      summary: High request latency
-  # 配置内存低于10%就告警
-  - alert: HostOutOfMemory
-      expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
-      for: 2m
-      labels:
-        severity: warning
-      annotations:
-        summary: Host out of memory (instance {{ $labels.instance }})
-        description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-          # - alertmanager:9093
-
-scrape_configs:
-  - job_name: "prometheus"
-    static_configs:
-      - targets: ["localhost:9090"]
-```
-
-2. 告警方式
-
-```
-a. 自己实现定时任务，通过prometheus api接口获取告警数据，然后自己实现发邮件
-b. 使用alert manager告警（目前支持邮件、电话吗）
-```
-
-### docker启动alert manager
 1. 配置
+
 ``` bash
 $ mkdir -p /Users/xuweiqiang/Documents/alertmanager/
 $ mkdir -p /Users/xuweiqiang/Documents/alertmanager/template
@@ -67,11 +21,14 @@ $ touch /Users/xuweiqiang/Documents/alertmanager/config.yml
 $ touch /Users/xuweiqiang/Documents/alertmanager/template/email.tmpl
 $ cd /Users/xuweiqiang/Documents/alertmanager
 ```
+
 ``` bash
 $ vim /Users/xuweiqiang/Documents/alertmanager/alertmanager.yml
 $ touch /Users/xuweiqiang/Documents/alertmanager/template/email.tmpl
 ```
+
 ``` yml
+# config.yml
 global:
   resolve_timeout: 5m
   smtp_from: '435861851@qq.com' # 发件人
@@ -99,6 +56,7 @@ receivers:
     send_resolved: true
     html: '{{ template "email.html" . }}'   #使用自定义的模板发送
 ```
+
 ``` html
 {{ define "email.html" }}
 {{ range $i, $alert :=.Alerts }}
@@ -116,7 +74,8 @@ receivers:
 {{ end }}
 ```
 
-2. 启动
+2. 启动alertmanager
+
 ``` bash
 $ docker run -d \
     --network p_net \
@@ -127,18 +86,22 @@ $ docker run -d \
     prom/alertmanager:latest
 ```
 
-### 启动prometheus
-1. 设置
+### 二、启动prometheus
+
+1. 配置
+
 ``` bash
 $ touch /Users/xuweiqiang/Documents/alertmanager/prometheus.yml
-$ vim /Users/xuweiqiang/Documents/alertmanager/prometheus.yml
+$ mkdir -p /Users/xuweiqiang/Documents/alertmanager/rules
+$ touch /Users/xuweiqiang/Documents/alertmanager/rules/one.yml
 ```
+
 ``` yml
+# prometheus.yml
 global:
   scrape_interval:     5s 
   evaluation_interval: 5s 
 
-# Alertmanager configuration
 alerting:
   alertmanagers:
   - static_configs:
@@ -149,16 +112,14 @@ scrape_configs:
   - job_name: "request_count"
     metrics_path: '/metrics'
     static_configs:
-      - targets: ["docker.for.mac.host.internal:6969"] # 宿主机IP ifconfig获取 en0 的IP
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+      - targets: ["docker.for.mac.host.internal:6969"]
+      
 rule_files:
   - "/etc/prometheus/rules/*.yml"
 ```
-``` bash
-$ mkdir -p /Users/xuweiqiang/Documents/alertmanager/rules
-$ vim /Users/xuweiqiang/Documents/alertmanager/rules/one.yml
-```
+
 ``` yml
+# rules/one.yml
 groups:
 - name: hostStatsAlert
   rules:
@@ -188,7 +149,8 @@ groups:
       description: "{{ $labels.instance }} request count above 3 (current value: {{ $value }})"
 ```
 
-2. 启动
+2. 启动prometheus
+
 ``` bash
 $ docker run \
     --name alert_client \
@@ -201,26 +163,29 @@ $ docker run \
     --config.file=/etc/prometheus/prometheus.yml
 ```
 
-4. 模拟一个指标就是在本机启动一个request_counter指标
+### 三、模拟告警指标
 
 [golang实现简单的指标exporter](https://weiqiangxu.github.io/2023/04/10/prometheus/golang%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%9A%84%E6%8C%87%E6%A0%87exporter/)
 
 
-#### 告警状态
+### 相关疑问
+
+- 告警状态有哪些
 
 ```
 Inactive：这里什么都没有发生。
 Pending：已触发阈值，但未知足告警持续时间（即rule中的for字段）
-Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，通过处理，发送给接受者这样目的是屡次判断失败才发告警，减小邮件
+Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，通过处理，目的是屡次判断失败才发告警，减小邮件
 ```
 
-### prometheus告警机制
+- prometheus告警机制如何降噪的
 
 ``` txt
 # 简要描述：
 Prometheus会根据rules中的规则，不断的评估是否需要发出告警信息,
 如果满足规则中的条件，则会向alertmanagers中配置的地址发送告警
-告警是通过alertmanager配置的地址post告警,比如targets: [node1:8090']，则会向node1:8090/api/v2/alerts发送告警信息
+告警是通过alertmanager配置的地址post告警,比如targets: [node1:8090']
+则会向node1:8090/api/v2/alerts发送告警信息
 
 # 如何验证：
 自己实现alertmanger程序，来接收Prometheus发送的告警，并将告警打印出来
@@ -238,26 +203,24 @@ Prometheus会根据rules中的规则，不断的评估是否需要发出告警�
 如果设置为0则立刻告警
 ```
 
-### alertmanager处理告警信息机制
+- alertmanager处理告警信息有哪些重要机制
 
-```
-告警分组
-抑制
-静默
-延时
-```
+1. 路由: 不同的告警来源发给不同的收件人
+2. 分组: 相同的告警类型合并为一封告警
 
-### 什么情况下会有Firing状态值
+- 什么情况下会有Firing状态值
 
 ```
 Firing状态值通常在Prometheus规则中定义的触发条件成立时出现。
-也就是说，当监控指标满足预设的规则条件时，Prometheus会发出告警，并将告警状态设置为Firing，以通知用户进行相应的处理。
+也就是说，当监控指标满足预设的规则条件时，Prometheus会发出告警
+并将告警状态设置为Firing，以通知用户进行相应的处理。
 常见的情况包括CPU使用率过高、内存使用率超标、网络延迟过高等问题。
 
-这个状态值的意义在于，当你的机器一直处于cpu爆满或其他某一个状态值的时候，不会每隔一段时间发送告警，相当于降噪
+这个状态值的意义在于，当你的机器一直处于cpu爆满或其他某一个状态值的时候
+不会每隔一段时间发送告警，相当于降噪
 ```
 
-### 告警路由是什么
+- 告警路由是什么
 
 ``` yml
 route:
@@ -270,13 +233,14 @@ route:
     macth: 
       componnet: memcache
 ```
+
 ``` txt
 以上的路由达到的效果是：
 
 告警的标签匹配 component=database 的发送告警给 database-receiver
 ```
 
-### 告警分组是什么
+- 分组是什么
 
 ``` yml
 route:
@@ -288,12 +252,15 @@ route:
 ```
 
 ``` txt
-当某一台机器挂了以后，机器上的prometheus和mysql以及其他全部都挂了
-
-分组可以将这些所有告警合并为1封告警邮件
+当alertmanager在一分钟内收到6封告警
+其中3封邮件是instance=A
+领完3封邮件是instance=B
+并且group wait为1分钟以上
+在group wait期间收到的这6封告警
+会合并为2封告警信息
 ```
 
-```
+``` txt
 对于告警
 
 {alertname="NodeCPU",instance="peng01",...}
@@ -307,18 +274,16 @@ route:
 但是超过了这个时间（5min），有同一个组的告警到达，会在等待group_wait时间后立刻发送告警
 ```
 
-### 主从多台alertmanager之下如何滤重告警
+- 主从多台alertmanager之下如何滤重告警
+
 ``` 
-多套Alertmanager。但是由于Alertmanager之间不存在并不了解彼此的存在，因此则会出现告警通知被不同的Alertmanager重复发送多次的问题
-
-Alertmanager引入了Gossip机制
+Gossip协议下的集群
 ```
-
 
 ### 参考资料
 
-[Prometheus一条告警是怎么触发的](https://blog.csdn.net/ActionTech/article/details/82421894)
-[Prometheus发送告警机制](https://www.cnblogs.com/zydev/p/16848444.html)
-[开箱即用的 Prometheus 告警规则集](https://zhuanlan.zhihu.com/p/371967435)
-[使用Docker部署alertmanager并配置prometheus告警](https://cloud.tencent.com/developer/article/2211153)
-[告警的路由与分组](https://pshizhsysu.gitbook.io/prometheus/ff08-san-ff09-prometheus-gao-jing-chu-li/gao-jing-de-lu-you-yu-fen-zu)
+[csdn.net之Prometheus一条告警是怎么触发的](https://blog.csdn.net/ActionTech/article/details/82421894)
+[cnblogs.com之Prometheus发送告警机制](https://www.cnblogs.com/zydev/p/16848444.html)
+[zhuanlan.zhihu.com开箱即用的 Prometheus 告警规则集](https://zhuanlan.zhihu.com/p/371967435)
+[cloud.tencent.com使用Docker部署alertmanager并配置prometheus告警](https://cloud.tencent.com/developer/article/2211153)
+[pshizhsysu.gitbook.io告警的路由与分组](https://pshizhsysu.gitbook.io/prometheus/ff08-san-ff09-prometheus-gao-jing-chu-li/gao-jing-de-lu-you-yu-fen-zu)
