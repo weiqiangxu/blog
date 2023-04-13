@@ -21,33 +21,12 @@ date: 2022-07-28 10:13:01
 
 ### 二、Alertmanager的本地存储
 
-1. 本地存储格式和查看方式
-
 ``` bash
-Alertmanager可以通过本地存储存档文件格式为JSON。可以通过以下方法查看历史告警：
-
-1. 通过Alertmanager的Web界面查看历史告警
-
-在Alertmanager的Web界面中，可以通过点击"Alerts"按钮查看当前所有的告警信息
-
-2. 通过API接口查看历史告警
-
-Alertmanager提供了多种API接口，可以通过curl等工具来查询历史告警信息。
-/api/v1/alerts接口可以用于查询当前活动的告警
-而/api/v1/alerts/history接口用于查询历史告警信息。
-
-例如，可以通过以下命令来查询最近一小时内的所有告警：
-
-curl -XGET 'http://localhost:9093/api/v1/alerts/history?start='$(date -d '-1 hours' '+%s')'&end='$(date '+%s')
-
-以上命令中，-XGET用于指定HTTP请求方法为GET，start和end参数用于指定查询时间范围。
-
-3. 通过本地存储文件查看历史告警
-
-Alertmanager的本地存储文件默认存储在/var/lib/prometheus/alertmanager/目录下，直接打开文件
+# 本地存储格式和查看方式
+alertmanager没有本地存储（持久化通过webhook适配）
 ```
 
-### 服务搭建
+### 三、服务搭建
 
 #### a.启动prometheus
 
@@ -59,6 +38,7 @@ $ mkdir -p /Users/xuweiqiang/Desktop/alert/rules
 $ touch /Users/xuweiqiang/Desktop/alert/prometheus.yml
 $ touch /Users/xuweiqiang/Desktop/alert/rules/one.yml
 ```
+
 ``` yml
 # prometheus.yml
 global:
@@ -187,6 +167,63 @@ $ docker run -d \
     --config.file=/etc/alertmanager/alertmanager.yml
 ```
 
+### 四、alertmanager提供的http api
+
+[alertmanager 的http api接口](https://pshizhsysu.gitbook.io/prometheus/ff08-san-ff09-prometheus-gao-jing-chu-li/kuo-zhan-yue-du/alertmanagerde-api)
+[alertmanager 的http api接口描述文档](https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml)
+[http://localhost:9093/api/v2/alerts](http://localhost:9093/api/v2/alerts)
+
+``` json
+# alerts获取告警信息返回内容
+# 源代码地址 /code/alertmanager/api/v1/api.go
+# 依赖的api对象仅仅存储内存之中重启就丢失了这些告警信息了
+
+[
+    {
+        "annotations":{
+            "description":"localhost:6969 request count above 3 (current value: 9)",
+            "summary":"Instance localhost:6969 request count too much"
+        },
+        "endsAt":"2023-04-13T03:12:23.643Z",
+        "fingerprint":"33beb4a34b645d5c",
+        "receivers":[
+            {
+                "name":"email"
+            }
+        ],
+        "startsAt":"2023-04-13T03:08:23.643Z",
+        "status":{
+            "inhibitedBy":[
+
+            ],
+            "silencedBy":[
+
+            ],
+            "state":"active"
+        },
+        "updatedAt":"2023-04-13T03:08:26.484Z",
+        "generatorURL":"http://xxx.tab=1",
+        "labels":{
+            "alertname":"request_counter",
+            "instance":"docker.for.mac.host.internal:6969",
+            "job":"request_count",
+            "severity":"critical"
+        }
+    }
+]
+```
+
+### 五、prometheus 的 http api
+
+[官方手册 querying/api](https://prometheus.io/docs/prometheus/latest/querying/api/)
+
+```
+GET /api/v1/query
+POST /api/v1/query
+GET /api/v1/query_range
+POST /api/v1/query_range
+```
+
 ### 参考资料
 
 [Alertmanager告警全方位讲解](https://blog.csdn.net/agonie201218/article/details/126243110)
@@ -195,4 +232,4 @@ $ docker run -d \
 [官方webhook reveiver集成写法](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver)
 [查看webhook标准写法](https://github.com/tomtom-international/alertmanager-webhook-logger)
 [Alertsnitch: saves alerts to a MySQL database](https://gitlab.com/yakshaving.art/alertsnitch)
-
+[rate 和 irate 函数解析](https://pshizhsysu.gitbook.io/prometheus/prometheus/promql/nei-zhi-han-shu/rate)
