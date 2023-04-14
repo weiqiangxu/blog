@@ -234,7 +234,7 @@ alerting:
 
 ### 总结
 
-alertmanager的高可用架构是：
+Alertmanager的高可用架构是：
 
 1. 多台实例之间启用集群通讯模式；
 2. prometheus各自向自己宿主机的alertmanager实例发送告警信息；
@@ -242,6 +242,8 @@ alertmanager的高可用架构是：
 4. 使用alertmanager分组将告警合并；
 5. alertmanager自带的Firing有降噪作用；
 
+
+### 相关疑问
 
 - alertmanager接收到告警之后处理流程怎么样的
 

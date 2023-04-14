@@ -175,7 +175,8 @@ $ docker run \
 ```
 Inactive：这里什么都没有发生。
 Pending：已触发阈值，但未知足告警持续时间（即rule中的for字段）
-Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，通过处理，目的是屡次判断失败才发告警，减小邮件
+Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline
+        通过处理，目的是屡次判断失败才发告警，减小邮件
 ```
 
 - prometheus告警机制如何降噪的

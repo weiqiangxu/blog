@@ -9,7 +9,8 @@ date: 2023-04-11 09:40:12
 excerpt: 使用结构体拼接URL请求路径，优化写法，提升代码质量
 ---
 
-### 代码
+### 一、代码
+
 ``` go
 package tool
 
@@ -66,7 +67,7 @@ func BuildURLByStruct(path string, queryRange *QueryRange) (string, error) {
 
 ```
 
-### 单元测试
+### 二、单元测试
 
 ``` go
 func TestBuildURLByStruct(t *testing.T) {
@@ -106,7 +107,8 @@ func TestBuildURLByStruct(t *testing.T) {
 	}
 }
 ```
-### 输出结果
+### 三、输出结果
+
 ``` txt
 config_test.go:74: www.baidu.com?end=2&query=cpu_counter&start=1&step=15
 ```

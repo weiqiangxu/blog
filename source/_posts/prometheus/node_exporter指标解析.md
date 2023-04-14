@@ -11,22 +11,20 @@ date: 2023-04-10 06:40:12
 excerpt: 使用docker搭建prometheus和node exporter，解释本机cpu、内存等指标查看方式，以及如何通过http api接口查看监控数据
 ---
 
-### 运行本机的node exporter采集指标
-
-[http://127.0.0.1:9090/graph](http://127.0.0.1:9090/graph)
-
-[http://127.0.0.1:9100/metrics](http://127.0.0.1:9100/metrics)
+### 一、本机运行node-exporter
 
 1. 启动node exporter
+
 ``` bash
-nohup ./node_exporter > ./node_exporter.log 2>&1 &
-```
-``` bash
-curl 127.0.0.1:9100/metrics
+# 常驻进程启动
+$ nohup ./node_exporter > ./node_exporter.log 2>&1 &
+# 查看采集到的指标
+$ curl 127.0.0.1:9100/metrics
 ```
 
 2. 配置prometheus采集node exporter指标
-``` bash
+
+``` yml
 # prometheus.yml
 global:
   scrape_interval: 15s
@@ -50,17 +48,18 @@ scrape_configs:
       - targets: ["localhost:9100"]
 ```
 
-3. 重载配置
+3. 本地启动prometheus
+
 ``` bash
 $ nohup ./prometheus --config.file=prometheus.yml --web.enable-lifecycle > run.log 2>&1 &
 $ kill -HUP pid
 $ curl -X POST http://127.0.0.1/-/reload
 ```
-[http://127.0.0.1:9090/targets?search=](http://10.202.40.237:9090/targets?search=)
 
-#### 使用docker运行node exporter采集指标
+### 二、docker运行node-exporter
 
 ``` bash
+# docker内启动一个node-exporter
 docker run -d \
   --name node_exporter \
   --network p_net \
@@ -69,7 +68,10 @@ docker run -d \
   quay.io/prometheus/node-exporter
 ```
 
-#### cpu指标查看
+### 三、node-exporter指标解析
+
+1. cpu指标查看
+
 ``` bash
 # node exporter 指标解释
 # 要对节点进行 CPU 监控，需要用到 node_cpu_seconds_total 这个监控指标
@@ -103,7 +105,7 @@ sum(increase(node_cpu_seconds_total[1m])) by (instance)
 (1 - sum(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) / sum(rate(node_cpu_seconds_total[1m])) by (instance) ) * 100
 ```
 
-#### 内存监控
+2. 内存监控
 
 ``` bash
 available 是从应用程序的角度看到的可用内存
@@ -127,7 +129,8 @@ Mem:           1999         153        1063           8         782        1679
 Swap:          1023           0        1023
 ```
 
-#### 磁盘空间监控
+3. 磁盘空间监控
+
 ``` bash
 node_filesystem_* 相关的指标
 
@@ -136,7 +139,8 @@ node_filesystem_* 相关的指标
 (1 - node_filesystem_avail_bytes{fstype=~"ext4|xfs"} / node_filesystem_size_bytes{fstype=~"ext4|xfs"}) * 100
 ```
 
-#### 磁盘的读写监控
+4. 磁盘的读写监控
+
 ``` bash
 # 读 IO 使用 node_disk_reads_completed
 # 写 IO 使用 node_disk_writes_completed_total
@@ -151,7 +155,7 @@ sum by (instance) (rate(node_disk_writes_completed_total[5m]))
 rate(node_disk_reads_completed_total[5m]) + rate(node_disk_writes_completed_total[5m])
 ```
 
-#### 网络IO监控
+5. 网络IO
 
 ``` bash
 # 上行带宽需要用到的指标是 node_network_receive_bytes
@@ -162,25 +166,11 @@ sum by(instance) (irate(node_network_receive_bytes_total{device!~"bond.*?|lo"}[5
 sum by(instance) (irate(node_network_transmit_bytes{device!~"bond.*?|lo"}[5m]))
 ```
 
-### 如何读取
+### 四、docker启动prometheus采集指标
 
-1. 启动一个本地node exporter
+1. prometheus配置
 
-2. 启动一个容器的prometheus
-
-``` bash
-# prometheus.yml 监控本机
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-scrape_configs:
-  - job_name: "node_exporter"
-    metrics_path: "/metrics"
-    static_configs:
-      - targets: ["docker.for.mac.host.internal:9100"]
-```
-
-``` bash
+``` yml
 # prometheus.yml 监控容器
 global:
   scrape_interval: 15s
@@ -192,7 +182,10 @@ scrape_configs:
       - targets: ["node_exporter:9100"]
 ```
 
+2. 启动
+
 ``` bash
+# 启动prometheus
 $ docker run \
     --name node_exporter_prometheus \
     -d \
@@ -204,16 +197,19 @@ $ docker run \
     --config.file=/etc/prometheus/prometheus.yml
 ```
 
-#### 通过curl查看指标
+### 相关疑问
+
+- 剩余内存转换为MB单位
+
 ``` bash
 # node_memory_free_bytes 空闲内存多少MB
 node_memory_free_bytes/(1024*1024) 
 ```
 
-#### 瞬时数据查询
+- 如何通过http接口查看监控数据
 
 ``` bash
-curl 'http://localhost:9090/api/v1/query?query=node_memory_free_bytes/(1024*1024)'
+$ curl 'http://localhost:9090/api/v1/query?query=node_memory_free_bytes/(1024*1024)'
 
 # 返回结果
 {
@@ -236,13 +232,13 @@ curl 'http://localhost:9090/api/v1/query?query=node_memory_free_bytes/(1024*1024
 }
 ```
 
-#### 区间数据查询
+- 如何通过http接口区间数据查询
 
 ``` bash
 # 查询区间数据 start和end分别表示开始和结束的unix_timestamp、step表示间隔多少秒1条数据 
 # 1680862582表示2023-04-07 18:16:22 ； 1680862782表示2023-04-07 18:19:42
 # curl 'http://localhost:9090/api/v1/query_range?query=&start=&end=&step='
-curl 'http://localhost:9090/api/v1/query_range?query=node_memory_free_bytes/(1024*1024)&start=1680862582&end=1680862782&step=15'
+$ curl 'http://localhost:9090/api/v1/query_range?query=node_memory_free_bytes/(1024*1024)&start=1680862582&end=1680862782&step=15'
 
 #返回结果 每一个时刻的空闲内存
 {

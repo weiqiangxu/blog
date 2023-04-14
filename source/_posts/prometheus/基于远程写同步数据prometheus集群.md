@@ -1,5 +1,5 @@
 ---
-title: 基于远程写模式的主从同步
+title: 基于远程写同步数据prometheus集群
 index_img: /images/prometheus_icon.jpeg
 tags:
   - prometheus
@@ -8,7 +8,7 @@ categories:
 date: 2023-04-08 06:40:12
 ---
 
-### 一、从库
+### 一、从库搭建
 
 1. 创建写主机配置
 
@@ -41,7 +41,7 @@ $ docker run \
 ```
 
 
-### 二、主库
+### 二、主库搭建
 
 1. 创建配置文件
 
