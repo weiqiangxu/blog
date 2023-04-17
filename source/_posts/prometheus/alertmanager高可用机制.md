@@ -232,6 +232,21 @@ alerting:
       - 127.0.0.1:9095
 ```
 
+### 十二、指纹算法
+
+``` go
+// provides a hash-capable representation of a Metric.
+model.Fingerprint uint64
+
+// Fingerprint returns a Metric's Fingerprint.
+// 生成指纹算法
+type func (m Metric) Fingerprint() Fingerprint
+
+// Equal compares the metrics.
+// 指标比对逻辑
+func (m Metric) Equal(o Metric) bool
+```
+
 ### 总结
 
 Alertmanager的高可用架构是：
@@ -319,7 +334,12 @@ Alertmanager提供了HTTP API，可以通过该API来查询历史告警。
 将history配置项设置为一个大于0的值，以指定历史告警的保留时间。
 ```
 
+- 对于proemtheus的联邦机制而言，是否会因为标签不一致导致重复发送呢
 
+``` txt
+取决于备用节点从主节点拉取指标的时候是否保留原有标签(honor_labels:true)
+更改标签会导致生成的指纹不一致导致重复发送告警
+```
 
 ### 参考资料
 
