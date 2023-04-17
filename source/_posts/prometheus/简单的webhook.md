@@ -97,3 +97,8 @@ alerts1='[
 
 curl -XPOST -d"$alerts1" http://localhost:9095/api/v1/alerts
 ```
+
+### 参考资料
+
+[官方手册alerting/configuration/#webhook_config](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config)
+[官方推荐webhook实现](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver)
