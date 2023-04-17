@@ -197,6 +197,87 @@ $ docker run \
     --config.file=/etc/prometheus/prometheus.yml
 ```
 
+### 五、golang调用接口查询各个指标
+
+``` go
+package bingo_monitor
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/prometheus/client_golang/api"
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/common/model"
+	"time"
+)
+
+const PrometheusServer = "http://127.0.0.1:9090"
+const RangeQueryPath = "api/v1/query_range"
+
+type QueryRangeType string
+
+const (
+	// FreeMemory 获取剩余内存大小 单位: MB
+	FreeMemory QueryRangeType = "node_memory_MemFree_bytes/(1024*1024)"
+
+	// TotalMemory 获取总内存大小 单位 MB
+	TotalMemory QueryRangeType = "node_memory_MemTotal_bytes/(1024*1024)"
+
+	// MemoryUsageRate 可用内存剩余（百分比）
+	MemoryUsageRate QueryRangeType = "(1- (node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes) * 100"
+
+	// FileSystemUsageRate 磁盘空间使用率(百分比) df -h 验证正确
+	FileSystemUsageRate QueryRangeType = "(1 - node_filesystem_avail_bytes{fstype=~\"ext4|xfs\"} / node_filesystem_size_bytes{fstype=~\"ext4|xfs\"}) * 100"
+
+	// CPUUsageRate cpu消耗占用
+	CPUUsageRate QueryRangeType = "(1 - sum(rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) by (instance) / sum(rate(node_cpu_seconds_total[1m])) by (instance) ) * 100"
+
+	// DiskRate 磁盘读写IO
+	DiskRate QueryRangeType = "rate(node_disk_reads_completed_total[5m]) + rate(node_disk_writes_completed_total[5m])"
+
+	// DownloadNetwork 下行带宽
+	DownloadNetwork QueryRangeType = "sum by(instance) (irate(node_network_transmit_bytes_total{device!~\"bond.*?|lo\"}[5m]))"
+
+	// UPNetwork 上行带宽
+	UPNetwork QueryRangeType = "sum by(instance) (irate(node_network_receive_bytes_total{device!~\"bond.*?|lo\"}[5m]))"
+)
+
+// ObtainChangesInIdleMemory 获取空闲内存变化
+func ObtainChangesInIdleMemory(queryType QueryRangeType, start time.Time, end time.Time, step time.Duration) ([]model.SamplePair, error) {
+	client, err := api.NewClient(api.Config{
+		Address: PrometheusServer,
+	})
+	if err != nil {
+		return nil, err
+	}
+	v1api := v1.NewAPI(client)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	r := v1.Range{
+		Start: start,
+		End:   end,
+		Step:  step,
+	}
+	result, warnings, err := v1api.QueryRange(ctx, string(queryType), r, v1.WithTimeout(5*time.Second))
+	if err != nil {
+		return nil, err
+	}
+	if len(warnings) > 0 {
+		return nil, fmt.Errorf("warning:%v", warnings)
+	}
+	if result.Type() != model.ValMatrix {
+		return nil, errors.New("query result is not ValMatrix")
+	}
+	z := result.(model.Matrix)
+	var metricsDataList []model.SamplePair
+	for _, v := range z {
+		metricsDataList = append(metricsDataList, v.Values...)
+	}
+	return metricsDataList, nil
+}
+```
+
 ### 相关疑问
 
 - 剩余内存转换为MB单位
