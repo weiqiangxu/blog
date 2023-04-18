@@ -315,11 +315,31 @@ yum-config-manager --add-repo用于添加一个新的yum软件源地址，并将
 以便在软件包依赖项解决方案中更好地满足其需求。
 ```
 
+- kuernetes.repo
+
+``` bash
+# repo地址
+cat /etc/yum.repos.d/kubernetes.repo
+```
+
+``` bash
+cat << EOF > /etc/yum.repos.d/kubernetes.repo 
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+```
+
+
 ### 相关资料
 
 [kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 [docker离线安装](https://download.docker.com/linux/static/stable)
-
+[kubernetes/yum/repos各个架构下的](https://mirrors.aliyun.com/kubernetes/yum/repos/)
 
 
 
