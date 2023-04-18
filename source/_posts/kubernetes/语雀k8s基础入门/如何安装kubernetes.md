@@ -82,7 +82,8 @@ net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 
-# 生效
+# 重新加载系统参数并应用任何更改
+# 通常用于修改系统级别的参数，例如内核参数、网络配置等
 $ sysctl --system
 ```
 
