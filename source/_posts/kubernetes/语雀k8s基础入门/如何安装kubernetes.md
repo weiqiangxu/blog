@@ -3,10 +3,9 @@ title: 如何安装kubernetes
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
-  - prometheus
-  - linux
+  - kubernetes
 categories:
-  - prometheus
+  - kubernetes
 date: 2023-04-18 18:40:12
 excerpt: 使用kubeadm搭建kubenertes环境
 sticky: 1
@@ -40,7 +39,6 @@ $ hostnamectl set-hostname k8s-node1
 # 注意：这里的IP地址是机器的局域网IP地址
 $ cat >> /etc/hosts << EOF
 10.0.20.2 k8s-master
-10.0.8.13 k8s-master
 EOF
 ```
 
@@ -114,10 +112,12 @@ $ docker version
 $ sudo mkdir -p /etc/docker
 
 # 设置docker国内镜像
+# tee: 该命令用于向文件中写入内容，并在标准输出中显示相同的内容
+# 将大括号的空JSON对象写入到/etc/docker/daemon.json文件中
 $ sudo tee /etc/docker/daemon.json <<-'EOF'
 {
   "exec-opts": ["native.cgroupdriver=systemd"], 
-  "registry-mirrors": ["https://du3ia00u.mirror.aliyuncs.com"], 
+  "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"], 
   "live-restore": true,
   "log-driver":"json-file",
   "log-opts": {"max-size":"500m", "max-file":"3"},
@@ -287,6 +287,32 @@ Docker Engine: https://docs.docker.com/engine/install/binaries/
 Docker Compose: https://github.com/docker/compose/releases
 Docker Machine: https://github.com/docker/machine/releases
 注意：离线安装包的下载可能比在线安装包的下载时间更长，建议选择适合自己网络和设备的安装方式。
+```
+
+- 路径的docker.repo是干嘛的
+
+``` bash
+$ cd /etc/yum.repos.d/docker.repo 
+
+# etc/yum.repos.d/docker.repo 是一个yum源配置文件，用于添加docker的官方仓库到yum源中。
+# 通过该文件，可以使用yum命令在CentOS/RHEL系统中安装、更新、卸载docker软件包
+```
+
+- Failed to download metadata for repo ‘docker-ce-stable
+
+``` bash
+$ cd /etc/yum.repos.d
+$ rm -rf docker*
+$ yum update
+$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+- yum-config-manager --add-repo干嘛用的
+
+```
+yum-config-manager --add-repo用于添加一个新的yum软件源地址，并将其保存在yum配置文件中
+以便yum命令可以从该软件源中下载和安装软件包。该命令可以帮助用户获得更多的软件源
+以便在软件包依赖项解决方案中更好地满足其需求。
 ```
 
 ### 相关资料
