@@ -10,6 +10,7 @@ tags:
 categories:
   - prometheus
 date: 2022-07-26 17:45:01
+sticky: 1
 ---
 
 ### 一、定义各个prometheus指标

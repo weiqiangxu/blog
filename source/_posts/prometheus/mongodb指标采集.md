@@ -10,6 +10,7 @@ categories:
   - prometheus
 date: 2022-04-12 18:40:12
 excerpt: 采集golang/mongodb-driver的查询数据相关的性能指标
+sticky: 1
 ---
 
 ### 一、定义prometheus指标

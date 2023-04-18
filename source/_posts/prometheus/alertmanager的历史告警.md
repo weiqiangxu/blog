@@ -9,6 +9,7 @@ tags:
 categories:
   - prometheus
 date: 2022-07-28 10:13:01
+sticky: 1
 ---
 
 

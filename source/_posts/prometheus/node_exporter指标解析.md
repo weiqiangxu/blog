@@ -9,6 +9,7 @@ categories:
   - prometheus
 date: 2023-04-10 06:40:12
 excerpt: 使用docker搭建prometheus和node exporter，解释本机cpu、内存等指标查看方式，以及如何通过http api接口查看监控数据
+sticky: 1
 ---
 
 ### 一、本机运行node-exporter

@@ -9,6 +9,7 @@ categories:
   - prometheus
 date: 2023-04-10 18:40:12
 excerpt: 编写简单的webhook程序验证alertmanager告警服务
+sticky: 1
 ---
 
 ### 一、webhook

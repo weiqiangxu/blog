@@ -9,6 +9,7 @@ categories:
   - prometheus
 date: 2023-04-12 18:40:12
 excerpt: 通过top命令和prometheus的metrics端点查看内存占用
+sticky: 1
 ---
 
 ### 一、top的RES

@@ -8,6 +8,7 @@ categories:
   - prometheus
 date: 2023-04-10 18:40:12
 excerpt: 使用docker和自定义指标搭建promethus服务、alertmanager服务，试用邮件告警功能
+sticky: 1
 ---
 
 ### 一、启动alert manager

@@ -7,6 +7,7 @@ categories:
   - prometheus
 date: 2023-04-10 06:40:12
 excerpt: 使用go实现简单的指标用于测试prometheus
+sticky: 1
 ---
 
 ### code

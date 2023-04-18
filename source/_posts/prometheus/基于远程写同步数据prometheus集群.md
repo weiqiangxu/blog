@@ -6,6 +6,7 @@ tags:
 categories:
   - prometheus
 date: 2023-04-08 06:40:12
+sticky: 1
 ---
 
 ### 一、从库搭建

@@ -10,6 +10,7 @@ tags:
 categories:
   - prometheus
 date: 2022-07-26 10:13:01
+sticky: 1
 ---
 
 ### 一、定义mongo监听器指标采集
