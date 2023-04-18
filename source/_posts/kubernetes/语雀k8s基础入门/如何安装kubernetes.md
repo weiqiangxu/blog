@@ -277,10 +277,22 @@ $ FLANNEL_MTU=1450
 $ FLANNEL_IPMASQ=true
 ```
 
+### 相关问题
+
+- docker离线安装包
+
+``` txt
+Docker离线安装包官方下载链接：
+Docker Engine: https://docs.docker.com/engine/install/binaries/
+Docker Compose: https://github.com/docker/compose/releases
+Docker Machine: https://github.com/docker/machine/releases
+注意：离线安装包的下载可能比在线安装包的下载时间更长，建议选择适合自己网络和设备的安装方式。
+```
+
 ### 相关资料
 
 [kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
-
+[docker离线安装](https://download.docker.com/linux/static/stable)
 
 
 
