@@ -58,15 +58,18 @@ $ ntpdate time.windows.com
 $ getenforce
 ```
 
-```
-#永久关闭selinux，需要重启
-sed -i 's/enforcing/disabled/' /etc/selinux/config
+``` bash
+# 永久关闭selinux，需要重启
+# 使用sed工具在/etc/selinux/config文件中查找包含“enforcing”的行并将其替换为“disabled”
+$ sed -i 's/enforcing/disabled/' /etc/selinux/config
 ```
 
 #### 6.关闭swap分区
 
 ``` bash
-#永久关闭swap分区，需要重启：
+# 永久关闭swap分区，需要重启：
+# 使用sed工具在/etc/fstab文件中查找任何包含“swap”的行
+# 并在每行前加上“#”注释符，从而将它们全部注释掉
 $ sed -ri 's/.*swap.*/#&/' /etc/fstab
 ```
 
