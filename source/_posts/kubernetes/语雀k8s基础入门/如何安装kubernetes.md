@@ -1,0 +1,289 @@
+---
+title: 如何安装kubernetes
+index_img: /images/bg/k8s.webp
+banner_img: /images/bg/5.jpg
+tags:
+  - prometheus
+  - linux
+categories:
+  - prometheus
+date: 2023-04-18 18:40:12
+excerpt: 使用kubeadm搭建kubenertes环境
+sticky: 1
+---
+
+### 一、环境准备
+
+CentOS 7.6 64bit 2核 2G * 2 ( 操作系统的版本至少在7.5以上 )
+
+
+#### 1.防火墙
+
+``` bash
+$ systemctl stop firewalld
+$ systemctl disable firewalld
+```
+
+#### 2.设置主机名
+
+``` bash
+# 在master节点执行
+$ hostnamectl set-hostname k8s-master
+
+# 在其他节点执行
+$ hostnamectl set-hostname k8s-node1
+```
+
+#### 3.主机域名解析
+
+``` bash
+# 注意：这里的IP地址是机器的局域网IP地址
+$ cat >> /etc/hosts << EOF
+10.0.20.2 k8s-master
+10.0.8.13 k8s-master
+EOF
+```
+
+#### 4.统一时间
+
+``` bash
+$ yum install ntpdate -y
+$ ntpdate time.windows.com
+```
+
+#### 5.关闭selinux
+
+``` bash
+#查看selinux是否开启
+$ getenforce
+```
+
+```
+#永久关闭selinux，需要重启
+sed -i 's/enforcing/disabled/' /etc/selinux/config
+```
+
+#### 6.关闭swap分区
+
+``` bash
+#永久关闭swap分区，需要重启：
+$ sed -ri 's/.*swap.*/#&/' /etc/fstab
+```
+
+#### 7.将桥接的IPv4流量传递到iptables的链
+
+``` bash
+#在每个节点上将桥接的IPv4流量传递到iptables的链
+$ cat > /etc/sysctl.d/k8s.conf << EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+# 生效
+$ sysctl --system
+```
+
+### 二、docker和二进制程序
+
+
+#### 1.安装docker
+
+``` bash
+# 从阿里云的镜像站点上下载docker-ce的yum源配置文件docker-ce.repo
+# 并将其保存到本地的/etc/yum.repos.d/目录下
+$ wget https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo -O /etc/yum.repos.d/docker-ce.repo
+
+# 各节点安装docker
+$ yum -y install docker-ce-18.06.3.ce-3.el7
+
+# docker添加到系统服务并启动docker
+$ systemctl enable docker && systemctl start docker
+
+# 验证安装结果
+$ docker version
+```
+
+#### 2.设置Docker镜像加速器：
+
+``` bash
+# 创建docker配置
+$ sudo mkdir -p /etc/docker
+
+# 设置docker国内镜像
+$ sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "exec-opts": ["native.cgroupdriver=systemd"], 
+  "registry-mirrors": ["https://du3ia00u.mirror.aliyuncs.com"], 
+  "live-restore": true,
+  "log-driver":"json-file",
+  "log-opts": {"max-size":"500m", "max-file":"3"},
+  "storage-driver": "overlay2"
+}
+EOF
+
+# systemctl重载服务配置文件
+$ sudo systemctl daemon-reload
+
+# 重启docker服务
+$ sudo systemctl restart docker
+```
+
+#### 3.kubernetes镜像源
+
+``` bash
+$ cat > /etc/yum.repos.d/kubernetes.repo << EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+```
+
+#### 4.安装kubeadm\kubelet\kubectl
+
+``` bash
+# install
+$ yum install -y kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0
+
+# 启用kubelet服务,开机自启动
+$ systemctl enable kubelet
+```
+
+#### 5.kubeadm初始化集群
+
+``` bash
+# 查看k8s所需的镜像
+$ kubeadm config images list
+
+# 部署k8s的master节点
+# apiserver-advertise-address更改为部署master的节点的局域网IP地址
+# pod-network-cidr 集群中Pod的IP地址段 常用的有10.244.0.0/16
+# service-cidr.集群中Service的IP地址段.默认为10.96.0.0/12
+kubeadm init \
+  --apiserver-advertise-address=192.168.18.100 \
+  --image-repository registry.aliyuncs.com/google_containers \
+  --kubernetes-version v1.18.0 \
+  --service-cidr=10.96.0.0/12 \
+  --pod-network-cidr=10.244.0.0/16
+```
+
+#### 8.集群配置信息
+
+``` bash
+# 配置信息指定Kubernetes API的访问地址、认证信息、命名空间、资源配额以及其他配置参数
+$ mkdir -p $HOME/.kube
+
+# 拷贝文件
+$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+# 将配置文件的所有权赋予给当前用户
+$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+### 三、部署CNI网络插件
+
+``` bash
+# 查看节点状态
+$ kubectl get nodes 
+
+# 获取yml
+$ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# 安装
+$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# 查看集群pods确认是否成功
+$ kubectl get pods -n kube-system
+
+# 查看节点状态
+$ kubectl get nodes
+
+# 查看集群健康状况(显示了控制平面组件
+# Control Plane Component）的健康状态
+# etcd/kube-apiserver/kube-controller-manager/kube-scheduler
+$ kubectl get cs
+
+# 显示集群的相关信息(DNS\证书\密钥等)
+$ kubectl cluster-info
+```
+
+### 四、部署nginx服务测试集群
+
+``` bash
+# 部署Nginx
+$ kubectl create deployment nginx --image=nginx:1.14-alpine
+
+# 暴露端口
+$ kubectl expose deployment nginx --port=80 --type=NodePort
+
+# 查看服务状态需要看到nginx服务为running
+$ kubectl get pods,svc
+
+# 访问nginx服务需要看到输出Welcome to nginx!
+curl k8s-master:30185
+```
+
+### 五、其他节点部署服务并加入到集群之中
+
+``` bash
+# worker node 安装Docker/kubeadm/kubelet/kubectl
+# master节点生成token(2小时过期)
+$ kubeadm token create --print-join-command
+
+# 生成一个永不过期的token
+$ kubeadm token create --ttl 0 --print-join-command
+
+# 在worker node执行
+# --token：用于新节点加入集群的令牌
+# --discovery-token-ca-cert-hash：用于验证令牌的证书哈希值(集群初始化生成)
+# --control-plane：如果要将新节点添加到控制平面，则需要指定此选项
+# --node-name：指定新节点的名称
+$ kubeadm join 192.168.18.100:6443 \
+    --token xxx \
+    --discovery-token-ca-cert-hash sha256:xxx
+```
+
+### 六、相关疑问
+
+
+- kubeadmn如何重新初始化
+
+``` bash
+$ kubeadm reset
+```
+
+- 查看pod详情
+
+``` bash
+$ kubectl describe pod $pod_name
+$ kubectl describe pod nginx-deployment-xxx
+$ kubectl describe pod mongodb -n NamespaceName
+```
+
+- run/flannel/subnet.env无法找到
+
+``` bash
+# 当错误是/run/flannel/subnet.env无法找到时候手动创建subnet.env内容是
+$ FLANNEL_NETWORK=10.244.0.0/16
+$ FLANNEL_SUBNET=10.244.0.1/24
+$ FLANNEL_MTU=1450
+$ FLANNEL_IPMASQ=true
+```
+
+### 相关资料
+
+[kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+
+
+
+
+
+
+
+
+
+
+
