@@ -183,13 +183,23 @@ kubeadm init \
   --pod-network-cidr=10.244.0.0/16
 ```
 
+``` bash
+# 创建成功输出
+$ Your Kubernetes control-plane has initialized successfully!
+
+$ kubeadm join 192.168.1.1:6443 --token xxx.xx \
+    --discovery-token-ca-cert-hash sha256:xxx
+```
+
 #### 8.集群配置信息
 
 ``` bash
 # 配置信息指定Kubernetes API的访问地址、认证信息、命名空间、资源配额以及其他配置参数
 $ mkdir -p $HOME/.kube
 
-# 拷贝文件
+# 将admin.conf复制到当前用户的$HOME/.kube/config
+# kubectl命令在使用时默认使用该文件
+# 否则使用kubectl命令时必须明确指定配置文件路径或设置环境变量
 $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 
 # 将配置文件的所有权赋予给当前用户
@@ -204,15 +214,10 @@ $ kubectl get nodes
 
 # 获取yml
 $ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
-# 安装
-$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+$ kubectl apply -f kube-flannel.yml
 
 # 查看集群pods确认是否成功
 $ kubectl get pods -n kube-system
-
-# 查看节点状态
-$ kubectl get nodes
 
 # 查看集群健康状况(显示了控制平面组件
 # Control Plane Component）的健康状态
@@ -236,7 +241,7 @@ $ kubectl expose deployment nginx --port=80 --type=NodePort
 $ kubectl get pods,svc
 
 # 访问nginx服务需要看到输出Welcome to nginx!
-curl k8s-master:30185
+$ curl k8s-master:30185
 ```
 
 ### 五、其他节点部署服务并加入到集群之中
@@ -246,7 +251,7 @@ curl k8s-master:30185
 # master节点生成token(2小时过期)
 $ kubeadm token create --print-join-command
 
-# 生成一个永不过期的token
+# master节点生成一个永不过期的token
 $ kubeadm token create --ttl 0 --print-join-command
 
 # 在worker node执行
@@ -260,7 +265,6 @@ $ kubeadm join 192.168.18.100:6443 \
 ```
 
 ### 六、相关疑问
-
 
 - kubeadmn如何重新初始化
 
@@ -361,6 +365,40 @@ kube-flannel使用VXLAN或UDP封装技术来创建一个覆盖整个集群的扁
 5. cloud-controller-manager：云控制器管理器，负责管理云平台上的资源，如EC2、ELB等，并将这些资源与Kubernetes集群进行集成。
 
 > 这些组件共同组成了Kubernetes控制平面，负责管理和控制整个Kubernetes集群的运行状态。
+
+- kubectl get svc的输出解释
+
+``` bash
+$ NAME：Service名称。
+$ TYPE：Service类型。通常有ClusterIP、NodePort、LoadBalancer和ExternalName四种类型。
+$ CLUSTER-IP：Service的Cluster IP地址。
+$ EXTERNAL-IP：Service的外部IP地址（仅适用于LoadBalancer类型）。
+$ PORT(S)：Service暴露的端口号和协议。
+$ AGE：Service被创建后的时间。
+
+例如，以下是一段`kubectl get svc`命令的输出结果：
+
+NAME           TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)          AGE
+my-service     ClusterIP      10.0.0.5        <none>          80/TCP           5d
+app-service    LoadBalancer   10.0.0.15       203.0.113.10   80:30000/TCP     2d
+
+解释：
+
+$ `my-service`是一个ClusterIP类型的Service，其Cluster IP地址为`10.0.0.5`，暴露的端口号为80/TCP。
+$ `app-service`是一个LoadBalancer类型的Service，其Cluster IP地址为`10.0.0.15`
+    暴露的端口号为80/TCP，同时外部IP地址为`203.0.113.10`，将请求转发到NodePort `30000`上
+```
+
+- linux怎么样验证一个端口通不通
+
+``` bash
+# telnet
+$ telnet ${IP地址} ${端口号}
+$ telnet 192.168.1.10 80
+
+# success
+$ Connected to $ip
+```
 
 ### 相关资料
 
