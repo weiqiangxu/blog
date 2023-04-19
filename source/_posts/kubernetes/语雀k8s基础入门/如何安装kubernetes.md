@@ -135,6 +135,15 @@ $ sudo systemctl restart docker
 #### 3.kubernetes镜像源
 
 ``` bash
+# 注意下面的mirrors是区分架构的
+# 查看当前机器的架构
+$ arch
+
+# 访问地址 https://mirrors.aliyun.com/kubernetes/yum/repos 获取所有架构镜像源
+# 更改下面的 baseurl
+```
+
+``` bash
 $ cat > /etc/yum.repos.d/kubernetes.repo << EOF
 [kubernetes]
 name=Kubernetes
@@ -334,18 +343,27 @@ gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors
 EOF
 ```
 
+- kube-flannel是干嘛的
+
+``` txt
+kube-flannel是一个CNI插件，用于为Kubernetes集群创建和管理网络。
+它提供了一种简单而有效的方法，让容器在不同节点上进行通信，而无需手动配置网络。
+kube-flannel使用VXLAN或UDP封装技术来创建一个覆盖整个集群的扁平网络，
+使得Kubernetes Pod能够互相通信，同时确保网络性能的高效和可靠性。
+```
+
+- k8s的控制平面有哪些
+
+1. kube-apiserver：Kubernetes API服务器，提供Kubernetes API的访问入口，以及对Kubernetes内部对象的认证、授权和验证。
+2. etcd：Kubernetes使用etcd作为其默认的分布式键值存储系统，用于存储Kubernetes集群的所有配置数据、元数据和状态信息。
+3. kube-scheduler：负责将新创建的Pod调度到集群中的Node上，选择最佳的Node来运行Pod。
+4. kube-controller-manager：Kubernetes控制器管理器，包含了多个控制器，用于自动化管理Kubernetes集群中的各种资源和对象。
+5. cloud-controller-manager：云控制器管理器，负责管理云平台上的资源，如EC2、ELB等，并将这些资源与Kubernetes集群进行集成。
+
+> 这些组件共同组成了Kubernetes控制平面，负责管理和控制整个Kubernetes集群的运行状态。
 
 ### 相关资料
 
 [kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 [docker离线安装](https://download.docker.com/linux/static/stable)
 [kubernetes/yum/repos各个架构下的](https://mirrors.aliyun.com/kubernetes/yum/repos/)
-
-
-
-
-
-
-
-
-
