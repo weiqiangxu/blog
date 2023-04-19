@@ -163,6 +163,28 @@ $ yum install -y kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0
 
 # 启用kubelet服务,开机自启动
 $ systemctl enable kubelet
+
+# 移除kubelet的CNI网络插件设置
+# 文件`/var/lib/kubelet/kubeadm-flags.env`中
+# 将所有的`--network-plugin=cni`字符串替换为空字符串
+$ sed -i 's/--network-plugin=cni//' /var/lib/kubelet/kubeadm-flags.env
+$ systemctl restart kubelet
+
+# 配置在Kubernetes集群中使用Flannel网络插件时的CNI插件参数
+# Flannel是一种软件定义网络（SDN）解决方案，它使用虚拟网络来连接容器和节点
+# 需要在集群中的每个节点上配置Flannel CNI插件参数
+# 以便容器运行环境能够正确使用Flannel网络插件
+$ mkdir -p /etc/cni/net.d
+$ cat > /etc/cni/net.d/10-flannel.conf <<EOF
+{
+  "name": "cbr0",
+  "cniVersion": "0.2.0",
+  "type": "flannel",
+  "delegate": {
+    "isDefaultGateway": true
+  }
+} 
+EOF
 ```
 
 #### 5.kubeadm初始化集群
@@ -191,7 +213,7 @@ $ kubeadm join 192.168.1.1:6443 --token xxx.xx \
     --discovery-token-ca-cert-hash sha256:xxx
 ```
 
-#### 8.集群配置信息
+#### 8.配置kubectl环境
 
 ``` bash
 # 配置信息指定Kubernetes API的访问地址、认证信息、命名空间、资源配额以及其他配置参数
@@ -206,13 +228,15 @@ $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-### 三、部署CNI网络插件
+### 三、部署集群中Flannel网络插件
 
 ``` bash
 # 查看节点状态
-$ kubectl get nodes 
+$ kubectl get nodes
 
-# 获取yml
+# 使用kubectl工具将kube-flannel.yml文件中定义的Flannel网络插件之中
+# Deployment、DaemonSet、ServiceAccount等Kubernetes资源部署到集群中
+# 从而为集群中的宿主机和容器、容器间提供网络互联功能
 $ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 $ kubectl apply -f kube-flannel.yml
 
@@ -440,5 +464,6 @@ $ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoSchedule-
 ### 相关资料
 
 [kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
-[docker离线安装](https://download.docker.com/linux/static/stable)
+[官方docker离线安装](https://download.docker.com/linux/static/stable)
 [kubernetes/yum/repos各个架构下的](https://mirrors.aliyun.com/kubernetes/yum/repos/)
+[zhihu/k8s 1.16.0 版本的coreDNS一直处于pending状态的解决方案](https://zhuanlan.zhihu.com/p/602370492)
