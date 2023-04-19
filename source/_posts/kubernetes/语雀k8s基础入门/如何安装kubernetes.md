@@ -105,7 +105,7 @@ $ systemctl enable docker && systemctl start docker
 $ docker version
 ```
 
-#### 2.设置Docker镜像加速器：
+#### 2.Docker镜像源
 
 ``` bash
 # 创建docker配置
@@ -474,6 +474,24 @@ $ kubectl taint nodes k8s-master node-role.kubernetes.io/master:NoSchedule-
 默认情况下，Kubernetes会在主节点上设置Taints。这是为了确保主节点不被普通的Pod调度和运行。
 只有具有对应Tolerations的Pod才能被调度和运行在主节点上。
 这可以确保主节点保持稳定和安全，防止普通的Pod对主节点产生负面影响。
+```
+
+- k8s安装以后有哪些服务
+
+``` bash
+# nginx是唯一的业务pod
+$ kubectl get pod -A -o wide
+
+# NAMESPACE      NAME                                 READY   STATUS    
+# default        nginx-55f8fd7cfc-vjqq5               1/1     Running
+# kube-flannel   kube-flannel-ds-fs2wf                1/1     Running
+# kube-system    coredns-7ff77c879f-hwjtl             1/1     Running  
+# kube-system    coredns-7ff77c879f-pqjdk             1/1     Running 
+# kube-system    etcd-k8s-master                      1/1     Running 
+# kube-system    kube-apiserver-k8s-master            1/1     Running
+# kube-system    kube-controller-manager-k8s-master   1/1     Running
+# kube-system    kube-proxy-5qzvn                     1/1     Running
+# kube-system    kube-scheduler-k8s-master            1/1     Running
 ```
 
 ### 相关资料
