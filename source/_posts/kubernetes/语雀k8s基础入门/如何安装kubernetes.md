@@ -144,6 +144,7 @@ $ arch
 ```
 
 ``` bash
+# 注意执行之前确保baseurl后面的镜像源架构是否匹配
 $ cat > /etc/yum.repos.d/kubernetes.repo << EOF
 [kubernetes]
 name=Kubernetes
@@ -187,7 +188,22 @@ $ cat > /etc/cni/net.d/10-flannel.conf <<EOF
 EOF
 ```
 
-#### 5.kubeadm初始化集群
+#### 5.安装CNI插件
+
+``` bash
+# https://github.com/containernetworking/plugins/releases
+# 进入下载页根据架构选择安装包
+$ arch
+$ aarch64
+
+# AArch64是一种ARMv8架构
+$ wget https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-arm64-v1.2.0.tgz
+
+# 解压后移动bin,注意这个插件很重要
+$ mv /home/cni-plugins-linux-arm64-v1.2.0/* /opt/cni/bin/
+```
+
+#### 6.kubeadm初始化集群
 
 ``` bash
 # 查看k8s所需的镜像
@@ -213,7 +229,7 @@ $ kubeadm join 192.168.1.1:6443 --token xxx.xx \
     --discovery-token-ca-cert-hash sha256:xxx
 ```
 
-#### 8.配置kubectl环境
+#### 7.配置kubectl环境
 
 ``` bash
 # 配置信息指定Kubernetes API的访问地址、认证信息、命名空间、资源配额以及其他配置参数
@@ -444,8 +460,9 @@ $ kubectl describe node
 $ kubectl taint nodes <master-node-name> node-role.kubernetes.io/master:NoSchedule-
 
 # 取消2个标记
-$ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoExecute -
+$ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoExecute-
 $ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoSchedule-
+$ kubectl taint nodes k8s-master node-role.kubernetes.io/master:NoSchedule-
 ```
 
 - k8s会默认设置Taints在主节点吗
@@ -465,3 +482,4 @@ $ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoSchedule-
 [官方docker离线安装](https://download.docker.com/linux/static/stable)
 [kubernetes/yum/repos各个架构下的](https://mirrors.aliyun.com/kubernetes/yum/repos/)
 [zhihu/k8s 1.16.0 版本的coreDNS一直处于pending状态的解决方案](https://zhuanlan.zhihu.com/p/602370492)
+[k8s部署flannel时报failed to find plugin /opt/cni/bin](https://blog.csdn.net/qq_41586875/article/details/124688043)
