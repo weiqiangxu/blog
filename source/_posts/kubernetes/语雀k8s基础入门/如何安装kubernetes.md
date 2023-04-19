@@ -400,6 +400,43 @@ $ telnet 192.168.1.10 80
 $ Connected to $ip
 ```
 
+- telnet 127.0.0.1 30022 出现Connection refused
+
+``` bash
+# 没有运行正在监听30022端口的服务或防火墙等安全设置阻止了连接
+$ sudo firewall-cmd --state
+$ sudo firewall-cmd --list-ports
+```
+
+- 只有master节点无法调度怎么办
+
+``` bash
+# 获取节点信息
+$ kubuctl get node
+
+# 查看当前mster节点所有taint
+# 输出之中所有的Taints:node.kubernetes.io/not-ready:NoExecute...
+$ kubectl describe node
+
+# 取消标记语法
+$ kubectl taint nodes <master-node-name> node-role.kubernetes.io/master:NoSchedule-
+
+# 取消2个标记
+$ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoExecute -
+$ kubectl taint nodes k8s-master node.kubernetes.io/not-ready:NoSchedule-
+```
+
+- k8s会默认设置Taints在主节点吗
+
+```  bash
+# 给主节点打上一个Key为`node-role.kubernetes.io/master`，value为`NoSchedule`的Taint，即在主节点上设置Taints
+# kubectl taint nodes `master-node-name` node-role.kubernetes.io/master=:NoSchedule
+
+默认情况下，Kubernetes会在主节点上设置Taints。这是为了确保主节点不被普通的Pod调度和运行。
+只有具有对应Tolerations的Pod才能被调度和运行在主节点上。
+这可以确保主节点保持稳定和安全，防止普通的Pod对主节点产生负面影响。
+```
+
 ### 相关资料
 
 [kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
