@@ -28,7 +28,13 @@ sticky: 1
 - docker架构图
 - Istios是第二代Service Mesh的代表
 - Service Mesh服务网格是一种用于解决微服务架构中服务之间通信的问题的技术
+- namespace和cgroups标准是什么
+- OCI(开放容器标准)是什么涉及哪些内容
+- Kubernetes的CRI(Container Runtime Interface)的容器运行时接口是什么意思
+- shim的设计:作为适配器将自身容器运行时接口适配到 Kubernetes 的 CRI 接口(dockershim就是Kubernetes对接Docker到CRI接口)
+- 
 
+### 课题方向
 
 1. 容器哪里不安全了
 2. 目前的解决方案是什么样的
@@ -37,8 +43,23 @@ sticky: 1
 
 
 > Containerd 实现了 Kubernetes 容器运行时接口 (CRI)
-
 > BuildKit 是一种开源工具，它从 Dockerfile 获取指令并“构建”Docker 映像
+
+### 架构图
+
+![什么是k8s的CRI-O](/images/什么是k8s的CRI-O.png)
+![早期的k8s与docker](/images/早期的k8s与docker.png)
+![containerd集成cri-containerd-shim后架构图](/images/containerd集成cri-containerd-shim后架构图.png)
+![docker和containerd关系](/images/docker和containerd关系.png)
+![docker依赖k8s标准](/images/docker依赖k8s标准.png)
+![k8s-v1.20-24分离docker-shim](/images/k8s-v1.20-24分离docker-shim.png)
+![k8s-v1.20之前内置docker-shim](/images/k8s-v1.20之前内置docker-shim.png)
+![k8s-v1.24之后自行安装cri-dockerd](/images/k8s-v1.24之后自行安装cri-dockerd.png)
+![k8s分离docker-shim](/images/k8s分离docker-shim.png)
+![k8s与docker分离的初步计划](/images/k8s与docker分离的初步计划.png)
+![kubelet和containerd简化调用链过程](/images/kubelet和containerd简化调用链过程.png)
+![kubelet与容器运行时](/images/kubelet与容器运行时.png)
+![kubelet与cri内部结构](/images/kubelet与cri内部结构.png)
 
 ### 相关资料
 
@@ -46,4 +67,5 @@ sticky: 1
 [zhihu/什么是 Service Mesh](https://zhuanlan.zhihu.com/p/61901608)
 [PhilCalcado/Pattern: Service Mesh](https://philcalcado.com/2017/08/03/pattern_service_mesh.html)
 [官网运行时container-runtimes](https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/)
-[csdn剖析容器docker运行时](https://blog.csdn.net/m0_57776598/article/details/126963904)
+[csdn剖析容器docker运行时-说的太细致了](https://blog.csdn.net/m0_57776598/article/details/126963904)
+[csdn之IaaS/PaaS/SaaS/DaaS的区别-说的太好了](https://blog.csdn.net/yangyijun1990/article/details/108694011)
