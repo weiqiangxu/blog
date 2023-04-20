@@ -15,7 +15,35 @@ sticky: 1
 ### 课题
 
 - 容器在k8s是什么
-- 什么是容器安全
+
+``` bash
+轻量级的虚拟化技术，可以打包应用程序及其依赖项，使其更易于部署和管理
+k8s支持多种容器运行时（Container Runtime），包括Docker、containerd、CRI-O等
+```
+
+- 容器运行时Container Runtime是什么意思
+
+``` txt
+一种软件，其主要任务是负责在操作系统上启动和管理容器
+容器运行时通常通过调用操作系统提供的系统调用 - 来创建和管理容器
+一般和容器编排工具（例如Kubernetes）协同工作，实现容器的自动化部署、扩缩容等
+常见容器运行时有：Docker容器引擎、rkt、containerd等
+```
+
+- Kubernetes中的容器可能会有哪些安全风险
+
+``` txt
+1. 容器之间共享主机系统的资源,可能会通过共享文件或进程来获取其他容器中的敏感信息
+2. 容器的容量限制不够严格
+3. 容器镜像来源不可信
+4. 容器网络安全风险,比如需要访问外部网络或者其他容器
+5. 容器数据持久化缺少加密
+6. Kubernetes容器默认以高权限运行，容器内进程的文件系统和主机文件系统是共享的
+```
+
+- 模拟docker的容器A非法访问容器B的资源
+- NetworkNamespace是在Linux内核中实现的一种机制，用于隔离网络资源，例如网络接口、路由表和iptables规则等
+- kata是什么
 - 容器逻辑上分割，物理上的资源区隔的设计是什么样的
 - kubernetes的安全策略，如容器隔离、网络策略、RBAC设计是什么样的
 - iSula是什么
@@ -33,6 +61,12 @@ sticky: 1
 - Kubernetes的CRI(Container Runtime Interface)的容器运行时接口是什么意思
 - shim的设计:作为适配器将自身容器运行时接口适配到 Kubernetes 的 CRI 接口(dockershim就是Kubernetes对接Docker到CRI接口)
 - CGroup是Control Groups限制\记录\隔离进程组所使用的物理资源
+
+- linux的命名空间是什么
+``` bash
+命名空间是Linux内核中的一个概念，它可以将不同的系统资源隔离开来，比如网络、进程空间等。
+通过将容器连接到特定的网络命名空间中，可以实现容器与特定网络资源的隔离和互通
+```
 
 ### 课题方向
 
@@ -70,3 +104,4 @@ sticky: 1
 [csdn剖析容器docker运行时-说的太细致了](https://blog.csdn.net/m0_57776598/article/details/126963904)
 [csdn之IaaS/PaaS/SaaS/DaaS的区别-说的太好了](https://blog.csdn.net/yangyijun1990/article/details/108694011)
 [知乎/container之runc](https://zhuanlan.zhihu.com/p/279747954)
+[从零开始入门 K8s | Kata Containers 创始人带你入门安全容器技术](https://zhuanlan.zhihu.com/p/122247284)

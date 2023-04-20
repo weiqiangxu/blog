@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dd256b24-ae05-4fa8-aab3-c7a20e8d622b" name="变更" comment="">
-      <change beforePath="$PROJECT_DIR$/source/_posts/golang/Gin实践/如何优雅的依据结构体拼接URL.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/golang/Gin实践/如何优雅的依据结构体拼接URL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/_posts/prometheus/alertmanager的历史告警.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/prometheus/alertmanager的历史告警.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/_posts/prometheus/alertmanager高可用.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/prometheus/alertmanager高可用.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/_posts/prometheus/基于远程写模式的主从同步.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/prometheus/基于远程写模式的主从同步.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/images/.$gossip-protoctl2.svg.bkp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/_posts/kubernetes/官方手册/ kubernetes容器安全.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/kubernetes/官方手册/ kubernetes容器安全.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +35,8 @@
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "last_opened_file_path": "/Users/xuweiqiang/Documents/code/blog",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm"
   }
 }]]></component>
