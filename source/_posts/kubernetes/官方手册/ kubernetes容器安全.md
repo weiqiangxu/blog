@@ -32,7 +32,7 @@ sticky: 1
 - OCI(开放容器标准)是什么涉及哪些内容
 - Kubernetes的CRI(Container Runtime Interface)的容器运行时接口是什么意思
 - shim的设计:作为适配器将自身容器运行时接口适配到 Kubernetes 的 CRI 接口(dockershim就是Kubernetes对接Docker到CRI接口)
-- 
+- CGroup是Control Groups限制\记录\隔离进程组所使用的物理资源
 
 ### 课题方向
 
@@ -59,7 +59,7 @@ sticky: 1
 ![k8s与docker分离的初步计划](/images/k8s与docker分离的初步计划.png)
 ![kubelet和containerd简化调用链过程](/images/kubelet和containerd简化调用链过程.png)
 ![kubelet与容器运行时](/images/kubelet与容器运行时.png)
-![kubelet与cri内部结构](/images/kubelet与cri内部结构.png)
+![kubelet与cri内部结构](/images/k8s分离docker-shim.png)
 
 ### 相关资料
 
@@ -69,3 +69,4 @@ sticky: 1
 [官网运行时container-runtimes](https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/)
 [csdn剖析容器docker运行时-说的太细致了](https://blog.csdn.net/m0_57776598/article/details/126963904)
 [csdn之IaaS/PaaS/SaaS/DaaS的区别-说的太好了](https://blog.csdn.net/yangyijun1990/article/details/108694011)
+[知乎/container之runc](https://zhuanlan.zhihu.com/p/279747954)
