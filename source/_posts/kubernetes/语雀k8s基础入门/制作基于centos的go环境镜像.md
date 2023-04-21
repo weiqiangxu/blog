@@ -85,7 +85,7 @@ $ kata-runtime version
 
 - kata-deploy怎么支持k8s
 
-- kata怎么编译kata 获取手动安装包kata-static-3.1.0-x86_64.tar.xz
+- kata-containerd怎么编译获取手动安装包kata-static-3.1.0-x86_64.tar.xz
 
 ### 相关文档
 
