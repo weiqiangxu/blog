@@ -1,0 +1,82 @@
+---
+title: 制作基于centos的go环境镜像
+index_img: /images/bg/k8s.webp
+banner_img: /images/bg/5.jpg
+tags:
+  - golang
+  - cicd
+categories:
+  - docker
+date: 2023-04-18 18:40:12
+excerpt: 构建有go环境的centos镜像用于构建kata-container
+sticky: 1
+---
+
+### 一、编写Dockerfile
+
+``` Dockerfile
+FROM centos:centos7
+
+ENV GOPATH="/home/go" \
+    GOROOT="/usr/local/go" \
+    GOPROXY="https://goproxy.cn,direct" \
+    GOINSECURE="gitlab.my-company.net" \
+    GOPRIVATE="*.corp.com,gitlab.my-company.net" \
+    GONOPROXY="gitlab.my-company.net" \
+    GONOSUMDB="gitlab.my-company.net" \
+    PATH="$PATH:/usr/local/go/bin" \
+    TZ="Asia/Shanghai"
+
+# repo
+RUN curl https://sh.rustup.rs -sSf | sh && export PATH="$HOME/.cargo/bin:$PATH"
+RUN yum-config-manager --add-repo  https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo && yum -y install wget
+RUN cd /home && wget https://go.dev/dl/go1.19.8.linux-arm64.tar.gz && tar -C /usr/local -xzf go1.19.8.linux-arm64.tar.gz
+RUN echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile && source /etc/profile
+RUN yum install -y automake autoconf libtool make gcc gcc-c++ rsync git
+RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+```
+
+### 二、制作镜像
+
+``` bash
+# go 1.19.8 && centos 7.9 
+$ docker build -t centos-go1.19.8:v1 .
+```
+
+### 三、推送镜像到云端
+
+``` bash
+docker tag centos-go1.19.8:v2 registry.my.net/devops/centos-go1.19.8:v2
+docker login
+docker push registry.my.net/devops/centos-go1.19.8:v2
+docker logout
+```
+
+### 四、运行镜像验证
+
+``` bash
+# 验证kata的编译
+$ docker run -itd \
+    -v /Users/xuweiqiang/Documents/code/kata-containers/:/home/kata-containers \
+    --privileged=true \
+    --name test \
+    centos-go1.19.8:v2
+```
+
+### 五、构建并安装kata
+
+``` bash
+$ cd /home
+$ pushd kata-containers/src/runtime
+$ make && make install
+$ mkdir -p /etc/kata-containers/
+$ cp /usr/share/defaults/kata-containers/configuration.toml /etc/kata-containers
+$ popd
+```
+
+### 六、验证安装成功
+
+``` bash
+$ kata-runtime version
+# kata-runtime  : 3.1.0
+```

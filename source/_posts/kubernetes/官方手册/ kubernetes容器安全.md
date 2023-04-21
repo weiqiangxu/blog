@@ -79,9 +79,11 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 3. 解决方案的使用怎样可达到更好的效果
 4. 一些常见的兼容性、性能测试覆盖一下
 
-
 > Containerd 实现了 Kubernetes 容器运行时接口 (CRI)
 > BuildKit 是一种开源工具，它从 Dockerfile 获取指令并“构建”Docker 映像
+> OCI (Open Container Initiative) 开放容器计划（容器规范的开放标准）
+> CRI (Container Runtime Interface) 容器运行时接口，定义了 Kubernetes 与容器运行时之间的接口和协议
+> CRI-O 是实现了CRI和OCI，实现 OCI 和 CRI，等于是containerd
 
 ### 架构图
 
@@ -109,3 +111,6 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 [csdn之IaaS/PaaS/SaaS/DaaS的区别-说的太好了](https://blog.csdn.net/yangyijun1990/article/details/108694011)
 [知乎/container之runc](https://zhuanlan.zhihu.com/p/279747954)
 [从零开始入门 K8s | Kata Containers 创始人带你入门安全容器技术](https://zhuanlan.zhihu.com/p/122247284)
+[如何在 Kubernetes 集群中集成 Kata](https://cloud.tencent.com/developer/article/1730700)
+[Docker，containerd，CRI，CRI-O，OCI，runc 分不清？看这一篇就够了 - 写的太好了](https://www.dtstack.com/bbs/article/258)
+[huweihuang/Kata-container简介](https://www.huweihuang.com/kubernetes-notes/runtime/kata/kata-container.html)
