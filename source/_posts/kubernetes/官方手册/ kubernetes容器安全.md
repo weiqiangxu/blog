@@ -61,6 +61,10 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 - Kubernetes的CRI(Container Runtime Interface)的容器运行时接口是什么意思
 - shim的设计:作为适配器将自身容器运行时接口适配到 Kubernetes 的 CRI 接口(dockershim就是Kubernetes对接Docker到CRI接口)
 - CGroup是Control Groups限制\记录\隔离进程组所使用的物理资源
+- Name Space是什么
+- Busy Box是什么
+- k3s是什么
+
 
 - linux的命名空间是什么
 ``` bash

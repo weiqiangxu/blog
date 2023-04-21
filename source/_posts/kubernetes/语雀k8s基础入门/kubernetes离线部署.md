@@ -9,6 +9,7 @@ categories:
 date: 2023-04-18 18:40:12
 excerpt: 离线安装k8s
 sticky: 1
+hide: true
 ---
 
 
