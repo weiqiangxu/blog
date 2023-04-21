@@ -7,7 +7,7 @@ tags:
   - cicd
 categories:
   - docker
-date: 2023-04-18 18:40:12
+date: 2023-04-21 18:40:12
 excerpt: 构建有go环境的centos镜像用于构建kata-container
 sticky: 1
 ---
@@ -80,3 +80,16 @@ $ popd
 $ kata-runtime version
 # kata-runtime  : 3.1.0
 ```
+
+### 相关疑问
+
+- kata-deploy怎么支持k8s
+
+- kata怎么编译kata 获取手动安装包kata-static-3.1.0-x86_64.tar.xz
+
+### 相关文档
+
+[官方文档kata-containers-v1.3.0开发者向导](https://github.com/kata-containers/kata-containers/blob/3.1.0/docs/Developer-Guide.md)
+[官方文档kata-containers-v1.3.0二进制包下载链接](https://github.com/kata-containers/kata-containers/releases/tag/3.1.0)
+[官方文档kata-containers-v1.3.0手动安装文档](https://github.com/kata-containers/kata-containers/blob/3.1.0/docs/install/container-manager/containerd/containerd-install.md)
+
