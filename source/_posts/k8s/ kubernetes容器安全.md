@@ -130,6 +130,21 @@ kvm通过硬件虚拟化技术实现虚拟化，提供更高效的虚拟化性�
 因此，Intel VT-x和AMD SVM是支持kvm运行的基础。
 ```
 
+- 虚拟化研究中KVM和QEMU的区别
+
+``` txt
+
+QEMU（Quick Emulator）是一个独立的开源虚拟机软件，纯软件的实现（处理器虚拟化、内存虚拟、虚拟设备模拟）
+
+Qemu利用KVM提供的LibKvm应用程序接口，通过ioctl系统调用创建和运行虚拟机
+
+QEMU在上层，KVM在下层
+
+KVM(Kernel-based Virtual Machine)是基于虚拟化扩展（Intel VT或AMD-V）的X86硬件平台实现的Linux的全虚拟化解决方案
+
+KVM是x86的东西
+```
+
 ### 课题方向
 
 1. 容器哪里不安全了
@@ -177,4 +192,4 @@ kvm通过硬件虚拟化技术实现虚拟化，提供更高效的虚拟化性�
 [博客园-KataContainers和Docker的集成](https://www.cnblogs.com/fanqisoft/p/12096904.html)
 [https://www.qemu.org/](https://www.qemu.org/)
 [sandbox interface because it conflicts with existing route](https://github.com/kata-containers/runtime/issues/935)
-[虚拟化研究中KVM和QEMU的区别](https://www.scholat.com/vpost.html?pid=7294)
+[虚拟化研究中KVM和QEMU的区别-这个图画的很哇塞哦](https://www.scholat.com/vpost.html?pid=7294)
