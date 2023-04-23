@@ -6,7 +6,7 @@ tags:
   - kubernetes
 categories:
   - kubernetes
-date: 2023-04-18 18:40:12
+date: 2023-04-23 18:40:12
 excerpt: 介绍k8s操作系统底层资源分割逻辑
 sticky: 1
 ---
@@ -64,8 +64,24 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 - Name Space是什么
 - Busy Box是什么
 - k3s是什么
+- Kernel是什么
+- 如何添加并使用docker的runtime和查看当前docker支持的runtime
+- docker使用kata runtime 抛出异常 cannot program address in sandbox interface because it conflicts with existing route
+- Qemu是什么
+- KVM是什么
+- KVM 要求 CPU 支持虚拟化扩展，例如 Intel VT 或 AMD-V。如果您的 CPU 不支持这些扩展，则无法使用 KVM
 
+```
+https://github.com/kata-containers/runtime/issues/935
+```
 
+- QEMU path (/usr/bin/qemu-kvm) does not exist
+
+``` bash
+$ yum install -y qemu
+```
+- docker run --runtime kata-runtime && Could not access KVM kernel module
+- 怎么判断cpu是否支持KVM
 - linux的命名空间是什么
 ``` bash
 命名空间是Linux内核中的一个概念，它可以将不同的系统资源隔离开来，比如网络、进程空间等。
@@ -114,3 +130,5 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 [如何在 Kubernetes 集群中集成 Kata](https://cloud.tencent.com/developer/article/1730700)
 [Docker，containerd，CRI，CRI-O，OCI，runc 分不清？看这一篇就够了 - 写的太好了](https://www.dtstack.com/bbs/article/258)
 [huweihuang/Kata-container简介](https://www.huweihuang.com/kubernetes-notes/runtime/kata/kata-container.html)
+[kata-containd和docker集成](https://blog.51cto.com/u_11979904/5676073)
+[如何给docker添加runtime支持](https://blog.51cto.com/u_11979904/5676073)
