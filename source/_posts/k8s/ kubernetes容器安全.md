@@ -73,10 +73,11 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 - Kata Containers如何配置使用QEMU
 - Kata Runtime使用Firecracker
 - QEMU path (/usr/bin/qemu-kvm) does not exist
-
 ``` bash
 $ yum install -y qemu
 ```
+- Fedora 和 Centos 和 ky10.aarch64是什么关系
+- modprobe是干嘛的
 - docker run --runtime kata-runtime && Could not access KVM kernel module
 - 怎么判断cpu是否支持KVM
 - linux的命名空间是什么
@@ -143,3 +144,4 @@ $ yum install -y qemu
 [博客园-KataContainers和Docker的集成](https://www.cnblogs.com/fanqisoft/p/12096904.html)
 [https://www.qemu.org/](https://www.qemu.org/)
 [sandbox interface because it conflicts with existing route](https://github.com/kata-containers/runtime/issues/935)
+[虚拟化研究中KVM和QEMU的区别](https://www.scholat.com/vpost.html?pid=7294)

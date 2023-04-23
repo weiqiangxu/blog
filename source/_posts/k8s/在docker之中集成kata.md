@@ -21,7 +21,59 @@ sticky: 1
 
 ### 二、kata-containers安装
 
-
-
+[kata-containers/docs/install](https://github.com/kata-containers/kata-containers/tree/main/docs/install)
 
 ### 三、配置docker使用kata-containers
+
+``` bash
+# 第一种方式：systemd
+$ mkdir -p /etc/systemd/system/docker.service.d/
+
+$ cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/kata-containers.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -D --add-runtime kata-runtime=/usr/bin/kata-runtime --default-runtime=kata-runtime
+EOF
+```
+
+``` bash
+# 第二种方式：daemon.json
+$ vim /etc/docker/daemon.json
+```
+
+``` yml
+{
+  "default-runtime": "kata-runtime",
+  "runtimes": {
+    "kata-runtime": {
+      "path": "/usr/bin/kata-runtime"
+    }
+  }
+}
+```
+
+### 四、验证使用kata-containerd启动容器
+
+``` bash
+$ docker run --net=none busybox uname -a
+```
+
+
+### 疑问
+
+- OCI runtime create failed: QEMU path (/usr/bin/qemu-kvm) does not exist
+
+``` bash
+$ yum install -y qemu-kvm
+```
+-  messages from qemu log: Could not access KVM kernel module: No such file or directory
+
+``` bash
+f2进入bios界面，查找virtual字样的选项，将其开启(enable)
+```
+
+- sandbox interface because it conflicts with existing route
+
+```
+--net=none
+```
