@@ -70,11 +70,8 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 - Qemu是什么
 - KVM是什么
 - KVM 要求 CPU 支持虚拟化扩展，例如 Intel VT 或 AMD-V。如果您的 CPU 不支持这些扩展，则无法使用 KVM
-
-```
-https://github.com/kata-containers/runtime/issues/935
-```
-
+- Kata Containers如何配置使用QEMU
+- Kata Runtime使用Firecracker
 - QEMU path (/usr/bin/qemu-kvm) does not exist
 
 ``` bash
@@ -87,6 +84,16 @@ $ yum install -y qemu
 命名空间是Linux内核中的一个概念，它可以将不同的系统资源隔离开来，比如网络、进程空间等。
 通过将容器连接到特定的网络命名空间中，可以实现容器与特定网络资源的隔离和互通
 ```
+
+- kata-containerd 和 kvm 是什么关系
+- kata-containerd 可以不依赖kvm吗
+- 使用docker时候用的runtime是kata-runtime 但是不想依赖kvm怎么实现
+- kata containerd 怎么运行需要什么条件
+- KataContainers和Docker如何集成
+- kvm_intel是干嘛的
+- 如何判断当前aarch64支持ARM Hyp
+- kata runtime可以不需要kvm吗，怎么实现
+
 
 ### 课题方向
 
@@ -132,3 +139,6 @@ $ yum install -y qemu
 [huweihuang/Kata-container简介](https://www.huweihuang.com/kubernetes-notes/runtime/kata/kata-container.html)
 [kata-containd和docker集成](https://blog.51cto.com/u_11979904/5676073)
 [如何给docker添加runtime支持](https://blog.51cto.com/u_11979904/5676073)
+[博客园-KataContainers和Docker的集成](https://www.cnblogs.com/fanqisoft/p/12096904.html)
+[https://www.qemu.org/](https://www.qemu.org/)
+[sandbox interface because it conflicts with existing route](https://github.com/kata-containers/runtime/issues/935)
