@@ -93,7 +93,8 @@ $ yum install -y qemu
 - kvm_intel是干嘛的
 - 如何判断当前aarch64支持ARM Hyp
 - kata runtime可以不需要kvm吗，怎么实现
-
+- x86_64, amd64	Intel VT-x, AMD SVM 是什么意思
+- aarch64 ("arm64")	ARM Hyp 是什么意思
 
 ### 课题方向
 
