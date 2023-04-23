@@ -97,6 +97,39 @@ $ yum install -y qemu
 - x86_64, amd64	Intel VT-x, AMD SVM 是什么意思
 - aarch64 ("arm64")	ARM Hyp 是什么意思
 
+- mac 怎么判断 arm64（aarch64）架构是否支持ARM Hypervisor
+
+``` bash
+# 输出1表示支持虚拟化
+$ sysctl kern.hv_support
+```
+- kvm 和 ARM Hypervisor什么关系
+
+``` txt
+KVM和ARM Hypervisor都是虚拟化技术，用于在处理器上创建虚拟化环境。
+
+KVM是用于x86架构的开源虚拟化解决方案，而ARM Hypervisor是用于ARM架构的虚拟化解决方案。
+
+在ARM架构中，ARM Hypervisor被用于虚拟化环境和资源，它允许多个操作系统同时运行在单个ARM处理器上，每个操作系统都在自己的虚拟机中运行。
+ARM Hypervisor通过使用虚拟地址空间映射等技术来隔离不同的虚拟机之间的资源，从而保证每个虚拟机的安全性和独立性。
+
+与此类似，KVM也是一种虚拟化解决方案，它可以在x86架构的处理器上运行多个虚拟机，并将物理资源映射到虚拟机中。
+KVM通过模拟多种硬件设备，如网络适配器和存储控制器等，为虚拟机提供与物理主机相同的环境，从而保证虚拟机的稳定性和性能。
+
+总之，KVM和ARM Hypervisor都是虚拟化技术，它们可以在不同的架构上将物理主机资源虚拟化为多个虚拟机，并支持多个操作系统同时运行。
+相比于x86架构，ARM Hypervisor在ARM架构上提供了更高效和安全的虚拟化环境。
+```
+
+- kvm 和 Intel VT-x, AMD SVM是什么关系
+
+``` txt
+Intel VT-x和AMD SVM是虚拟化技术的硬件支持，可以使操作系统在虚拟机中以更高效率的方式运行。
+kvm是一种基于虚拟化技术的虚拟机监视器，可以在支持Intel VT-x或AMD SVM的处理器上运行。
+kvm通过硬件虚拟化技术实现虚拟化，提供更高效的虚拟化性能。
+
+因此，Intel VT-x和AMD SVM是支持kvm运行的基础。
+```
+
 ### 课题方向
 
 1. 容器哪里不安全了
