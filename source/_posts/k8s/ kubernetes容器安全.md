@@ -57,7 +57,7 @@ k8s支持多种容器运行时（Container Runtime），包括Docker、container
 - Istios是第二代Service Mesh的代表
 - Service Mesh服务网格是一种用于解决微服务架构中服务之间通信的问题的技术
 - namespace和cgroups标准是什么
-- OCI(开放容器标准)是什么涉及哪些内容
+- OCI(Open Container Initiative)(开放容器计划)是什么涉及哪些内容
 - Kubernetes的CRI(Container Runtime Interface)的容器运行时接口是什么意思
 - shim的设计:作为适配器将自身容器运行时接口适配到 Kubernetes 的 CRI 接口(dockershim就是Kubernetes对接Docker到CRI接口)
 - CGroup是Control Groups限制\记录\隔离进程组所使用的物理资源
@@ -193,3 +193,29 @@ KVM是x86的东西
 [https://www.qemu.org/](https://www.qemu.org/)
 [sandbox interface because it conflicts with existing route](https://github.com/kata-containers/runtime/issues/935)
 [虚拟化研究中KVM和QEMU的区别-这个图画的很哇塞哦](https://www.scholat.com/vpost.html?pid=7294)
+[k8s官方讲解有多少种CRI](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md)
+
+
+### gVisor和Kata Containers都是用于提供容器运行时隔离性的开源技术选项。以下是它们各自的优缺点：
+
+#### gVisor的优点：
+- gVisor 使用了一个特殊的沙箱机制，可以提供更高的隔离性和安全性。
+- gVisor可以在Linux容器内运行，而无需对宿主机进行特殊设置。
+- gVisor的性能比Kata Containers更快。
+
+#### gVisor的缺点：
+- gVisor还是一个比较新的项目，尚未被广泛测试和采用。
+- gVisor需要的内存和CPU资源比Kata Containers更多。
+- 系统调用频繁的情况下gvisor的性能差
+
+#### Kata Containers的优点：
+- Kata Containers运行在轻量级虚拟机中，可以提供与传统虚拟机相似的隔离性和安全性。
+- Kata Containers基于OCI标准，可以无缝地与Docker等容器工具集成。
+- Kata Containers比gVisor更易于部署和使用。
+- Kata Containers的启动时间通常在几百毫秒到一秒左右。
+
+#### Kata Containers的缺点：
+- Kata Containers的启动速度比gVisor慢（但kata速度仍然非常快，通常在毫秒级别），因为它需要启动轻量级虚拟机。
+- 由于使用了轻量级虚拟机，Kata Containers的性能比gVisor略低。
+
+需要注意的是，以上优缺点只是大概的总结，实际的情况可能会因特定的使用场景和需求而发生变化。
