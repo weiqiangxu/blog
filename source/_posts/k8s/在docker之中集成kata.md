@@ -21,6 +21,39 @@ sticky: 1
 
 ### 二、kata-containers安装
 
+1. 检测是否支持kata-containers
+
+``` bash
+# 先查看当前架构
+$ uname -a
+
+# x86和AMD判断支持Intel VT-x, AMD SVM
+# Intel的处理器支持Intel VT-x技术，而AMD的处理器支持AMD SVM技术
+# KVM虚拟化需要处理器支持Intel VT-x或AMD SVM
+# 要看cpu型号是否支持虚拟化
+# 判断是否支持kvm可以知道当前系统是否支持虚拟化
+# 对于Intel处理器(如果返回值大于0，则表示处理器支持Intel VT-x，并且操作系统在启动时已启用虚拟化支持)
+$ grep -cw vmx /proc/cpuinfo
+$ egrep -c '(svm|vmx)' /proc/cpuinfo
+$ cat /proc/cpuinfo | grep -E "svm|vmx"  # x86平台
+
+# 对于AMD处理器(如果返回值大于0，则表示处理器支持AMD SVM，并且操作系统在启动时已启用虚拟化支持)
+$ grep -cw svm /proc/cpuinfo
+$ cat /proc/cpuinfo
+
+# 检查KVM模块是否安装
+$ lsmod | grep kvm
+
+# aarch64判断支持ARM Hyp
+$ grep -i "HYP" /proc/cpuinfo
+$ cat /proc/cpuinfo | grep "hypervisor"  # ARM平台
+
+# mac判断支持虚拟化
+$ sysctl kern.hv_support
+```
+
+2. 安装教程
+
 [kata-containers/docs/install](https://github.com/kata-containers/kata-containers/tree/main/docs/install)
 
 ### 三、配置docker使用kata-containers
