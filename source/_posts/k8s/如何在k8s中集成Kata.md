@@ -9,6 +9,7 @@ categories:
 date: 2023-04-18 18:40:12
 excerpt: 如何在k8s之中集成kata
 sticky: 1
+hide: true
 ---
 
 1. centos

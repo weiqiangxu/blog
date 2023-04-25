@@ -10,6 +10,7 @@ categories:
 date: 2023-04-24 17:40:12
 excerpt: 如何在containerd之中集成kata
 sticky: 1
+hide: true
 ---
 
 
