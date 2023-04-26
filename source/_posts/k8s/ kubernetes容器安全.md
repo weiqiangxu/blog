@@ -146,6 +146,26 @@ KVM(Kernel-based Virtual Machine)是基于虚拟化扩展（Intel VT或AMD-V）�
 KVM是x86的东西
 ```
 
+- 网桥是什么
+
+网桥（Bridge）是一种网络设备，用于将两个或多个网络段连接起来，并通过数据包过滤和转发实现网络通信。它的作用是在不同的网络中进行数据流的转发，从而让不同的网络能够互相通信。网桥工作在OSI模型的第二层，通过物理地址（MAC地址）识别不同的网络设备，并在不同网络之间传递数据包。它可以减少网络拥堵，提高网络效率，增强网络安全性能。
+
+- 网段是什么
+
+网段是指互联网中被划分的一段网络地址范围，常用的表示方式为IP地址和子网掩码的组合。一个网段内的所有设备可以通过在局域网中进行通信，而与其他网段的设备则需要通过路由器等设备进行通信。网段的划分可以进行细分划分，使得网络资源能够更加高效地利用。
+
+- rootfs是什么
+
+- Guest Kernel是什么
+
+- Virtio是什么
+
+- 阿里巴巴的ACK是什么意思
+
+``` txt
+阿里的ACK的全称是Alibaba Cloud ACK（Alibaba Cloud Container Service for Kubernetes）。
+```
+
 ### 课题方向
 
 1. 容器哪里不安全了
@@ -195,7 +215,7 @@ KVM是x86的东西
 [sandbox interface because it conflicts with existing route](https://github.com/kata-containers/runtime/issues/935)
 [虚拟化研究中KVM和QEMU的区别-这个图画的很哇塞哦](https://www.scholat.com/vpost.html?pid=7294)
 [k8s官方讲解有多少种CRI](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md)
-
+[非常细致描述kata的优势](https://blog.51cto.com/u_15682248/5806851)
 
 ### gVisor和Kata Containers都是用于提供容器运行时隔离性的开源技术选项。以下是它们各自的优缺点：
 
