@@ -9,7 +9,7 @@ date: 2023-04-18 06:40:12
 sticky: 1
 ---
 
-### 二、主库搭建
+### 一、主库搭建
 
 1. 创建配置文件
 
@@ -62,7 +62,7 @@ $ curl -XPOST 127.0.0.1:9090/api/v1/admin/tsdb/snapshot
 {"status":"success","data":{"name":"20230418T015823Z-29b962a698b24a01"}}
 ```
 
-### 二、从库搭建
+### 三、从库搭建
 
 1. 创建写主机配置
 
@@ -99,14 +99,14 @@ $ docker run \
     --config.file=/etc/prometheus/prometheus.yml
 ```
 
-### 三、如何保证主库数据完整
+### 四、如何保证主库数据完整
 
 主库执行snapshot之前，更改master.prometheus.yml的配置，remote write到slave，此刻开始所有push不过去的数据会被加入队列重试，当slave使用备份快照启动成功后，这些数据会被写入，从而保证不丢失。
 
 > 2小时内（取决于落盘时间）
 
 
-### 四、remote write数据完整性
+### 五、remote write数据完整性
 
 ``` go
 // /prometheus/storage
