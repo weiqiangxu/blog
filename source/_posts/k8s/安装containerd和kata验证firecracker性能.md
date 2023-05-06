@@ -108,9 +108,9 @@ $ sudo ctr run --runtime "io.containerd.kata.v2" --rm -t "$image" test-kata unam
 4. containerd怎么安装扩展plugins.devmapper
 5. containerd刚刚安装的时候没有配置文件怎么生成
 ```
-containerd config default > /etc/containerd/config.toml.
+containerd config default > /etc/containerd/config.toml
 ```
-
-
 6. kata-runtime刚刚生成没有配置文件怎么处理
 7. containerd 怎么添加扩展
+8. containerd的devmapper是什么来的
+9. CNI怎么安装，etc/cni/net.d/这个文件夹下面的配置是怎么填写的
