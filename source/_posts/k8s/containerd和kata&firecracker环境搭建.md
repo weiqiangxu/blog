@@ -137,6 +137,22 @@ containerd config default > /etc/containerd/config.toml
 - kata container amd64下载
 [https://github.com/kata-containers/kata-containers/issues/6776](https://github.com/kata-containers/kata-containers/issues/6776)
 
+- containerd.plugin.snapshotter的devmapper是什么
+
+``` txt
+containerd.plugin.snapshotter的devmapper是一个存储驱动程序，它使用devmapper技术在宿主机上创建镜像和容器快照。
+它允许容器在宿主机上使用基于写时复制（Copy-on-Write）的快照技术，以减少磁盘空间和I/O使用。
+devmapper是Docker默认使用的存储驱动程序之一，也可以在containerd中使用。
+```
+
+- snapshotter是什么
+``` txt
+在Containerd中，snapshotter是一个用于管理和创建容器根文件系统（rootfs）以及容器快照的组件。
+当容器创建时，snapshotter会根据指定的镜像，创建一个只读的rootfs，并在其上添加一个可写层，以允许容器进行修改。
+snapshotter还负责为容器创建快照，这可以提供可恢复性和备份能力。
+Containerd支持多个snapshotter驱动程序，如devmapper、overlayfs和btrfs等，以满足不同的需求和环境。
+```
+
 
 ### 相关资料
 
