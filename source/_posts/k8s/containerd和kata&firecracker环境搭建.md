@@ -100,23 +100,38 @@ $ sudo ln -s /home/opt/kata/bin/containerd-shim-kata-v2 /usr/bin/containerd-shim
 ```
 
 ``` bash
+# 创建kata-fc
+$ touch /usr/local/bin/containerd-shim-kata-fc-v2
+
+$ cat <<EOF > /usr/local/bin/containerd-shim-kata-fc-v2
+#!/bin/bash
+KATA_CONF_FILE=/opt/kata/share/defaults/kata-containers/configuration-fc.toml /opt/kata/bin/containerd-shim-kata-v2 $@
+EOF
+```
+
+``` bash
 # containerd.plugin.devmapper需要安装
-$ sudo ctr images pull --snapshotter devmapper docker.io/library/ubuntu:latest
-$ sudo ctr run --snapshotter devmapper --runtime io.containerd.run.kata-fc.v2 -t --rm docker.io/library/ubuntu
+$ ctr images pull --snapshotter devmapper docker.io/library/ubuntu:latest
+$ ctr run --snapshotter devmapper --runtime io.containerd.run.kata-fc.v2 -t --rm docker.io/library/ubuntu:latest test-kata-fc
+$ ctr run --snapshotter devmapper --runtime io.containerd.run.kata.v2 -t --rm docker.io/library/ubuntu:latest test-kata-qemu
+$ ctr run --snapshotter devmapper --runtime io.containerd.run.runc.v2 -t --rm docker.io/library/ubuntu:latest test-kata-runc
+
+# [root ~]# ctr c ls
+# CONTAINER         IMAGE                              RUNTIME                         
+# test-kata-fc      docker.io/library/ubuntu:latest    io.containerd.run.kata-fc.v2    
+# test-kata-qemu    docker.io/library/ubuntu:latest    io.containerd.run.kata.v2  
+```
+
+``` bash
+# 宿主机上查看进程
+$ ps -ef | grep test-kata-fc
+$ ps -ef | grep test-kata-qemu
 ```
 
 ### 八、比较qemu和firecracker的性能
 
 ``` bash
-$ ctr run --cni --snapshotter devmapper --runtime io.containerd.run.kata.v2 -t docker.io/library/busybox:latest hello sh
-```
-
-``` bash
-# 停止所有容器
-$ ctr tasks kill -a -s 9 container_id
-
-# 删除容器
-$ ctr c rm $(ctr c list -q)
+$ ps -ef
 ```
 
 ### Q&A
@@ -130,15 +145,18 @@ kata runtime独立仓库(v1.5) 之前出的一个兼容fc的脚本
 
 - kata-runtime和kata-containerd什么关系
 
-```
+``` txt
 kata-container 包含 kata-runtime
 ```
 
 - containerd怎么集成kata-rc
+
 - containerd怎么安装扩展plugins.devmapper
+
 - containerd刚刚安装的时候没有配置文件怎么生成
-```
-containerd config default > /etc/containerd/config.toml
+
+``` bash
+$ containerd config default > /etc/containerd/config.toml
 ```
 - kata-runtime刚刚生成没有配置文件怎么处理
 - containerd 怎么添加扩展
@@ -146,9 +164,11 @@ containerd config default > /etc/containerd/config.toml
 - CNI怎么安装，etc/cni/net.d/这个文件夹下面的配置是怎么填写的
 
 - rootfs not found
+
 [https://github.com/kata-containers/kata-containers/issues/6784](https://github.com/kata-containers/kata-containers/issues/6784)
 
 - kata container amd64下载
+
 [https://github.com/kata-containers/kata-containers/issues/6776](https://github.com/kata-containers/kata-containers/issues/6776)
 
 - containerd.plugin.snapshotter的devmapper是什么
@@ -160,6 +180,7 @@ devmapper是Docker默认使用的存储驱动程序之一，也可以在containe
 ```
 
 - snapshotter是什么
+
 ``` txt
 在Containerd中，snapshotter是一个用于管理和创建容器根文件系统（rootfs）以及容器快照的组件。
 当容器创建时，snapshotter会根据指定的镜像，创建一个只读的rootfs，并在其上添加一个可写层，以允许容器进行修改。
@@ -167,7 +188,18 @@ snapshotter还负责为容器创建快照，这可以提供可恢复性和备份
 Containerd支持多个snapshotter驱动程序，如devmapper、overlayfs和btrfs等，以满足不同的需求和环境。
 ```
 
+- ctr对容器的操作
+
+``` bash
+# 停止所有容器
+$ ctr tasks kill -a -s 9 container_id
+
+# 删除容器
+$ ctr c rm $(ctr c list -q)
+```
+
 
 ### 相关资料
 
 [kata-firecracker和docker的集成](https://github.com/kata-containers/documentation/wiki/Initial-release-of-Kata-Containers-with-Firecracker-support)
+[kata-containers/3.0.2/crictl创建容器](https://github.com/kata-containers/kata-containers/blob/3.0.2/docs/how-to/run-kata-with-crictl.md)
