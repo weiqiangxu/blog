@@ -1,18 +1,34 @@
-### 环境
+---
+title: containerd和kata&firecracker环境搭建
+index_img: /images/bg/k8s.webp
+banner_img: /images/bg/5.jpg
+tags:
+  - kubernetes
+categories:
+  - kubernetes
+date: 2023-04-23 18:40:12
+excerpt: 安装containerd和kata，测试kata-qemu和kata-firecracker
+sticky: 1
+---
+
+
+### 一、环境
 
 ```
 [root@VM-8-4-centos ~]# uname -a
 Linux VM-8-4-centos 3.10.0-1160.71.1.el7.x86_64 #1 SMP Tue Jun 28 15:37:28 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
-### 安装包
+### 二、安装包
 
 ``` txt
-kata-static-3.1.0-x86_64.tar.xz
+kata-static-3.0.2-x86_64.tar.xz
 cni-plugins-linux-amd64-v1.2.0.tgz
 runc.amd64
 containerd.service
 ```
+
+### 
 
 ### 具体步骤
 
