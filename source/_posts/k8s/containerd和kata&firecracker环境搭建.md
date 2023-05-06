@@ -105,6 +105,20 @@ $ sudo ctr images pull --snapshotter devmapper docker.io/library/ubuntu:latest
 $ sudo ctr run --snapshotter devmapper --runtime io.containerd.run.kata-fc.v2 -t --rm docker.io/library/ubuntu
 ```
 
+### 八、比较qemu和firecracker的性能
+
+``` bash
+$ ctr run --cni --snapshotter devmapper --runtime io.containerd.run.kata.v2 -t docker.io/library/busybox:latest hello sh
+```
+
+``` bash
+# 停止所有容器
+$ ctr tasks kill -a -s 9 container_id
+
+# 删除容器
+$ ctr c rm $(ctr c list -q)
+```
+
 ### Q&A
 
 - kata-rc怎么和containerd集成
