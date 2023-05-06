@@ -24,6 +24,9 @@ $ egrep '(vmx|svm)' /proc/cpuinfo |wc -l
 $ lsmod | grep kvm
 # kvm_intel  376832  11
 # kvm  1015808  1 kvm_intel
+
+# dev设备
+$ ll /dev/kvm
 ```
 
 ### 二、安装包
