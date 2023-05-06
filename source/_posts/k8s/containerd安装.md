@@ -6,7 +6,7 @@ tags:
   - kubernetes
 categories:
   - kubernetes
-date: 2023-04-23 18:40:12
+date: 2023-05-06 18:40:12
 excerpt: 安装containerd和扩展
 sticky: 1
 ---
@@ -108,8 +108,18 @@ $ sudo ctr image pull docker.io/library/busybox:latest
 $ sudo ctr run --cni -t --rm docker.io/library/busybox:latest hello sh
 ```
 
+
+### Q&A
+
+- 如何查看containerd的插件有哪些
+
+``` bash
+$ ctr plugin ls
+```
+
 ### 相关文章
 
 [https://www.cni.dev/](https://www.cni.dev/)
 [cni/net.d的containerd配置文件示例](https://github.com/kubernetes/website/blob/dev-1.24/content/en/docs/tasks/administer-cluster/migrating-from-dockershim/troubleshooting-cni-plugin-related-errors.md#an-example-containerd-configuration-file)
 [kata-containers的cri-tools的CNI默认配置](https://github.com/kata-containers/kata-containers/blob/3.0.2/docs/how-to/containerd-kata.md#configuration-for-cri-tools)
+[containerd-v1.7.0安装snapshotters.devmapper](https://github.com/containerd/containerd/blob/v1.7.0/docs/snapshotters/devmapper.md)

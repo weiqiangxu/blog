@@ -11,122 +11,133 @@ excerpt: 安装containerd和kata，测试kata-qemu和kata-firecracker
 sticky: 1
 ---
 
-
 ### 一、环境
 
-```
+``` bash
 [root@VM-8-4-centos ~]# uname -a
-Linux VM-8-4-centos 3.10.0-1160.71.1.el7.x86_64 #1 SMP Tue Jun 28 15:37:28 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+Linux x86_64 GNU/Linux
+
+# 需要支持虚拟化：有输出表示支持
+$ egrep '(vmx|svm)' /proc/cpuinfo |wc -l
+
+# 需要安装kvm
+$ lsmod | grep kvm
+# kvm_intel  376832  11
+# kvm  1015808  1 kvm_intel
 ```
 
 ### 二、安装包
 
 ``` txt
 kata-static-3.0.2-x86_64.tar.xz
-cni-plugins-linux-amd64-v1.2.0.tgz
-runc.amd64
-containerd.service
 ```
 
-### 
+### 三、文档地址
 
-### 具体步骤
-
-[下载kata 3.1.0](https://github.com/kata-containers/kata-containers/blob/main/docs/install/container-manager/containerd/containerd-install.md)
-
-[containerd安装详细](https://github.com/containerd/containerd/blob/main/docs/getting-started.md)
-
-``` sh
-# containerd
-$ tar xvf containerd-1.7.0-linux-amd64.tar.gz
-$ mv bin/* /usr/local/bin/
-
-# containerd system service
-$ touch /usr/local/lib/systemd/system/containerd.service
-$ wget https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
-$ systemctl daemon-reload
-$ systemctl enable --now containerd
-
-# runc
-$ install -m 755 runc.amd64 /usr/local/sbin/runc
-
-# cni
-$ cni 
-$ systemctl status containerd
-```
+- [kata-containers/3.0.2-如何与containerd集成](https://github.com/kata-containers/kata-containers/blob/3.0.2/docs/how-to/containerd-kata.md)
+- [containerd-v1.7.0安装snapshotters.devmapper](https://github.com/containerd/containerd/blob/v1.7.0/docs/snapshotters/devmapper.md)
+- [kata-containerd/v3.0.2](https://github.com/kata-containers/kata-containers/releases/tag/3.0.2)
+- [kata-container和containerd安装](https://github.com/kata-containers/kata-containers/blob/main/docs/install/container-manager/containerd/containerd-install.md)
 
 
-
-### kata
+### 四、安装kata-containers
 
 ``` bash
-$ cd /home && tar xvf kata-static-3.1.0-x86_64.tar.xz
-$ vi ~/.bashrc
-# 添加一行
-# export PATH=$PATH:/home/opt/kata/bin
-$ source ~/.bashrc
-$ kata-runtime --version
-# 检测是否可以运行
-$ kata-runtime kata-check
+# 下载安装包
+$ /home/kata-static-3.0.2-x86_64.tar.xz
+
+# 解压至根目录
+$ tar -xvf  kata-static-3.0.2-x86_64.tar.xz -C /
+
+# 验证可用
+$ kata-runtime check --no-network-checks
+$ kata-runtime --show-default-config-paths
+$ kata-runtime kata-env
 ```
 
-### 更改containerd配置将kata集成到containerd之中
-
-``` sh
-# 查看默认配置
-$ containerd config default
-
-# 查看当前配置如果没有会提示没有配置文件
-$ containerd config dump
-
-# 没有配置文件就自己手动创建一个
-$ mkdir -p /etc/containerd
-$ vim /etc/containerd/config.toml
-$ containerd config dump
-```
+### 五、配置containerd
 
 ``` yml
-[plugins]
-  [plugins."io.containerd.grpc.v1.cri"]
-    [plugins."io.containerd.grpc.v1.cri".containerd]
-      default_runtime_name = "kata"
-      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]
-          runtime_type = "io.containerd.kata.v2"
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]
+  runtime_type = "io.containerd.kata.v2"
+  privileged_without_host_devices = true
+  pod_annotations = ["io.katacontainers.*"]
+  container_annotations = ["io.katacontainers.*"]
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata.options]
+    ConfigPath = "/opt/kata/share/defaults/kata-containers/configuration.toml"
 ```
+[containerd.plugins.cri.runtimes.kata配置说明](https://github.com/kata-containers/kata-containers/blob/main/docs/how-to/containerd-kata.md#kata-containers-as-a-runtimeclass)
 
 ``` bash
+# 重启containerd服务
+$ systemctl daemon-reload
+$ systemctl start containerd 
+```
+
+``` bash 
+$ containerd config dump | grep kata
+```
+
+### 六、运行容器
+
+``` bash
+$ sudo ctr image pull docker.io/library/busybox:latest
+$ sudo ctr run --runtime "io.containerd.kata.v2" --rm -t docker.io/library/busybox:latest test-kata uname -r
+```
+
+### 七、使用firecracker创建容器
+
+
+[how-to-use-kata-containers-with-firecracker](https://github.com/kata-containers/kata-containers/blob/3.0.2/docs/how-to/how-to-use-kata-containers-with-firecracker.md)
+
+``` bash
+# devmapper非常重要
+# devmapper非常重要
+$ sudo ctr plugins ls | grep devmapper
+
 # 创建符号连接否则containerd找不到kata
 $ sudo ln -s /home/opt/kata/bin/containerd-shim-kata-v2 /usr/bin/containerd-shim-kata-v2
 ```
 
 ``` bash
-$ cat /etc/containerd/config.toml | grep kata
+# containerd.plugin.devmapper需要安装
+$ sudo ctr images pull --snapshotter devmapper docker.io/library/ubuntu:latest
+$ sudo ctr run --snapshotter devmapper --runtime io.containerd.run.kata-fc.v2 -t --rm docker.io/library/ubuntu
 ```
 
-# 测试验证
+### Q&A
 
+- kata-rc怎么和containerd集成
 
-``` sh
-$ image="docker.io/library/busybox:latest"
-$ sudo ctr image pull "$image"
-$ sudo ctr run --runtime "io.containerd.kata.v2" --rm -t "$image" test-kata uname -r
+``` txt
+kata runtime独立仓库(v1.5) 之前出的一个兼容fc的脚本
+新版本3.0需要了
 ```
 
+- kata-runtime和kata-containerd什么关系
 
+```
+kata-container 包含 kata-runtime
+```
 
-[kata-firecracker和docker的集成](https://github.com/kata-containers/documentation/wiki/Initial-release-of-Kata-Containers-with-Firecracker-support)
-
-
-1. kata-rc怎么和containerd集成
-2. kata-runtime和kata-containerd什么关系
-3. containerd怎么集成kata-rc
-4. containerd怎么安装扩展plugins.devmapper
-5. containerd刚刚安装的时候没有配置文件怎么生成
+- containerd怎么集成kata-rc
+- containerd怎么安装扩展plugins.devmapper
+- containerd刚刚安装的时候没有配置文件怎么生成
 ```
 containerd config default > /etc/containerd/config.toml
 ```
-6. kata-runtime刚刚生成没有配置文件怎么处理
-7. containerd 怎么添加扩展
-8. containerd的devmapper是什么来的
-9. CNI怎么安装，etc/cni/net.d/这个文件夹下面的配置是怎么填写的
+- kata-runtime刚刚生成没有配置文件怎么处理
+- containerd 怎么添加扩展
+- containerd的devmapper是什么来的
+- CNI怎么安装，etc/cni/net.d/这个文件夹下面的配置是怎么填写的
+
+- rootfs not found
+[https://github.com/kata-containers/kata-containers/issues/6784](https://github.com/kata-containers/kata-containers/issues/6784)
+
+- kata container amd64下载
+[https://github.com/kata-containers/kata-containers/issues/6776](https://github.com/kata-containers/kata-containers/issues/6776)
+
+
+### 相关资料
+
+[kata-firecracker和docker的集成](https://github.com/kata-containers/documentation/wiki/Initial-release-of-Kata-Containers-with-Firecracker-support)
