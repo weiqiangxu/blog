@@ -200,9 +200,38 @@ $ ctr tasks kill -a -s 9 container_id
 # 删除容器
 $ ctr c rm $(ctr c list -q)
 ```
+- yum 
 
+```
+cat /etc/os-release
+cd /etc/yum.repos.d/
+```
+
+- Fedora RedHat Ubuntu CentOS Debian之间的区别和联系是什么
+``` txt
+Fedora、RedHat、Ubuntu、CentOS和Debian都是常见的Linux发行版，它们之间有以下区别和联系：
+
+1. Fedora是由Red Hat公司赞助的社区开发的Linux发行版，Red Hat则是一家提供商业Linux产品的公司。CentOS是基于Red Hat Enterprise Linux (RHEL)源代码的开源发行版，而Ubuntu和Debian是完全独立的发行版。
+
+2. Fedora、RedHat和CentOS都使用RPM软件包管理系统，而Ubuntu和Debian使用DEB软件包管理系统。
+
+3. Fedora和Ubuntu都是面向桌面和开发者的发行版，而RedHat和CentOS主要面向企业服务器市场，而Debian则更多用于开发者和服务器上。
+
+4. Fedora和Ubuntu都有免费版和商业版，而RedHat和CentOS则主要提供商业版。
+
+5. Fedora和Ubuntu更新频繁，每6个月发布一次新版本，而RedHat和CentOS更新周期较长，通常每2-3年发布一次新版本，Debian则更新周期更为稳定。
+
+但它们都是基于Linux内核的操作系统。
+```
+- Fedora RedHat Ubuntu CentOS Debian 关系图
+- linux分区操作
+- ubuntu 安装yum 可以吗
+- Linux两大系列debian和redhat
+- yum repolist all干嘛的
 
 ### 相关资料
 
 [kata-firecracker和docker的集成](https://github.com/kata-containers/documentation/wiki/Initial-release-of-Kata-Containers-with-Firecracker-support)
 [kata-containers/3.0.2/crictl创建容器](https://github.com/kata-containers/kata-containers/blob/3.0.2/docs/how-to/run-kata-with-crictl.md)
+[ubuntu安装使用yum-更新yumde软件源地址即可](https://blog.csdn.net/m0_70885101/article/details/127271416)
+[清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/)
