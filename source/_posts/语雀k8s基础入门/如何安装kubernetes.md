@@ -52,6 +52,12 @@ $ ntpdate time.windows.com
 #### 5.关闭selinux
 
 ``` bash
+# 查看是否安装SELinux模块
+# rpm Linux操作系统上管理RPM软件包的命令行工具
+$ rpm -q selinux-policy
+```
+
+``` bash
 #查看selinux是否开启
 $ getenforce
 ```
@@ -62,13 +68,42 @@ $ getenforce
 $ sed -i 's/enforcing/disabled/' /etc/selinux/config
 ```
 
+``` txt
+SELinux（Security-Enhanced Linux） 安全机制，更为细粒度的安全策略控制
+要查看SELinux是否启用，可以在终端输入以下命令：getenforce
+
+Enforcing 强制模式
+Permissive 宽容模式
+Disabled 被禁用
+```
+
 #### 6.关闭swap分区
+
+Linux swap分区是一种特殊的分区，为内存不足时提供交换空间，可以将一部分硬盘空间作为虚拟内存使用。当物理内存不足时，系统将部分不常用的数据和进程暂存到swap分区中，以释放物理内存。swap分区对于提高系统的稳定性和可靠性非常重要。
+
+要查看Linux系统中是否存在swap分区，可以使用以下命令：
+
+``` bash
+# 没有输出表示当前系统并没有启用swap分区
+$ sudo swapon --show
+
+# 关闭已经启用的swap分区
+$ sudo swapoff -a
+
+# 重新开启swap分区
+$ sudo swapon -a
+```
+
 
 ``` bash
 # 永久关闭swap分区，需要重启：
 # 使用sed工具在/etc/fstab文件中查找任何包含“swap”的行
 # 并在每行前加上“#”注释符，从而将它们全部注释掉
 $ sed -ri 's/.*swap.*/#&/' /etc/fstab
+```
+``` bash
+# 查看包含swap的行是否已经注释
+$ cat /etc/fstab | grep swap
 ```
 
 #### 7.将桥接的IPv4流量传递到iptables的链
@@ -144,6 +179,7 @@ $ arch
 ```
 
 ``` bash
+# 这里需要yum工具
 # 注意执行之前确保baseurl后面的镜像源架构是否匹配
 $ cat > /etc/yum.repos.d/kubernetes.repo << EOF
 [kubernetes]
@@ -154,9 +190,15 @@ gpgcheck=0
 repo_gpgcheck=0
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
+
+# 更新缓存
+$ yum clean all
+$ yum makecache
 ```
 
 #### 4.安装kubeadm\kubelet\kubectl
+
+如果需要离线安装请[访问](https://kubernetes.io/releases/download/)
 
 ``` bash
 # install
@@ -169,7 +211,7 @@ $ systemctl enable kubelet
 # 文件`/var/lib/kubelet/kubeadm-flags.env`中
 # 将所有的`--network-plugin=cni`字符串替换为空字符串
 $ sed -i 's/--network-plugin=cni//' /var/lib/kubelet/kubeadm-flags.env
-$ systemctl restart kubelet
+$ systemctl status kubelet
 
 # 配置在Kubernetes集群中使用Flannel网络插件时的CNI插件参数
 # Flannel是一种软件定义网络（SDN）解决方案，它使用虚拟网络来连接容器和节点
@@ -199,6 +241,9 @@ $ aarch64
 # AArch64是一种ARMv8架构
 $ wget https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-arm64-v1.2.0.tgz
 
+# 解压
+$ tar xvf cni-plugins-linux-arm64-v1.2.0.tgz -C /opt/cni/bin/
+
 # 解压后移动bin,注意这个插件很重要
 $ mv /home/cni-plugins-linux-arm64-v1.2.0/* /opt/cni/bin/
 ```
@@ -209,14 +254,17 @@ $ mv /home/cni-plugins-linux-arm64-v1.2.0/* /opt/cni/bin/
 # 查看k8s所需的镜像
 $ kubeadm config images list
 
+# 可以提前拉好镜像
+$ kubeadm config images pull --image-repository registry.aliyuncs.com/google_containers
+
 # 部署k8s的master节点
 # apiserver-advertise-address更改为部署master的节点的局域网IP地址
 # pod-network-cidr 集群中Pod的IP地址段 常用的有10.244.0.0/16
 # service-cidr.集群中Service的IP地址段.默认为10.96.0.0/12
-kubeadm init \
+$ kubeadm init \
   --apiserver-advertise-address=192.168.18.100 \
   --image-repository registry.aliyuncs.com/google_containers \
-  --kubernetes-version v1.18.0 \
+  --kubernetes-version v1.27.1 \
   --service-cidr=10.96.0.0/12 \
   --pod-network-cidr=10.244.0.0/16
 ```
@@ -502,3 +550,4 @@ $ kubectl get pod -A -o wide
 [zhihu/k8s 1.16.0 版本的coreDNS一直处于pending状态的解决方案](https://zhuanlan.zhihu.com/p/602370492)
 [k8s部署flannel时报failed to find plugin /opt/cni/bin](https://blog.csdn.net/qq_41586875/article/details/124688043)
 [kubernetes.io使用kubeadm安装集群](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+[离线运行kubeadm初始化集群](https://kubernetes.io/zh-cn/docs/reference/setup-tools/kubeadm/kubeadm-init/#without-internet-connection)
