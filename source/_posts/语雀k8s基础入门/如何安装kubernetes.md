@@ -211,7 +211,7 @@ $ systemctl enable kubelet
 # 文件`/var/lib/kubelet/kubeadm-flags.env`中
 # 将所有的`--network-plugin=cni`字符串替换为空字符串
 $ sed -i 's/--network-plugin=cni//' /var/lib/kubelet/kubeadm-flags.env
-$ systemctl status kubelet
+$ systemctl restart kubelet
 
 # 配置在Kubernetes集群中使用Flannel网络插件时的CNI插件参数
 # Flannel是一种软件定义网络（SDN）解决方案，它使用虚拟网络来连接容器和节点
@@ -523,6 +523,10 @@ $ kubectl taint nodes k8s-master node-role.kubernetes.io/master:NoSchedule-
 只有具有对应Tolerations的Pod才能被调度和运行在主节点上。
 这可以确保主节点保持稳定和安全，防止普通的Pod对主节点产生负面影响。
 ```
+
+- Port 10250 is in use
+
+> $ kubeadm reset
 
 - k8s安装以后有哪些服务
 
