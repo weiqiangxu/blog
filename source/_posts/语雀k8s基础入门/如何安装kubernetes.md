@@ -726,6 +726,13 @@ eth0是指计算机中的第一个以太网接口，通常用于连接本地网�
 
 ifconfig 输出的 eth0 中的 inet 和 inet6 是指该接口所分配的 IPv4 和 IPv6 地址。inet 是 IPv4 地址，inet6 是 IPv6 地址。这两个地址用于标识网络中的设备，以便它们可以相互通信。inet 和 inet6 地址是网络编程中常用的概念，它们分别对应着 IPv4 和 IPv6 协议，用于实现网络数据传输。
 
+- couldn't get current server API group list: Get "http://localhost:8080/api
+
+``` bash
+$ echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bash_profile
+$ source ~/.bash_profile
+```
+
 ### 相关资料
 
 [kubernetes.io/zh-cn/安装kubeadm](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
