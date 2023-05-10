@@ -54,6 +54,8 @@ $ containerd --version
 1. 生成默认配置
 
 ``` bash
+# 创建文件夹
+$ mkdir -p /etc/containerd
 $ containerd config default > /etc/containerd/config.toml
 # 查看配置
 $ containerd config dump
