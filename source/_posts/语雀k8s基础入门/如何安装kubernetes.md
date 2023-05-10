@@ -224,7 +224,7 @@ $ yum makecache
 
 #### 4.安装kubeadm\kubelet\kubectl
 
-如果需要离线安装请访问[Kubernetes文档/入门/下载Kubernetes](https://kubernetes.io/releases/download/)
+二进制文件下载可以访问[Kubernetes文档/入门/下载Kubernetes](https://kubernetes.io/releases/download/) 或者 [https://www.downloadkubernetes.com/](https://www.downloadkubernetes.com/)，kubeadm和kubectl可以直接离线二进制文件移动至/usr/bin完成安装，而kubelet需要systemend注册，比较麻烦可以通过离线下载rpm包的方式进行安装.详细说明查看 [kubelet 的 systemd drop-in 文件](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#the-kubelet-drop-in-file-for-systemd)
 
 ``` bash
 # install
@@ -232,6 +232,10 @@ $ yum install -y kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0
 
 # 启用kubelet服务,开机自启动
 $ systemctl enable kubelet
+
+$ kubeadm version -o json
+$ kubelet --version
+$ kubectl version -o json
 
 # 移除kubelet的CNI网络插件设置
 # 文件`/var/lib/kubelet/kubeadm-flags.env`中
@@ -256,7 +260,22 @@ $ cat > /etc/cni/net.d/10-flannel.conf <<EOF
 EOF
 ```
 
+``` bash
+# 如果需要离线安装建议下载rpm包
+$ sudo yum install yum-utils
+$ sudo yumdownloader --resolve kubelet-1.27.1 kubeadm-1.27.1 kubectl-1.27.1
+
+# 下载后所有的kubelet-1.27.1-0.x86_64.rpm\kubeadm-1.27.1-0.x86_64.rpm等
+# 以及libnetfilter_cthelper-1.0.0-11.el7.x86_64.rpm之类的依赖
+# 手动安装文件夹下面所有的rpm包
+$ sudo rpm -ivh *.rpm
+$ systemctl status kubelet
+```
+
 #### 5.安装CNI插件
+
+
+CNI插件是二进制文件移动到系统环境变量里面完成安装，各个架构下的各个版本下载可以访问[github.com/containernetworking/plugins](https://github.com/containernetworking/plugins/releases)
 
 ``` bash
 # https://github.com/containernetworking/plugins/releases
@@ -267,10 +286,10 @@ $ aarch64
 # AArch64是一种ARMv8架构
 $ wget https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-arm64-v1.2.0.tgz
 
-# 解压
+# 解压至/opt/cni/bin/
 $ tar xvf cni-plugins-linux-arm64-v1.2.0.tgz -C /opt/cni/bin/
 
-# 解压后移动bin,注意这个插件很重要
+# or 先解压，后移动bin,注意这个插件很重要
 $ mv /home/cni-plugins-linux-arm64-v1.2.0/* /opt/cni/bin/
 ```
 
@@ -284,7 +303,8 @@ $ kubeadm config images list
 $ kubeadm config images pull --image-repository registry.aliyuncs.com/google_containers
 
 # 部署k8s的master节点
-# apiserver-advertise-address更改为部署master的节点的局域网IP地址
+# apiserver-advertise-address更改为部署master的节点的
+# 局域网IP地址(默认值是本地网络接口中第一个非回环地址,使用ifconfig查看所有网络接口)
 # pod-network-cidr 集群中Pod的IP地址段 常用的有10.244.0.0/16
 # service-cidr.集群中Service的IP地址段.默认为10.96.0.0/12
 $ kubeadm init \
@@ -293,7 +313,18 @@ $ kubeadm init \
   --kubernetes-version v1.27.1 \
   --service-cidr=10.96.0.0/12 \
   --pod-network-cidr=10.244.0.0/16
+
+
+# 可以使用简单版本 ,apiserver-advertise-address使用默认值
+# 注意v1.27.1搭配docker需要额外安装cri-dockerd 
+$ kubeadm init \
+  --image-repository registry.aliyuncs.com/google_containers \
+  --kubernetes-version v1.27.1 \
+  --service-cidr=10.96.0.0/12 \
+  --pod-network-cidr=10.244.0.0/16
 ```
+
+[k8s v1.27.1默认移除dockershim，需要安装cri-dockerd](https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/#docker)
 
 ``` bash
 # 创建成功输出
@@ -439,6 +470,10 @@ yum-config-manager --add-repo用于添加一个新的yum软件源地址，并将
 以便yum命令可以从该软件源中下载和安装软件包。该命令可以帮助用户获得更多的软件源
 以便在软件包依赖项解决方案中更好地满足其需求。
 ```
+- kubueadm 的--pod-network-cidr是什么
+
+"kubeadm --pod-network-cidr" 是一个命令行参数，用于指定 Kubernetes 集群中 Pod 网络的 CIDR 范围。这个参数需要在初始化 Kubernetes 集群时使用，在部署网络插件时使用。Pod 网络 CIDR 是一个 IP 地址段，用于定义 Kubernetes 集群中 Pod 之间通信的网络地址。这个 CIDR 范围定义了 Kubernetes 集群中 Pod 网络的 IP 地址。常见的 CIDR 范围包括 10.244.0.0/16、172.16.0.0/16 等。正确设置 Pod 网络 CIDR 很重要，因为它对 Kubernetes 集群的网络和通信架构有重要的影响。
+
 
 - kuernetes.repo
 
@@ -560,6 +595,17 @@ $ sudo yumdownloader --resolve docker-ce-18.06.3.ce-3.el7
 - Port 10250 is in use
 
 > $ kubeadm reset
+
+- k8s的默认CNI配置在哪里获取
+
+``` log
+默认情况下，Kubernetes使用CNI插件来管理容器网络，其中包括常见的插件如Flannel、Calico、Weave Net等。
+
+```
+
+- linux 的 /etc/cni/net.d/ 里面的配置是干嘛的
+
+/etc/cni/net.d/目录是用于存放Kubernetes CNI插件的配置文件的，默认情况下是在kubelet启动时从这个目录读取配置文件。Kubernetes的默认CNI插件是`kubelet`在启动时自动加载。在使用kubelet启动Kubernetes集群时，kubelet会检查`/etc/cni/net.d/`目录中是否存在`10-kubenet.conf`或`10-bridge.conf`文件。CNI插件是Kubernetes系统中用于管理网络的组件，它可以为不同的Pod分配IP地址、创建和删除网络接口等操作。在该目录下，可以指定使用哪一个CNI插件，并为该插件提供相应的配置参数，例如网络类型、IP地址池、MTU等等。不同的CNI插件有不同的配置方式，但这个目录是它们的公共配置目录。
 
 - k8s安装以后有哪些服务
 
