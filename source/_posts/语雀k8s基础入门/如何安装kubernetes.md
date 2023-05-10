@@ -144,6 +144,33 @@ EOF
 $ sysctl --system
 ```
 
+8. 安装
+
+``` bash
+$ yum install bridge-utils ebtable
+$ systemctl restart network.service
+# 启用 iptables 转发功能
+$ sysctl -w net.ipv4.ip_forward=1
+# 开启bridge相关的内核模块
+# modprobe是Linux中用于加载内核模块的命令
+# br_netfilter是Linux内核网络功能的一个模块
+# 用于实现网络桥接口的内核网络过滤器功能
+$ modprobe br_netfilter
+
+# ip_forward控制Linux内核是否开启IP包转发功能
+# 如果不开启，则无法实现网络之间的数据传输
+# 开启ip_forward
+
+# 命令开启, 重启服务器后这个设置会失效
+$ sysctl net.ipv4.ip_forward=1
+
+# 更改为1则永久开启IP包转发功能
+$ cat /etc/sysctl.conf | grep net.ipv4.ip_forward
+
+# 刷新配置
+$ sudo sysctl -p
+```
+
 ### 二、docker和二进制程序
 
 
@@ -318,11 +345,31 @@ $ kubeadm init \
 # 可以使用简单版本 ,apiserver-advertise-address使用默认值
 # 注意v1.27.1搭配docker需要额外安装cri-dockerd 
 $ kubeadm init \
+  --apiserver-advertise-address=192.168.18.100 \
   --image-repository registry.aliyuncs.com/google_containers \
   --kubernetes-version v1.27.1 \
   --service-cidr=10.96.0.0/12 \
-  --pod-network-cidr=10.244.0.0/16
+  --pod-network-cidr=10.244.0.0/16 \
+  --v=5
+
+### kubueadm init 失败的时候
+$ kubeadm reset
+
+# 重新init的时候带上 --v=5 查看详细
+
+# 生成文件初始化集群
+$ kubeadm config print init-defaults > init.default.yaml
+$ kubeadm init--config=init.default.yaml
 ```
+
+``` bash
+# 查看contianerd是否正常
+$ journalctl -xeu containerd --no-pager
+
+# 查看是否有containerd的镜像启动
+$ ctr --help
+```
+
 
 [k8s v1.27.1默认移除dockershim，需要安装cri-dockerd](https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/#docker)
 
@@ -454,6 +501,12 @@ $ cd /etc/yum.repos.d/docker.repo
 # 通过该文件，可以使用yum命令在CentOS/RHEL系统中安装、更新、卸载docker软件包
 ```
 
+- ebtables  和bridge-utils 是干嘛的
+
+   ebtables是一种基于Linux内核的防火墙软件，可以实现在数据包到达网络接口之前或之后对其进行过滤、修改等操作。ebtables是专门用于网桥设备的防火墙，可以识别和处理以太网帧，可以基于MAC地址、VLAN标签等进行过滤和转发操作。
+
+   bridge-utils是一组用于配置和管理Linux内核中的网络桥设备的命令行工具。它可以进行网桥的创建、删除、配置等操作。bridge-utils提供了一些命令行工具，例如brctl，可以用来查询、设置和管理网络桥接口，如添加和删除网桥、添加和删除网桥端口、设置网桥参数等。通过bridge-utils，用户可以方便地搭建以太网桥接网络，实现不同物理网络间的数据转发和通信。
+
 - Failed to download metadata for repo ‘docker-ce-stable
 
 ``` bash
@@ -513,6 +566,13 @@ kube-flannel使用VXLAN或UDP封装技术来创建一个覆盖整个集群的扁
 
 > 这些组件共同组成了Kubernetes控制平面，负责管理和控制整个Kubernetes集群的运行状态。
 
+- 检查 IP 为 192.168.1.1 的计算机的端口 80 是否开放
+
+``` bash
+$ yum install telnet
+$ telnet 192.168.1.1 80
+```
+
 - kubectl get svc的输出解释
 
 ``` bash
@@ -535,6 +595,31 @@ $ `my-service`是一个ClusterIP类型的Service，其Cluster IP地址为`10.0.0
 $ `app-service`是一个LoadBalancer类型的Service，其Cluster IP地址为`10.0.0.15`
     暴露的端口号为80/TCP，同时外部IP地址为`203.0.113.10`，将请求转发到NodePort `30000`上
 ```
+
+- kubeadm config print init-defaults
+
+``` txt 
+kubeadm config print init-defaults 是一个命令，用于打印 kubeadm 初始化时的默认配置。
+这个命令可以帮助用户了解 kubeadm 在默认情况下会使用哪些配置，以及这些配置如何影响 Kubernetes 集群的部署和运行。
+```
+
+- containerd出现异常 failed to pull and unpack image "registry.k8s.io/pause:3.8"
+
+``` bash
+# 镜像拉取失败
+$ ctr image pull registry.k8s.io/pause:3.8
+
+# 需要配置sanbox为
+sandbox_image = "registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.5"
+```
+
+- kubeadm init的时候监听日志
+
+``` bash
+$ journalctl -xeu kubelet -f
+```
+
+[使用 kubeadm 部署 kubernetes(CRI 使用 containerd)](https://docker-practice.github.io/zh-cn/kubernetes/setup/kubeadm.html)
 
 - linux怎么样验证一个端口通不通
 
