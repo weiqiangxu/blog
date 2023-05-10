@@ -21,6 +21,7 @@ CentOS 7.6 64bit 2核 2G * 2 ( 操作系统的版本至少在7.5以上 )
 ``` bash
 $ systemctl stop firewalld
 $ systemctl disable firewalld
+$ systemctl status firewalld
 ```
 
 #### 2.设置主机名
@@ -31,20 +32,41 @@ $ hostnamectl set-hostname k8s-master
 
 # 在其他节点执行
 $ hostnamectl set-hostname k8s-node1
+
+# 查看当前主机名称
+$ uname -a
 ```
 
 #### 3.主机域名解析
 
 ``` bash
+# 获取本机在本地网络中的ip地址
+# ifconfig输出的是 网络接口，各个网络接口
+# 一般是ifconfig的第一个网络接口eth0的ipV4
+# etho的全称是 Ethernet interface 0,表示第一块以太网网卡的接口
+# 还有其他网络接口比如docker0(docker创建的虚拟网络接口用于容器之间、容器与主机通信)
+# 网络接口lo全称是loopback：本地回环接口，主机与自己通话用的
+
+# ifconfig的eth0的ipV4
+
 # 注意：这里的IP地址是机器的局域网IP地址
 $ cat >> /etc/hosts << EOF
-10.0.20.2 k8s-master
+10.0.8.4 k8s-master
 EOF
+
+# 查看设置的内容
+$ cat /etc/hosts
 ```
 
 #### 4.统一时间
 
 ``` bash
+# 查看当前时间
+$ date
+
+# ntpdate是一个程序
+# 用于在Linux或其他类Unix操作系统中同步计算机时钟与网络时间协议（NTP）服务器的系统时间
+# 它可以在启动时自动更新系统时间，或者手动运行以进行时间同步
 $ yum install ntpdate -y
 $ ntpdate time.windows.com
 ```
@@ -109,7 +131,9 @@ $ cat /etc/fstab | grep swap
 #### 7.将桥接的IPv4流量传递到iptables的链
 
 ``` bash
-#在每个节点上将桥接的IPv4流量传递到iptables的链
+# 启用桥接网络模块的 IPv6 数据包过滤功能
+# 启用桥接网络模块的 IPv4 数据包过滤功能
+# 系统会在下次启动时自动加载这些参数
 $ cat > /etc/sysctl.d/k8s.conf << EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -124,6 +148,8 @@ $ sysctl --system
 
 
 #### 1.安装docker
+
+如果需要离线安装参照[这里](https://weiqiangxu.github.io/2023/04/18/%E8%AF%AD%E9%9B%80k8s%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/docker%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85/)
 
 ``` bash
 # 从阿里云的镜像站点上下载docker-ce的yum源配置文件docker-ce.repo
@@ -198,7 +224,7 @@ $ yum makecache
 
 #### 4.安装kubeadm\kubelet\kubectl
 
-如果需要离线安装请[访问](https://kubernetes.io/releases/download/)
+如果需要离线安装请访问[Kubernetes文档/入门/下载Kubernetes](https://kubernetes.io/releases/download/)
 
 ``` bash
 # install
@@ -524,6 +550,13 @@ $ kubectl taint nodes k8s-master node-role.kubernetes.io/master:NoSchedule-
 这可以确保主节点保持稳定和安全，防止普通的Pod对主节点产生负面影响。
 ```
 
+- yum怎么下载rpm安装包
+
+``` bash
+$ sudo yum install yum-utils
+$ sudo yumdownloader --resolve docker-ce-18.06.3.ce-3.el7
+```
+
 - Port 10250 is in use
 
 > $ kubeadm reset
@@ -545,6 +578,14 @@ $ kubectl get pod -A -o wide
 # kube-system    kube-proxy-5qzvn                     1/1     Running
 # kube-system    kube-scheduler-k8s-master            1/1     Running
 ```
+
+- ifconfig 输出的 eth0是什么意思
+
+eth0是指计算机中的第一个以太网接口，通常用于连接本地网络或连接到互联网的路由器。该接口可以通过ifconfig命令进行配置和管理。
+
+- ifconfig 输出的 eth0之中的 inet 和 inet6是什么意思
+
+ifconfig 输出的 eth0 中的 inet 和 inet6 是指该接口所分配的 IPv4 和 IPv6 地址。inet 是 IPv4 地址，inet6 是 IPv6 地址。这两个地址用于标识网络中的设备，以便它们可以相互通信。inet 和 inet6 地址是网络编程中常用的概念，它们分别对应着 IPv4 和 IPv6 协议，用于实现网络数据传输。
 
 ### 相关资料
 
