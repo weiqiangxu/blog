@@ -15,6 +15,8 @@ sticky: 1
 
 CentOS 7.6 64bit 2核 2G * 2 ( 操作系统的版本至少在7.5以上 )
 
+[1.环境准备之 kubernetes v1.26 CRI](https://v1-26.docs.kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/)
+[2.使用部署工具kubeadm安装 kubernetes v1.26](https://v1-26.docs.kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/)
 
 #### 1.防火墙
 
@@ -345,7 +347,7 @@ $ kubeadm init \
 # 可以使用简单版本 ,apiserver-advertise-address使用默认值
 # 注意v1.27.1搭配docker需要额外安装cri-dockerd 
 $ kubeadm init \
-  --apiserver-advertise-address=192.168.18.100 \
+  --apiserver-advertise-address=10.0.8.4 \
   --image-repository registry.aliyuncs.com/google_containers \
   --kubernetes-version v1.27.1 \
   --service-cidr=10.96.0.0/12 \
@@ -357,14 +359,20 @@ $ kubeadm reset
 
 # 重新init的时候带上 --v=5 查看详细
 
-# 生成文件初始化集群
+# kubeadm生成默认配置并且用来启动
 $ kubeadm config print init-defaults > init.default.yaml
 $ kubeadm init--config=init.default.yaml
 ```
 
 ``` bash
 # 查看contianerd是否正常
+# 可能看到/etc/containerd/config.yml的sandbox_image pull fail
+# 可以改成 registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.5
 $ journalctl -xeu containerd --no-pager
+
+# 监听containerd
+$ journalctl -xeu kubelet -f
+$ journalctl -xeu containerd -f
 
 # 查看是否有containerd的镜像启动
 $ ctr --help
