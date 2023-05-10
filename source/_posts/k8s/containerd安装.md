@@ -95,7 +95,12 @@ EOF
 
 2. systemd
 
-拷贝内容 [containerd.service](https://raw.githubusercontent.com/containerd/containerd/main/containerd.service) 到 /usr/local/lib/systemd/system/containerd.service, 然后运行:
+``` bash
+$ mkdir -p /usr/local/lib/systemd/system/
+$ touch /usr/local/lib/systemd/system/containerd.service
+```
+
+然后拷贝内容 [containerd.service](https://raw.githubusercontent.com/containerd/containerd/main/containerd.service) 到 /usr/local/lib/systemd/system/containerd.service, 然后运行:
 
 ``` bash
 $ systemctl daemon-reload
