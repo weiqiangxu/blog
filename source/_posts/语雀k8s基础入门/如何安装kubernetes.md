@@ -413,7 +413,7 @@ $ kubectl get nodes
 # 使用kubectl工具将kube-flannel.yml文件中定义的Flannel网络插件之中
 # Deployment、DaemonSet、ServiceAccount等Kubernetes资源部署到集群中
 # 从而为集群中的宿主机和容器、容器间提供网络互联功能
-$ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+$ wget https://github.com/flannel-io/flannel/releases/download/v0.21.5/kube-flannel.yml
 $ kubectl apply -f kube-flannel.yml
 
 # 查看集群pods确认是否成功
@@ -427,6 +427,8 @@ $ kubectl get cs
 # 显示集群的相关信息(DNS\证书\密钥等)
 $ kubectl cluster-info
 ```
+
+kubectl怎么安装flannel的,新添加的节点又是如何安装flannel的呢,在文件夹/etc/cni/net.d的配置是如何拷贝的呢,请访问[K8s网络之深入理解CNI](https://zhuanlan.zhihu.com/p/450140876)
 
 ### 四、部署nginx服务测试集群
 
