@@ -47,7 +47,7 @@ virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
 ```
 执行 "ifconfig" 命令可以查看 Linux 系统上的网络接口信息。以下是该命令输出的一些字段及其含义：
 
-- 接口名称（例如 enp0s3）：这是网络接口的名称，每个接口都有一个唯一的名称。
+- 网络接口名称（例如 enp0s3）：这是网络接口的名称，每个接口都有一个唯一的名称。
 - flags 属性：它告诉您接口的当前状态，如是否启用（UP）、是否支持广播（BROADCAST）、是否运行（RUNNING）和是否支持多播（MULTICAST）。
 - inet 属性：它显示分配给接口的 IP 地址。
 - netmask 属性：它显示子网掩码。

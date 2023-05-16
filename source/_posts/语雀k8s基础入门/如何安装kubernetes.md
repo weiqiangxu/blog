@@ -130,7 +130,7 @@ $ sed -ri 's/.*swap.*/#&/' /etc/fstab
 $ cat /etc/fstab | grep swap
 ```
 
-#### 7.将桥接的IPv4流量传递到iptables的链
+#### 7.启用桥接网络模块的IPv6\IPv4 数据包过滤功能
 
 ``` bash
 # 启用桥接网络模块的 IPv6 数据包过滤功能
@@ -149,10 +149,10 @@ $ sysctl --system
 8. 安装
 
 ``` bash
+# 如果有一些工具没有安装
 $ yum install bridge-utils ebtable
 $ systemctl restart network.service
-# 启用 iptables 转发功能
-$ sysctl -w net.ipv4.ip_forward=1
+
 # 开启bridge相关的内核模块
 # modprobe是Linux中用于加载内核模块的命令
 # br_netfilter是Linux内核网络功能的一个模块
@@ -162,67 +162,34 @@ $ modprobe br_netfilter
 # ip_forward控制Linux内核是否开启IP包转发功能
 # 如果不开启，则无法实现网络之间的数据传输
 # 开启ip_forward
-
-# 命令开启, 重启服务器后这个设置会失效
-$ sysctl net.ipv4.ip_forward=1
-
 # 更改为1则永久开启IP包转发功能
+# 将下面的net.ipv4.ip_forward的一行的值更改为1
+# 如果没有添加一行 net.ipv4.ip_forward = 1
 $ cat /etc/sysctl.conf | grep net.ipv4.ip_forward
 
 # 刷新配置
-$ sudo sysctl -p
+$ sysctl -p
+
+# 验证更改是否成功
+$ sysctl -a | grep net.ipv4.ip_forward
 ```
 
-### 二、docker和二进制程序
+### 二、安装二进制程序
 
 
-#### 1.安装docker
+#### 1.containerd安装
 
-如果需要离线安装参照[这里](https://weiqiangxu.github.io/2023/04/18/%E8%AF%AD%E9%9B%80k8s%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/docker%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85/)
+[containerd v1.7.0 的安装](https://weiqiangxu.github.io/2023/05/06/k8s/containerd%E5%AE%89%E8%A3%85/)
 
-``` bash
-# 从阿里云的镜像站点上下载docker-ce的yum源配置文件docker-ce.repo
-# 并将其保存到本地的/etc/yum.repos.d/目录下
-$ wget https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo -O /etc/yum.repos.d/docker-ce.repo
+更改镜像地址 /etc/containerd/config.yml:
 
-# 各节点安装docker
-$ yum -y install docker-ce-18.06.3.ce-3.el7
-
-# docker添加到系统服务并启动docker
-$ systemctl enable docker && systemctl start docker
-
-# 验证安装结果
-$ docker version
+``` yml
+# 注意这里因为网络原因更改sanbox镜像地址否则会无法kubeadm init
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.5"
 ```
 
-#### 2.Docker镜像源
-
-``` bash
-# 创建docker配置
-$ sudo mkdir -p /etc/docker
-
-# 设置docker国内镜像
-# tee: 该命令用于向文件中写入内容，并在标准输出中显示相同的内容
-# 将大括号的空JSON对象写入到/etc/docker/daemon.json文件中
-$ sudo tee /etc/docker/daemon.json <<-'EOF'
-{
-  "exec-opts": ["native.cgroupdriver=systemd"], 
-  "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"], 
-  "live-restore": true,
-  "log-driver":"json-file",
-  "log-opts": {"max-size":"500m", "max-file":"3"},
-  "storage-driver": "overlay2"
-}
-EOF
-
-# systemctl重载服务配置文件
-$ sudo systemctl daemon-reload
-
-# 重启docker服务
-$ sudo systemctl restart docker
-```
-
-#### 3.kubernetes镜像源
+#### 2.添加kubernetes镜像源
 
 ``` bash
 # 注意下面的mirrors是区分架构的
@@ -251,13 +218,11 @@ $ yum clean all
 $ yum makecache
 ```
 
-#### 4.安装kubeadm\kubelet\kubectl
-
-二进制文件下载可以访问[Kubernetes文档/入门/下载Kubernetes](https://kubernetes.io/releases/download/) 或者 [https://www.downloadkubernetes.com/](https://www.downloadkubernetes.com/)，kubeadm和kubectl可以直接离线二进制文件移动至/usr/bin完成安装，而kubelet需要systemend注册，比较麻烦可以通过离线下载rpm包的方式进行安装.详细说明查看 [kubelet 的 systemd drop-in 文件](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#the-kubelet-drop-in-file-for-systemd)
+#### 3.安装kubeadm v1.27.1\kubelet v1.27.1\kubectl v1.27.1
 
 ``` bash
-# install
-$ yum install -y kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0
+# 在线安装
+$ yum install -y kubelet-1.27.1 kubeadm-1.27.1 kubectl-1.27.1
 
 # 启用kubelet服务,开机自启动
 $ systemctl enable kubelet
@@ -289,6 +254,8 @@ $ cat > /etc/cni/net.d/10-flannel.conf <<EOF
 EOF
 ```
 
+如果你想要离线安装，二进制文件下载可以访问[Kubernetes文档/入门/下载Kubernetes](https://kubernetes.io/releases/download/) 或者 [https://www.downloadkubernetes.com/](https://www.downloadkubernetes.com/)，kubeadm和kubectl可以直接离线二进制文件移动至/usr/bin完成安装，而kubelet需要systemend注册，比较麻烦可以通过离线下载rpm包的方式进行安装.详细说明查看 [kubelet 的 systemd drop-in 文件](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/kubelet-integration/#the-kubelet-drop-in-file-for-systemd)
+
 ``` bash
 # 如果需要离线安装建议下载rpm包
 $ sudo yum install yum-utils
@@ -301,7 +268,7 @@ $ sudo rpm -ivh *.rpm
 $ systemctl status kubelet
 ```
 
-#### 5.安装CNI插件
+#### 4.安装CNI插件
 
 
 CNI插件是二进制文件移动到系统环境变量里面完成安装，各个架构下的各个版本下载可以访问[github.com/containernetworking/plugins](https://github.com/containernetworking/plugins/releases)
