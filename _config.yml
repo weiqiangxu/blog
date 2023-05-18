@@ -27,7 +27,9 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-skip_render: "*.yml"
+skip_render: 
+  - "source/_posts/语雀k8s基础入门/mychart"
+  - "source/_posts/语雀k8s基础入门/yml"
 
 # Writing
 new_post_name: :title.md # File name of new posts
