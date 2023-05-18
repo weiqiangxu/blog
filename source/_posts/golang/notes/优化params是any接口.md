@@ -8,6 +8,7 @@ categories:
   - golang
 date: 2023-04-20 17:43:12
 excerpt: 如何优化参数为范型数据的接口
+hide: true
 ---
 
 ### 一、code

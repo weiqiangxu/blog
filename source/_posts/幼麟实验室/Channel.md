@@ -6,6 +6,7 @@ categories:
   - go
 date: 2023-04-08 06:40:12
 index_img: /images/bg/电脑桌面.jpeg
+hide: true
 ---
 
 ### channel的特性

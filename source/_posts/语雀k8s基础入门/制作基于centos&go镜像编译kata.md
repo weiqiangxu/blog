@@ -1,5 +1,5 @@
 ---
-title: 制作基于centos的go环境镜像
+title: 制作基于centos&go镜像编译kata
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
@@ -28,7 +28,7 @@ ENV GOPATH="/home/go" \
     TZ="Asia/Shanghai"
 
 # repo
-RUN curl https://sh.rustup.rs -sSf | sh && export PATH="$HOME/.cargo/bin:$PATH"
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && export PATH="$HOME/.cargo/bin:$PATH"
 RUN yum-config-manager --add-repo  https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo && yum -y install wget
 RUN cd /home && wget https://go.dev/dl/go1.19.8.linux-arm64.tar.gz && tar -C /usr/local -xzf go1.19.8.linux-arm64.tar.gz
 RUN echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile && source /etc/profile

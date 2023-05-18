@@ -1,2 +1,5 @@
+---
+hide: true
+---
 # chan
 

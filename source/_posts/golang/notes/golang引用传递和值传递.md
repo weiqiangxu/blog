@@ -8,6 +8,7 @@ categories:
   - golang
 date: 2020-08-20 17:43:12
 excerpt: 理解什么是值传递什么是引用传递吗，golang的结构体是值传递吗，切片是引用传递吗
+hide: true
 ---
 
 ### 一、为什么说golang的所有数据类型都是值传递

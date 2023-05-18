@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # websocket
 
 [github.com/gorilla/websocket](github.com/gorilla/websocket)

@@ -13,6 +13,7 @@ categories:
 date: 2013-11-06 06:40:12
 sticky: 100
 excerpt: 摘要
+hide: true
 ```
 
 ### 部署命令

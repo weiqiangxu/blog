@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # stream
 
 ### 类型

@@ -1,5 +1,6 @@
 ---
 title: string
+hide: true
 ---
 
 ### 术语

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # go build 约束
 
 [pkg.go.dev/go/build](https://pkg.go.dev/go/build#hdr-Build_Constraints)

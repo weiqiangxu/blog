@@ -1,5 +1,6 @@
 ---
 title: cpu架构
+hide: true
 ---
 
 ### CPU两大派系

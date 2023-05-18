@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # Redis集群模式搭建
 
 1. redis-conf

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # tcp 粘包
 
 [TCP黏包](https://www.topgoer.com/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/socket%E7%BC%96%E7%A8%8B/TCP%E9%BB%8F%E5%8C%85.html)

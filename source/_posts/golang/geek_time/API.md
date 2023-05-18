@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # API_Getway
 
 1. API Gateway 演进

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # 如何安装gitlab
 
 ### Linux上安装gitlab

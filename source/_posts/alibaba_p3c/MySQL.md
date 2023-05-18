@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 # MySQL规范
 
 

@@ -1,5 +1,6 @@
 ---
 title: float浮点数精度丢失
+hide: true
 ---
 
 [float浮点数精度丢失问题分析](https://zhuanlan.zhihu.com/p/375156201)

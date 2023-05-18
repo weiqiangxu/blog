@@ -1,1 +1,4 @@
+---
+hide: true
+---
 # pprof

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # nacos
 
 [nacos.io/zh-cn/docs](https://nacos.io/zh-cn/docs/what-is-nacos.html)

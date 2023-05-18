@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # 如何编写流水线fmt&&lint
 
 1. 安装gitlab-runner并注册

@@ -8,6 +8,7 @@ categories:
   - go
   - gmp
 date: 2013-11-06 06:40:12
+hide: true
 ---
 
 ### 关键术语

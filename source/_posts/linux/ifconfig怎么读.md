@@ -8,6 +8,7 @@ categories:
   - linux
 date: 2023-04-12 18:40:12
 excerpt: 如何读ifconfig输出
+hide: false
 ---
 
 ### 一、实例

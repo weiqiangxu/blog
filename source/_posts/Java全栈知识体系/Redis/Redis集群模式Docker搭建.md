@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # 基于Docker搭建Redis集群
 
 ### 创建本地data目录和conf文件夹

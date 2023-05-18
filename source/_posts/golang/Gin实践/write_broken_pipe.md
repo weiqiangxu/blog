@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # why write: broken pipe
 
 [golang服务报错: write: broken pipe](https://blog.csdn.net/cljdsc/article/details/124134531)

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # CI
 
 [https://docs.gitlab.com/ee/ci/](https://docs.gitlab.com/ee/ci/)

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # pprof
 
 1. 如何启用
