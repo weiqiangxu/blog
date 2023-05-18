@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # DockerDesktopInstall 在Docker上搭建k8s集群
 
 1. Docker Desktop 自带 kubenetes

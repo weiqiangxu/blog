@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # kubecm
 
 > 管理kube config的

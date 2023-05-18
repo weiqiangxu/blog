@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # harbor install && usage
 
 [goharbor.io](https://goharbor.io/docs/2.7.0/install-config/)

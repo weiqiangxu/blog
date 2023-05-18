@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # linux awk
 
 [linux三剑客之三（awk）(最强大）](https://zhuanlan.zhihu.com/p/419494231)

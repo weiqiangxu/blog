@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # kubeadm
 
 [kubeadm quickstart](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/)

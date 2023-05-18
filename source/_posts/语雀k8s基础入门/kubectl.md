@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # kubectl
 
 > $HOME/.kube/config

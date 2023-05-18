@@ -1,5 +1,6 @@
 ---
 title: mongodb集群
+hide: true
 ---
 
 # mongodb基于k8s实现高可用

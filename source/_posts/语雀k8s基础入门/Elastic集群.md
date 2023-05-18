@@ -1,5 +1,5 @@
 ---
-hide: false
+hide: true
 ---
 # Elastic高可用方案
 

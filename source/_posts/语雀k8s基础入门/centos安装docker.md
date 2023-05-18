@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # centos 安装 docker
 
 [https://docs.docker.com/engine/install/centos/](https://docs.docker.com/engine/install/centos/)

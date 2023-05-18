@@ -1,5 +1,5 @@
 ---
-hide: false
+hide: true
 ---
 # nacos
 

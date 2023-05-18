@@ -1,4 +1,4 @@
 ---
-hide: false
+hide: true
 ---
 # systemctl
