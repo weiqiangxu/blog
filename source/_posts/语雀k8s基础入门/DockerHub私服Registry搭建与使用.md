@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # Docker Hub私服Registry搭建与使用
 
 1. 镜像拉取

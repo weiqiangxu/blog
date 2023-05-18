@@ -1,3 +1,6 @@
+---
+hide: false
+---
 # docker install centos with golang
 
 1. 编写Dockerfile制作镜像

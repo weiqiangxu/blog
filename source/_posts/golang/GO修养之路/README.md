@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # GO修养之路
 
 [GO修养之路](https://www.yuque.com/aceld/golang/ithv8f)

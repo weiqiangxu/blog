@@ -1,3 +1,6 @@
+---
+hide: false
+---
 # Elastic高可用方案
 
 1. 多节点 多分片 [集群模式](https://blog.csdn.net/qq_41167306/article/details/122967059)

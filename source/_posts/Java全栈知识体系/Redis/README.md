@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 # redis
 
 1. 介绍

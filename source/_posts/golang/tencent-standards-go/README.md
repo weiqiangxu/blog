@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # Golang 代码规范
 
 [TOC]

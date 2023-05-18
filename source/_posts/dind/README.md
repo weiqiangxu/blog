@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # Docker in Docker
 
 ```

@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # opentracing
 
 1. 什么是opentracing

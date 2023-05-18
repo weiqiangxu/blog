@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # Domain Driven Design 领域驱动模型
 
 > 按业务水平分层，按数据流垂直分层

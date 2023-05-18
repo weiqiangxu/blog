@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # golang gin实践
 
 [Gin实践](https://www.jishuchi.com/books/gin-practice)

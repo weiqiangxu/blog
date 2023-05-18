@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # elastic
 
 1. 基本使用相关

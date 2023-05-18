@@ -1,3 +1,6 @@
+---
+hide: true
+---
 # golang推荐的包
 
 1. golang.org/x/sync/errgroup
