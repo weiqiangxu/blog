@@ -1,6 +1,6 @@
 ---
 title: 为什么需要flannel
-index_img: /images/bg/linux.jpeg
+index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
   - kubernetes
