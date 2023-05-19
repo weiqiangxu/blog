@@ -14,5 +14,19 @@ hide: false
 
 ### 一、发行版本关系图
 
+![linux发行版](/images/linux发行版.png)
 
 ### 二、 包管理工具
+
+1. dpkg (Ubuntu、Debian)
+2. apt (Ubuntu、Debian) 
+3. rpm (RHEL、CentOS)
+4. yum (CentOS6、CentOS7)
+5. dnf (RHEL8、CentOS8)
+6. apt-get,apt的旧版本
+
+
+### 相关资料
+
+[非常详细的linux发行版大全](https://github.com/FabioLolix/LinuxTimeline/releases/)
+[五种常见 Linux 系统安装包管理工具中文使用指南](https://zhuanlan.zhihu.com/p/562391617)
