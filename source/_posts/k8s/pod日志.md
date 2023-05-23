@@ -62,7 +62,17 @@ spec:
 
 5. 节点级代理 - 每个节点都有一个代理，使用daemonSet实现
 
-- stdout 和 stderr 传输流有什么区别
+- stdout 和 stderr 传输流（还有stdin）有什么区别
+
+1. 当一个用户进程被创建的时候，系统会自动为该进程创建三个数据流，分别是标准输出、标准输入和标准错误，分别用stdout, stdin, stderr来表示.
+2. stderr / stdin / stdout 分别指向与标准错误流 / 标准输入流 / 标准输出流相关联的 FILE 对象;
+3. 对于应用层来说，stdin / stdout / stderr 实际上就是在程序开始运行时被默认打开的文件而已，跟你自己用 fopen()/open() 去打开一个文件没有区别(本质是个设备文件)。
+4. 区别在于stdout（标准输出），输出方式是行缓冲。输出的字符会先存放在缓冲区，等按下回车键时才进行实际的I/O操作，stderr（标准出错），是不带缓冲的，这使得出错信息可以直接尽快地显示出来。
+
+``` bash
+$ ls -l /dev/std*
+```
+
 - 外挂的volumn可以是一个所有节点的容器都可以访问的 namespace下面的pod一样的吗
 - 外挂的volumn可以不是一个固定的宿主机上面的path对吧
 - kubectl logs 查看日志原理

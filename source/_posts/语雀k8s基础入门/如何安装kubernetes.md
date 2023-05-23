@@ -53,7 +53,7 @@ $ uname -a
 
 # 注意：这里的IP地址是机器的局域网IP地址
 $ cat >> /etc/hosts << EOF
-10.0.8.4 k8s-master
+10.16.203.44 k8s-master
 EOF
 
 # 查看设置的内容
@@ -314,7 +314,7 @@ $ kubeadm init \
 # 可以使用简单版本 ,apiserver-advertise-address使用默认值
 # 注意v1.27.1搭配docker需要额外安装cri-dockerd 
 $ kubeadm init \
-  --apiserver-advertise-address=10.0.8.4 \
+  --apiserver-advertise-address=10.16.203.44 \
   --image-repository registry.aliyuncs.com/google_containers \
   --kubernetes-version v1.27.1 \
   --service-cidr=10.96.0.0/12 \
@@ -328,8 +328,106 @@ $ kubeadm reset
 
 # kubeadm生成默认配置并且用来启动
 $ kubeadm config print init-defaults > init.default.yaml
-$ kubeadm init--config=init.default.yaml
+$ kubeadm init --config=init.default.yaml
 ```
+
+``` bash
+# 在你执行kubectl get ns之前拷贝一下配置
+# 在你执行kubectl get ns之前拷贝一下配置
+# 在你执行kubectl get ns之前拷贝一下配置
+
+[root@k8s-master ~]# mkdir -p $HOME/.kube
+[root@k8s-master ~]# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+[root@k8s-master ~]# sudo chown $(id -u):$(id -g) $HOME/.kube/config
+[root@k8s-master ~]# kubectl get pod
+
+# 否则会抛异常
+
+[root@k8s-master home]# kubectl get pod
+W0522 18:32:07.948191  915987 request.go:1480] the not healthz host trigger to upate base url: localhost:8080:6443
+W0522 18:32:07.950403  915987 request.go:1480] the not healthz host trigger to upate base url: localhost:8080:6443
+W0522 18:32:07.952802  915987 request.go:1480] the not healthz host trigger to upate base url: localhost:8080:6443
+W0522 18:32:07.955076  915987 request.go:1480] the not healthz host trigger to upate base url: localhost:8080:6443
+W0522 18:32:07.957487  915987 request.go:1480] the not healthz host trigger to upate base url: localhost:8080:6443
+```
+
+``` bash
+[root@i-C5B261D3 home]# kubeadm version
+kubeadm version: &version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.21", GitCommit:"ca62f64bd6397f9ab41f68c22d2d48d87d8edb91", GitTreeState:"clean", BuildDate:"2023-01-15T13:33:59Z", GoVersion:"go1.17.1", Compiler:"gc", Platform:"linux/arm64"}
+
+
+# 这个不知道为啥 
+# 为啥 kube-controller-manager 和 kube-scheduler 是Exited的状态
+[root@k8s-master home]# crictl ps -a
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID
+d529ea99a5dda       20654f2150dd5       6 seconds ago       Exited              kube-controller-manager   2                   26d5a6aaca513
+bcb291b686f32       717e2b2b33bd0       6 seconds ago       Exited              kube-scheduler            16                  93a27ed44a6fb
+efed94a74ba8c       78d0a9e0b092c       17 seconds ago      Running             kube-apiserver            2                   48c0c294eeeca
+924e523f0b13c       2252d5eb703b0       17 seconds ago      Running             etcd                      4                   0fe680e794e71
+```
+
+``` yml
+# 生成的 init.default.yaml 配置
+apiVersion: kubeadm.k8s.io/v1beta3
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  # 1.更改为当前局域网IP地址
+  advertiseAddress: 10.16.203.44
+  bindPort: 6443
+nodeRegistration:
+  # 2.更改CRI，默认是docker如果用containerd需要更改
+  criSocket: /run/containerd/containerd.sock
+  imagePullPolicy: IfNotPresent
+  # 3.更改为hostname
+  name: k8s-master
+  taints: null
+---
+apiServer:
+  timeoutForControlPlane: 4m0s
+apiVersion: kubeadm.k8s.io/v1beta3
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+controllerManager: {}
+dns: {}
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+# 4.更改镜像为国内镜像
+imageRepository: registry.aliyuncs.com/google_containers
+kind: ClusterConfiguration
+# 5.更改目标kubernetes版本
+kubernetesVersion: 1.22.0
+networking:
+  dnsDomain: cluster.local
+  # 6.设置集群中Pod的IP地址段
+  podSubnet: 172.16.0.0/16
+  # 7.设置集群中Service的IP地址段
+  serviceSubnet: 10.96.0.0/12
+scheduler: {}
+```
+
+``` bash
+# 执行初始化集群，如果已经初始化集群的则 kubeadm reset 一下
+# 注意：kubeadm reset 不会删除 $HOME/.kube
+# 所以 kubeadm reset之后手动删除 $HOME/.kube
+$ kubeadm init --config=init.default.yaml
+```
+>  kubeadm reset之后手动删除 $HOME/.kube
+
+``` bash
+# 查看集群所有容器
+$ crictl ps -a
+```
+
+>  为啥 `ctr c list` 查看不到k8s的所有容器呢
 
 ``` bash
 # 查看contianerd是否正常
@@ -701,6 +799,21 @@ ifconfig 输出的 eth0 中的 inet 和 inet6 是指该接口所分配的 IPv4 �
 $ echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bash_profile
 $ source ~/.bash_profile
 ```
+
+- CRI为containerd的k8s集群如何定位异常
+
+``` bash
+$ crictl ps -a
+$ crictl logs ${containerdID}
+```
+
+- k8s的版本怎么看，在安装了k8s集群的环境下
+
+可以通过 `$ kubectl version` 输出结果中会有两个版本号，一个是Client Version，一个是Server Version，其中Server Version即为当前集群的Kubernetes版本号。如果使用的是kubeadm搭建的集群，也可以通过 `$ kubeadm version` 输出结果中的kubernetes版本号即为当前集群的版本号。
+
+- 为什么安装了containerd的机器，执行 `ctr c list` 查看不到任何东西但是 `crictl ps -a` 却可以查看到容器列表
+
+可能是因为 `ctr c` 和 `crictl ps` 使用的不同的容器运行时。`ctr c` 是使用 containerd 运行时查看容器，而`crictl` 是使用 CRI (Container Runtime Interface) 运行时查看容器。因此，如果您使用的容器运行时与 containerd 不同，那么您可能无法使用 `ctr c` 查看容器。建议您使用 CRI 运行时，使用 `crictl ps` 来查看容器。
 
 ### 相关资料
 
