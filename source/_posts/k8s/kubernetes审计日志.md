@@ -120,6 +120,15 @@ $ kubectl get pod -A
 $ kubectl logs kube-apiserver-k8s-master -n kube-system -f
 ```
 
+### 相关疑问
+
+- 开启审计日志后时不时会有2条日志是干嘛的
+
+```json
+# ResponseComplete /api/v1/namespaces/kube-system/configmaps?watch=true,"user":{"username":"system:node:k8s-master"}
+# RequestReceived /api/v1/namespaces/kube-system/configmaps?watch=true, "user":{"username":"system:node:k8s-master"}
+```
+
 ### 参考资料
 
 [kubernertes安装](https://weiqiangxu.github.io/2023/04/18/%E8%AF%AD%E9%9B%80k8s%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85kubernetes/)
