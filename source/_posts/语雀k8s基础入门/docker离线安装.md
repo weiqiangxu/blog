@@ -94,6 +94,21 @@ systemctl start docker
 systemctl status docker
 ```
 
+### 四、导出rpm包或者deb包进行离线安装 - 方式更加简单一些
+
+``` bash
+# rpm包导出
+$ yum -y reinstall --downloadonly --downloaddir=./ docker
+
+# 安装rpm包
+$ rpm -ivh ./*.rpm
+$ rpm -ivh package_name.rpm
+
+# deb包导出
+$ apt-get install dpkg-repack
+$ dpkg-repack ${package-name}
+```
+
 ### 参考资料
 
 [docs.docker.com/docker的二进制安装](https://docs.docker.com/engine/install/binaries/)
