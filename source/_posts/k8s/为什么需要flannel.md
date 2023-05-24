@@ -8,7 +8,7 @@ categories:
   - kubernetes
 date: 2023-04-12 18:40:12
 excerpt: flannel做了什么事情，如果没有还可以用其他替代吗，如果是一个标准可以自己实现吗
-hide: false
+hide: true
 ---
 
 
