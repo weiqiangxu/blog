@@ -68,6 +68,44 @@ default via 10.16.207.254 dev br-ext
 - "192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown" 表示在虚拟网络设备virbr0上的子网，本机通过这个设备连接到虚拟机。但是因为该设备处于linkdown（未连接）状态，无法进行通信。
 ```
 
+- 查看防火墙服务是否开启
+
+``` bash
+$ systemctl -l | grep firewalk
+$ systemctl stop firewalld
+```
+
+- 查看某一个ip是否可以访问
+
+``` bash
+$ ping 192.168.1.23
+```
+
+- 查看某一个ip的某一个端口是否可以访问
+
+``` bash
+$ telnet 127.0.0.1 8881
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+```
+
+- 端口是否有服务在监听
+
+``` bash
+$ netstat -tunlp | grep 8881
+tcp 0 0 0.0.0.0:8881 0.0.0.0:* LISTEN 21748/ovsdb-server 
+
+-t：显示TCP协议的连接情况
+-u：显示UDP协议的连接情况
+-n：显示IP地址和端口号，而不是域名和服务名
+-l：显示监听状态的连接情况
+-p：显示与连接相关的进程PID和进程名
+
+$ netstat -nl | grep 8881
+tcp 0 0 0.0.0.0:8881 0.0.0.0:* LISTEN
+```
+
 ### 相关资料
 
 [深入K8S组网架构和Flannel原理](https://juejin.cn/post/6884881812145995790)
