@@ -6,7 +6,7 @@ tags:
   - openvswitch
 categories:
   - kubernetes
-date: 2023-04-23 18:40:12
+date: 2023-06-02 16:56:12
 excerpt: 介绍OVS是什么，来一个quick start体验一下
 sticky: 1
 ---
@@ -83,3 +83,43 @@ root     1224787 1224164  0 10:53 pts/0    00:00:00 grep ovsdb-server
 第10列：TIME，表示进程累计 CPU 时间。
 第11列：COMMAND，表示进程所执行的命令。
 ```
+
+### 三、架构图
+
+当pod与pod之间通信，数据流向怎么样的，每个pod的流量是从pod对应的虚拟网卡，然后流转到网桥 bre-ext，然后经控制器，转向其他网络接口（网卡），最后转向物理网卡完成数据转发。
+
+``` bash
+# 查看当前网桥的拓扑图
+$ ovs-vsctl show
+```
+
+![ovs在多台宿主机之间创建虚拟网桥网卡控制器形式转发流量](/images/ovs-1.png)
+![ovs在单宿主机之间数据走向标准](/images/ovs-2.png)
+![解释什么叫做流表](/images/ovs-3.png)
+![ovs与内核模块之间的关系](/images/ovs-4.png)
+
+
+### 四、数据库结构和 ovs-vsctl 有2个进程
+
+- ovsdb-server 维护数据库/etc/openvswitch/conf.db
+- ovs-vswitchd 核心daemon
+- 两者通过unix domain socket /var/run/openvswitch/db.sock 互相通信
+
+ovs-vsctl 与 ovsdb-server通信，来修改数据库。ovs-vswitchd会和ovsdb-server进行通信，来对虚拟设备做相应的修改。
+
+![数据表结构](/images/vs-db1.png)
+
+> 通过 `cat /etc/openvswitch/conf.db` 或者 `ovsdb-client dump` 可以查看数据库表
+
+![数据表之间的关系](/images/ovs-db2.png)
+
+### Q&A
+
+1. 东西向和南北向流量指的是什么
+
+东西向指的是pod与pod之间，南北向指的是宿主机和pod之间的流量。
+
+### 相关资料
+
+- [set-manager主动连接ovsdb操作流解释](https://blog.csdn.net/wanglei1992721/article/details/105382332)
+- [刘超的通俗云计算](https://www.cnblogs.com/popsuper1982/p/3800574.html)
