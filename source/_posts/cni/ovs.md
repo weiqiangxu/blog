@@ -58,6 +58,7 @@ ovs-vswit 21764 root   19r     FIFO               0,12      0t0     75932 pipe
 ovs-vswit 21764 root   20w     FIFO               0,12      0t0     75932 pipe
 ovs-vswit 21764 root   21u      CHR                1,3      0t0      1029 /dev/null
 
+# 有一个db进程
 $ ps -ef | grep ovsdb-server
 root       58082       1  0 5月29 ?       00:00:00 ovsdb-server: monitoring pid 58083 (healthy)
 root       58083   58082  0 5月29 ?       00:01:25 ovsdb-server /etc/openvswitch/conf.db -vconsole:emer -vsyslog:err -vfile:info --remote=punix:/var/run/openvswitch/db.sock --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --no-chdir --log-file=/var/log/openvswitch/ovsdb-server.log --pidfile=/var/run/openvswitch/ovsdb-server.pid --detach --monitor
