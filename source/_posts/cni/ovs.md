@@ -94,9 +94,10 @@ $ ovs-vsctl show
 ```
 
 ![ovs在多台宿主机之间创建虚拟网桥网卡控制器形式转发流量](/images/ovs-1.png)
-![ovs在单宿主机之间数据走向标准](/images/ovs-2.png)
 ![解释什么叫做流表](/images/ovs-3.png)
+![ovs在单宿主机之间数据走向标准](/images/ovs-2.png)
 ![ovs与内核模块之间的关系](/images/ovs-4.png)
+![ovs内部模块架构图](/images/ovs-arch.png)
 
 
 ### 四、数据库结构和 ovs-vsctl 有2个进程
