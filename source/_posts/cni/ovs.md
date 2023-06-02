@@ -3,7 +3,7 @@ title: OVS入门
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
-  - kubernetes
+  - openvswitch
 categories:
   - kubernetes
 date: 2023-04-23 18:40:12
@@ -23,7 +23,6 @@ $ ps aux | grep openvswitch
 
 # 查询进程ID为65191的进程打开的文件或网络套接字的命令
 $ lsof -p 65191
-
 
 # 查看进程打开了多少个文件或者网络套接字
 $ lsof -p 21764
@@ -58,7 +57,12 @@ ovs-vswit 21764 root   18u  netlink                         0t0     75911 GENERI
 ovs-vswit 21764 root   19r     FIFO               0,12      0t0     75932 pipe
 ovs-vswit 21764 root   20w     FIFO               0,12      0t0     75932 pipe
 ovs-vswit 21764 root   21u      CHR                1,3      0t0      1029 /dev/null
-[root@i-7B581709 ~]# 
+
+$ ps -ef | grep ovsdb-server
+root       58082       1  0 5月29 ?       00:00:00 ovsdb-server: monitoring pid 58083 (healthy)
+root       58083   58082  0 5月29 ?       00:01:25 ovsdb-server /etc/openvswitch/conf.db -vconsole:emer -vsyslog:err -vfile:info --remote=punix:/var/run/openvswitch/db.sock --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --no-chdir --log-file=/var/log/openvswitch/ovsdb-server.log --pidfile=/var/run/openvswitch/ovsdb-server.pid --detach --monitor
+root     1224787 1224164  0 10:53 pts/0    00:00:00 grep ovsdb-server
+
 ```
 
 ``` bash
