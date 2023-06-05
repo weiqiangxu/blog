@@ -12,7 +12,7 @@ index:
     icon: 'iconfont icon-top'
   slogan:
     enable: true
-    text: 找寻热爱~
+    text: QuickStart程序员~
     api:
       enable: true
       url: "https://v1.hitokoto.cn/"
