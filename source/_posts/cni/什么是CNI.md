@@ -46,6 +46,41 @@ $ kubectl apply -f <add-on.yaml>
 
    不是的，除了 https://github.com/containernetworking/plugins 还有很多其他的网络插件可以用于Kubernetes，比如：Calico、Flannel、Weave Net、Cilium等等。可以根据自己的需求选择适合的网络插件来部署Kubernetes集群。
 
+### 六、CNI如何工作的
+
+CNI的接口并不是指HTTP，gRPC接口，CNI接口是指对可执行程序的调用（exec）。
+
+``` bash
+$ ls /opt/cni/bin/  
+
+bandwidth  bridge  dhcp  firewall  flannel  host-device  host-local  ipvlan  
+loopback  macvlan  portmap  ptp  sbr  static  tuning  vlan
+```
+
+![容器运行时执行CNI插件 - 调用二进制脚本方式](/images/cni-pod.png)
+
+> libcni（胶水层）是CNI提供的一个go package，封装了一些符合CNI规范的标准操作，便于容器运行时和网络插件对接。
+
+1. JSON格式的配置文件来描述网络配置;
+2. 容器运行时负责执行CNI插件，并通过CNI插件的标准输入（stdin）来传递配置文件信息，通过标准输出（stdout）接收插件的执行结果;
+3. 环境变量:
+    CNI_COMMAND：定义期望的操作，可以是ADD，DEL，CHECK或VERSION。
+    CNI_CONTAINERID：容器ID，由容器运行时管理的容器唯一标识符。
+    CNI_NETNS：容器网络命名空间的路径。（形如 /run/netns/[nsname]）。
+    CNI_IFNAME：需要被创建的网络接口名称，例如eth0。
+    CNI_ARGS：运行时调用时传入的额外参数，格式为分号分隔的key-value对，例如FOO=BAR;ABC=123
+    CNI_PATH：CNI插件可执行文件的路径，例如/opt/cni/bin。
+4. 通过链式调用的方式来支持多插件的组合使用;
+
+``` bash
+# 调用bridge插件将容器接入到主机网桥
+
+# CNI_COMMAND=ADD 顾名思义表示创建。
+# XXX=XXX 其他参数定义见下文。
+# < config.json 表示从标准输入传递配置文件
+CNI_COMMAND=ADD XXX=XXX ./bridge < config.json
+```
+
 ### Q&A
 
 ##### 1.k8s使用ovs通信的时候，当pod与pod之间通信，数据流向怎么样的
@@ -120,10 +155,41 @@ $ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 - 执行 TCP、UDP 和 SCTP 流转发；
 - 转发是基于iptables的（用iptables规则来实现Kubernetes Service的负载均衡和端口转发功能），每个Service创建一条iptables规则；
 
+
+#### 11.演示如何使用CNI插件来为Docker容器设置网络
+
+- docker指定网络`--net=none`的容器，容器内只有网卡lo无法通信；
+- 调用CNI插件，为容器设置eth0接口，为其分配IP地址，并接入主机网桥mynet0；
+
+1. 容器中新增eth0网络接口：使用Bridge插件为容器创建网络接口，并连接到主机网桥(bridge.json)；
+2. 为容器所在的网段添加路由: `ip route add 10.10.0.0/16 dev mynet0 src 10.10.0.1 `;
+3. 访问容器内
+
+``` bash
+$ curl -I 10.10.0.2 # IP换成实际分配给容器的IP地址
+HTTP/1.1 200 OK
+```
+
+#### 12.如何方便快捷查看网卡 
+
+``` bash
+$ nsenter -t $pid -n ip a
+```
+
+#### 13.删除网桥
+
+``` bash 
+$ ip link delete mynet0 type bridge
+```
+
+
 ### 相关资料
 
 [官方手册 https://github.com/containernetworking/cni](https://github.com/containernetworking/cni)
 [官方手册 CNI/plugins && https://github.com/containernetworking/plugins](https://github.com/containernetworking/plugins)
 [k8s/概念/扩展/网络插件](https://kubernetes.io/zh-cn/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/)
+[k8s/概念/扩展/网络插件/containerd安装网络插件](https://github.com/containerd/containerd/blob/main/script/setup/install-cni)
+[k8s/概念/扩展/网络插件/CRI-O安装网络插件](https://github.com/cri-o/cri-o/blob/main/contrib/cni/README.md)
 [k8s/概念/集群管理/集群网络系统/网络模型 && 如何实现网络模型](https://kubernetes.io/zh-cn/docs/concepts/cluster-administration/networking/#how-to-implement-the-kubernetes-networking-model)
 [k8s/概念/集群管理/安装扩展](https://kubernetes.io/zh-cn/docs/concepts/cluster-administration/addons/#networking-and-network-policy)
+[万字总结，体系化带你全面认识容器网络接口(CNI)](https://mp.weixin.qq.com/s/gWPZKz9Z4gCoZRFX8dvr6w)
