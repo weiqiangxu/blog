@@ -82,13 +82,30 @@ $ vim /etc/kubernetes/manifests/kube-apiserver.yaml
 ```
 
 ``` yml
+# 日志文件保留7天，并保留最近的5个备份。
+# 如果日志文件大小超过100MB，它也将被轮转。当日志文件到达最大保留时间或备份数时，较旧的日志文件将被删除。
 spec:
   containers:
   - command:
     - kube-apiserver
     - --audit-policy-file=/etc/kubernetes/audit/audit-policy.yaml            # 审计日志配置
-    - --audit-log-path=/var/log/containers/audit-log-$(date +%Y-%m-%d).log   # 输出到标准输出
+    - --audit-log-path=/var/log/containers/audit.log                         # 输出到标准输出
     - --audit-log-format=json                                                # 输出格式json
+    - --audit-log-maxage=7
+    - --audit-log-maxbackup=5
+    - --audit-log-maxsize=100
+```
+
+``` bash
+# 日志文件展示
+$ ls /var/log/containers/ | grep audit
+
+audit-2023-06-05T07-12-55.439.log # 备份文件最大100MB
+audit-2023-06-05T07-12-52.231.log # 备份文件
+audit-2023-06-05T07-12-55.891.log # 备份文件
+audit-2023-06-05T07-12-58.439.log # 备份文件
+audit-2023-06-05T07-12-58.786.log # 备份文件
+audit. # 最新的日志文件，超过100MB会自动轮转
 ```
 
 ``` yml
@@ -109,7 +126,7 @@ volumes:
     type: DirectoryOrCreate
   name: etc-audit
 - hostPath:
-    path: /var/log/containers/
+    path: /var/log/containers
     type: DirectoryOrCreate
   name: audit-log
 ```

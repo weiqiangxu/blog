@@ -116,6 +116,9 @@ $ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
 [k8s/参考/组件工具/kube-proxy](https://kubernetes.io/zh-cn/docs/reference/command-line-tools-reference/kube-proxy/)
 
+- 网络代理在每个节点上运行；
+- 执行 TCP、UDP 和 SCTP 流转发；
+- 转发是基于iptables的（用iptables规则来实现Kubernetes Service的负载均衡和端口转发功能），每个Service创建一条iptables规则；
 
 ### 相关资料
 
