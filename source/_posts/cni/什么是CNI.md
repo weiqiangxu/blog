@@ -6,8 +6,8 @@ tags:
   - kubernetes
 categories:
   - kubernetes
-date: 2023-04-23 18:40:12
-excerpt: 详细描述pod内无法访问apiserver cluster ip的时候的问题排查
+date: 2023-06-05 18:40:12
+excerpt: 理解什么是CNI，k8s的网络模型是什么，实现的插件有哪些，相关的OVS又是什么
 sticky: 1
 ---
 

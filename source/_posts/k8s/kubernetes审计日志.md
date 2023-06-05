@@ -86,29 +86,32 @@ spec:
   containers:
   - command:
     - kube-apiserver
-    - --audit-policy-file=/etc/kubernetes/audit/audit-policy.yaml  # 审计日志配置
-    - --audit-log-path=-                                           # 输出到标准输出
-    - --audit-log-format=json                                      # 输出格式json
+    - --audit-policy-file=/etc/kubernetes/audit/audit-policy.yaml            # 审计日志配置
+    - --audit-log-path=/var/log/containers/audit-log-$(date +%Y-%m-%d).log   # 输出到标准输出
+    - --audit-log-format=json                                                # 输出格式json
 ```
 
 ``` yml
-# 在 Kubernetes Pod 的容器中指定一个名为 "etc-audit" 的卷
-# 并将其挂载到容器的 "/etc/kubernetes/audit" 目录下
+# 创建两个卷etc-audit && audit-log分别挂载容器内的两个路径
 volumeMounts:
 - mountPath: /etc/kubernetes/audit
   name: etc-audit
   readOnly: true
+- mountPath: /var/log/containers/
+  name: audit-log
 ```
 
 ``` yml
-# 在 Kubernetes Pod 中指定一个名为 "etc-audit" 的卷
-# 并将其映射到主机上的 "/etc/kubernetes/audit" 目录
-# 卷类型是 hostPath，表示将主机上的目录或文件直接映射到容器中
+# 将两个卷 etc-audit && audit-log 分别挂载至宿主机
 volumes:
 - hostPath:
     path: /etc/kubernetes/audit
     type: DirectoryOrCreate
   name: etc-audit
+- hostPath:
+    path: /var/log/containers/
+    type: DirectoryOrCreate
+  name: audit-log
 ```
 
 > 更改了之后会自动重启 kube-apiserver
