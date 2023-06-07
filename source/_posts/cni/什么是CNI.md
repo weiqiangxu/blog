@@ -30,7 +30,9 @@ sticky: 1
 
 ### 三、k8s如何集成flannel
 
-- 官方手册关于网络插件安装的指引在[使用kubeadm引导集群](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/);
+- Kubernetes文档[使用kubeadm引导集群](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/);
+- Kubernetes文档[安装Pod网络附加组件](https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network)
+- Kubernetes文档[概念/扩展/计算存储和网络扩展/网络插件](https://kubernetes.io/zh-cn/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/)选择使用containerd\CRI-O
 
 ``` bash
 # 在控制平面节点或具有 kubeconfig 凭据的节点上安装 Pod 网络附加组件
@@ -47,6 +49,8 @@ $ kubectl apply -f <add-on.yaml>
    不是的，除了 https://github.com/containernetworking/plugins 还有很多其他的网络插件可以用于Kubernetes，比如：Calico、Flannel、Weave Net、Cilium等等。可以根据自己的需求选择适合的网络插件来部署Kubernetes集群。
 
 ### 六、CNI如何工作的
+
+参考[万字总结体系化带你全面认识容器网络接口(CNI)](https://mp.weixin.qq.com/s/gWPZKz9Z4gCoZRFX8dvr6w)
 
 CNI的接口并不是指HTTP，gRPC接口，CNI接口是指对可执行程序的调用（exec）。
 

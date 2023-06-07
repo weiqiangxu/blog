@@ -1,5 +1,5 @@
 ---
-title: VethPair和Hostr网桥通信
+title: veth-pair和host网桥通信
 index_img: /images/bg/network.png
 banner_img: /images/bg/computer.jpeg
 tags:
@@ -7,7 +7,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-06-07 18:40:12
-excerpt: 使用host bridg和 veth pair 实现两个网络命名空间下的网卡通信
+excerpt: 使用 host bridge 和 veth pair 实现两个网络命名空间下的网卡通信
 sticky: 1
 ---
 

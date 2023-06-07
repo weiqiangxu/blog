@@ -16,10 +16,17 @@ hide: false
 ``` bash
 # ifconfig只能查看本机的网络配置和IP地址
 [root@i-33D71DFC ~]# ifconfig
-enp1s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+
+# 网卡名称或者叫网络接口名称: enp1s0
+# 后面的<>必须要有UP才表示启用状态 如果没有启用可以使用 ip link set xxx up
+enp1s0: flags=4163< UP,BROADCAST 支持广播,RUNNING ,MULTICAST 支持多播 >  mtu 1500 最大传输单元为1500字节（网络接口能够传输的最大数据大小）
+        # IP 地址           # 子网掩码              # 当前网络接口的广播地址
         inet 10.16.123.39  netmask 255.255.248.0  broadcast 10.16.207.255
+        # ipv6地址
         inet6 fe80::ca83:3404:d922:1960  prefixlen 64  scopeid 0x20<link>
+        # ether查看 MAC 地址
         ether d0:0d:33:d7:1d:fc  txqueuelen 1000  (Ethernet)
+        # 接受和发送的数据包数量和字节数
         RX packets 34122  bytes 612851235 (584.4 MiB)
         RX errors 0  dropped 0  overruns 0  frame 0
         TX packets 31682  bytes 5632014 (5.3 MiB)
