@@ -6,7 +6,7 @@ tags:
   - golang
 categories:
   - golang
-date: 2023-06-05 18:40:12
+date: 2021-06-05 18:40:12
 excerpt: 配置git和go env
 sticky: 1
 ---
