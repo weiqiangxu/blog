@@ -6,7 +6,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-04-08 06:40:12
-index_img: /images/bg/电脑桌面.jpeg
+index_img: /images/bg/computer.jpeg
 ---
 
 ### containerd 二进制安装

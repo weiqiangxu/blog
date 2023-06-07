@@ -63,5 +63,5 @@ fun_features:
     loop: false # 是否循环播放效果
 favicon: /images/icon/favicon.svg
 dark_mode:
-  enable: true
+  enable: false
   default: auto
