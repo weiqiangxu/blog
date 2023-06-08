@@ -1,14 +1,17 @@
 ---
-title: 制作基于centos&go镜像编译kata
+title: 制作镜像编译kata
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
   - golang
   - cicd
+  - dockerfile
+  - image
+  - katacontainers
 categories:
   - docker
 date: 2023-04-21 18:40:12
-excerpt: 构建有go环境的centos镜像用于构建kata-container
+excerpt: 基于centos制作一个具备编译kata环境的镜像，golang\gcc\git，以及镜像推送步骤
 sticky: 1
 ---
 
@@ -17,8 +20,7 @@ sticky: 1
 ``` Dockerfile
 FROM centos:centos7
 
-ENV GOPATH="/home/go" \
-    GOROOT="/usr/local/go" \
+ENV GOROOT="/usr/local/go" \
     GOPROXY="https://goproxy.cn,direct" \
     GOINSECURE="gitlab.my-company.net" \
     GOPRIVATE="*.corp.com,gitlab.my-company.net" \
@@ -28,12 +30,13 @@ ENV GOPATH="/home/go" \
     TZ="Asia/Shanghai"
 
 # repo
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && export PATH="$HOME/.cargo/bin:$PATH"
-RUN yum-config-manager --add-repo  https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo && yum -y install wget
-RUN cd /home && wget https://go.dev/dl/go1.19.8.linux-arm64.tar.gz && tar -C /usr/local -xzf go1.19.8.linux-arm64.tar.gz
-RUN echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile && source /etc/profile
-RUN yum install -y automake autoconf libtool make gcc gcc-c++ rsync git
-RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && export PATH="$HOME/.cargo/bin:$PATH" && \
+yum-config-manager --add-repo  https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo && yum -y install wget && \
+cd /home && wget https://go.dev/dl/go1.19.8.linux-arm64.tar.gz && tar -C /usr/local -xzf go1.19.8.linux-arm64.tar.gz && \
+export PATH=$PATH:/usr/local/go/bin && source /etc/profile && \
+echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a /etc/profile > /etc/profile && source /etc/profile && \
+yum install -y automake autoconf libtool make gcc gcc-c++ rsync git && \
+cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
 ```
 
 ### 二、制作镜像
