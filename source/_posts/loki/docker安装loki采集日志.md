@@ -126,6 +126,10 @@ scrape_configs:
     labels:
       job: file
       __path__: /log/audit.log
+  pipeline_stages:
+    - json:
+        expressions:
+          name: name
 ```
 
 ``` bash
@@ -142,3 +146,4 @@ $ docker run -d \
 ### 相关资料
 
 [https://hub.docker.com/r/grafana/loki](https://hub.docker.com/r/grafana/loki)
+[https://grafana.com/docs/loki/latest/clients/promtail/installation/](https://grafana.com/docs/loki/latest/clients/promtail/installation/)
