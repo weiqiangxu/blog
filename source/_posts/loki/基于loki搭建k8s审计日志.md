@@ -8,7 +8,7 @@ tags:
   - audit
 categories:
   - kubernetes
-date: 2023-06-03 09:40:12
+date: 2023-06-12 09:40:12
 excerpt: 如何开启k8s的审计日志以及如何配置审计日志记录策略、解读k8s的apiserver关于审计日志的源码逻辑，了解loki如何采集日志并且http API接口查看日志
 sticky: 1
 ---
