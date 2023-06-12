@@ -1,37 +1,34 @@
 ---
-hide: true
+title: docker搭建loki && promtail服务
+index_img: /images/bg/k8s.webp
+banner_img: /images/bg/5.jpg
+tags:
+  - loki
+  - promtail
+categories:
+  - docker
+date: 2023-06-12 18:40:12
+excerpt: 使用docker compose搭建loki和promtail服务，支持自定义采集目标，并且通过 loki http API查看日志数据
+sticky: 1
 ---
 
 
-1. 使用compose搭建loki服务
+### 一、使用compose搭建loki服务
+
+1. 创建文件夹
 
 ``` bash
-$ mkdir loki
-$ cd loki
-$ mkdir data
-$ mkdir log
-$ mkdir config && cd config && touch local-config.yaml && touch promtail-local-config.yaml
+$ mkdir loki-compose
+$ cd loki-compose
+$ mkdir data && mkdir log && mkdir config
+$ cd config && touch local-config.yaml && touch promtail-config.yaml
 $ touch docker-compose.yml
 ```
 
-``` yml
-# docker-compose.yml
-version: '3.7'
-networks:
-  some-network:
-    driver: bridge
-services:
-  loki:
-    networks:
-      some-network:
-        aliases:
-         - alias1
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./config:/etc/loki
-      - ./data:/data/loki
+2. 容器内配置文件
+
+``` bash
+$ vim config/local-config.yaml
 ```
 
 ``` yml
@@ -77,29 +74,12 @@ ingester:
   chunk_retain_period: 30s
 ```
 
-```  bash
-$ cd loki && sudo docker-compose up -d
-```
-
 ``` bash
-# 目录结构
-$ tree .
-.
-├── config
-│   └── local-config.yaml
-├── data
-│   ├── chunks
-│   │   └── loki_cluster_seed.json
-│   └── index
-└── docker-compose.yml
+$ vim config/promtail-config.yaml
 ```
-
-[http://localhost:3100/loki/api/v1/series](http://localhost:3100/loki/api/v1/series)
-
-2. promtail
 
 ``` yml
-# promtail-config.yaml
+# promtail config yml
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
@@ -108,39 +88,122 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://alias1:3100/loki/api/v1/push
+  - url: http://loki-svc:3100/loki/api/v1/push
 
 scrape_configs:
-- job_name: system
+- job_name: log
   static_configs:
   - targets:
       - localhost
     labels:
-      job: varlogs
-      __path__: /var/log/*log
+      job: audit
+      __path__: /log/*log
+```
 
-- job_name: file
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: file
-      __path__: /log/audit.log
-  pipeline_stages:
-    - json:
-        expressions:
-          name: name
+2. 启动文件 docker-compose.yml
+
+``` bash
+$ vim docker-compose.yml
+```
+
+``` yml
+# docker-compose.yml
+version: '3.7'
+networks:
+  loki-net:
+    driver: bridge
+services:
+  loki:
+    networks:
+      loki-net:
+        aliases:
+         - loki-svc
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config:/etc/loki
+      - ./data:/data/loki
+
+  promtail:
+    networks:
+      loki-net:
+        aliases:
+         - promtail-svc
+    image: grafana/promtail:latest
+    privileged: true
+    volumes:
+      - ./config:/config
+      - ./log:/log
+    command: -config.file=/config/promtail-config.yaml
 ```
 
 ``` bash
-$ docker run -d \
-    --network loki_some-network \
-    --network-alias p \
-    --name promtail \
-    --privileged=true \
-    -v /Users/xuweiqiang/Documents/tmp/loki/log:/log \
-    -v /Users/xuweiqiang/Documents/tmp/loki/config:/config \
-    grafana/promtail:latest -config.file=/config/promtail-config.yaml
+# 目录结构
+$ tree .
+.
+├── config
+│   ├── local-config.yaml
+│   └── promtail-config.yaml
+├── data
+├── docker-compose.yml
+└── log
+```
+
+
+### 二、启动服务
+
+``` bash
+$ cd loki-compose && docker-compose up -d
+```
+
+``` bash
+# 制造测试数据
+$ cd loki-compose && touch log/audit.log
+$ echo '{"name":"jack"}' | sudo tee -a log/audit.log
+```
+
+
+### 三、服务访问
+
+``` bash
+$ curl http://localhost:3100/loki/api/v1/series
+{
+  "status": "success",
+  "data": [
+    {
+      "job": "audit",
+      "filename": "/log/audit.log"
+    },
+    {
+      "filename": "/var/log/dpkg.log",
+      "job": "varlogs"
+    }
+  ]
+}
+```
+``` bash
+$ curl http://localhost:3100/loki/api/v1/query_range?query={job="audit"}|json
+
+{
+  "status": "success",
+  "data": {
+    "resultType": "streams",
+    "result": [
+      {
+        "stream": {
+          "filename": "/log/audit.log",
+          "job": "audit",
+          "name": "jack"
+        },
+        "values": [
+          [
+            "1686537086403538378",
+            "{\"name\":\"jack\"}"
+          ]
+        ]
+      }
+...
 ```
 
 ### 相关资料

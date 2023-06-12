@@ -31,6 +31,7 @@ skip_render:
   - "_posts/语雀k8s基础入门/mychart/**"
   - "_posts/语雀k8s基础入门/yml/**"
   - "_posts/cicd/**"
+  - "_posts/loki/loki-compose/**"
 
 # Writing
 new_post_name: :title.md # File name of new posts
