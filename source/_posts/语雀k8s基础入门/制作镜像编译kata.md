@@ -31,12 +31,15 @@ ENV GOROOT="/usr/local/go" \
 
 # repo
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && export PATH="$HOME/.cargo/bin:$PATH" && \
-yum-config-manager --add-repo  https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo && yum -y install wget && \
-cd /home && wget https://go.dev/dl/go1.19.8.linux-arm64.tar.gz && tar -C /usr/local -xzf go1.19.8.linux-arm64.tar.gz && \
-export PATH=$PATH:/usr/local/go/bin && source /etc/profile && \
-echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a /etc/profile > /etc/profile && source /etc/profile && \
-yum install -y automake autoconf libtool make gcc gcc-c++ rsync git && \
-cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
+  yum-config-manager --add-repo  https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo && \
+  yum -y install wget && \
+  cd /home && wget https://go.dev/dl/go1.19.8.linux-arm64.tar.gz && \
+  tar -C /usr/local -xzf go1.19.8.linux-arm64.tar.gz && \
+  export PATH=$PATH:/usr/local/go/bin && source /etc/profile && \
+  echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a /etc/profile > /etc/profile && \
+  source /etc/profile && \
+  yum install -y automake autoconf libtool make gcc gcc-c++ rsync git && \
+  cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
 ```
 
 ### 二、制作镜像

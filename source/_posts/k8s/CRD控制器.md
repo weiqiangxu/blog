@@ -54,44 +54,50 @@ $ ./sample-controller  --kubeconfig=/root/.kube/config
 
 ### List-watch设计
 
-``` txt
-List-watch :
-    List:http短连接
-    watch:http长连接
-Informer:
-    Informer是Client-go中的一个核心工具包
-    Informer实例中的Lister()方法（该方法包含 了 Get 和 List 方法） -- 可用于List/Get Kubernetes中的Object
-    很少会直接请求k8s的API进行 List Get资源
-    Client-go 助力k8s资源操作
+1. List-watch :
+        List:http短连接
+        watch:http长连接
+2. Informer:
+        Informer是Client-go中的一个核心工具包
+        Informer实例中的Lister()方法（该方法包含 了 Get 和 List 方法） -- 可用于List/Get Kubernetes中的Object
+        很少会直接请求k8s的API进行 List Get资源
+        Client-go 助力k8s资源操作
 
-Informer设计：
-    依赖Kubernetes List/Watch API
-    可监听事件并触发回调函数的二级缓存工具包
-    Informer只会调用Kubernetes List和Watch两种类型的API
-    List/Get Kubernetes中的Object，Informer不会去请求Kubernetes API，而是直接查找缓存在本地内存中的数据，减少调用
-    Informer完全依赖Watch API去维护缓存，没有任何resync机制
-    Informer通过Kubernetes Watch API监听某种resource下的所有事件
+3. Informer设计：
+        依赖Kubernetes List/Watch API
+        可监听事件并触发回调函数的二级缓存工具包
+        Informer只会调用Kubernetes List和Watch两种类型的API
+        List/Get Kubernetes中的Object，Informer不会去请求Kubernetes API，而是直接查找缓存在本地内存中的数据，减少调用
+        Informer完全依赖Watch API去维护缓存，没有任何resync机制
+        Informer通过Kubernetes Watch API监听某种resource下的所有事件
 
-Informer回调实现：
-    回调函数实例(即ResourceEventHandler实例)：
+4. Informer回调实现：
+        回调函数实例(即ResourceEventHandler实例)：
         OnAdd(obj interface{})
         OnUpdate(oldObj, newObj interface{}) 
         OnDelete(obj interface{})
 
-Informer缓存：
-    二级缓存
-    DeltaFIFO
-    LocalStore
+5. Informer缓存：
+        二级缓存
+        DeltaFIFO
+        LocalStore
 
-Informaer:
-    Reflect:
-        ListerWatcher的Even丢给Reflector处理
-        Reflector处理后以Delta结果转入Delta_fifo
+6. Informaer:
+        Reflect:
+            ListerWatcher的Even丢给Reflector处理
+            Reflector处理后以Delta结果转入Delta_fifo
 
-Indexer:
-    索引器
-    加速数据的检索
+7. Indexer:
+        索引器
+        加速数据的检索
+
+### 源码理解
+
+``` golang
+Controller.run()
+
 ```
+
 
 ### 参考资料
 

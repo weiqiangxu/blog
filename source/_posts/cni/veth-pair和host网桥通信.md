@@ -72,3 +72,14 @@ $ ip netns exec ns1 ping 10.1.1.3
 
 > 结论：可以使用 host 上的网桥和 veth pair 实现两个 network namespace 的连接
 
+
+### Q&A
+
+- 如何删除网卡和网络命名空间 
+
+``` bash
+# 网络命名内部网卡必须全部已经删除否则无法删除该网络命名空间
+$ ip netns delete ns1
+$ ip netns exec ns1 ip link delete veth1-peer
+$ ip link delete veth1-peer
+```
