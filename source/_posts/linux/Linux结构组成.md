@@ -41,7 +41,7 @@ hide: false
 
 ### 二、Linux目录结构
 
-![linux目录结构](/images/linux目录结构)
+![linux目录结构](/images/linux目录结构.jpeg)
 
 ### 相关疑问
 

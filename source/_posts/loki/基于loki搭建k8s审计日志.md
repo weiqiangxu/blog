@@ -270,7 +270,7 @@ $ curl http://localhost:3101/loki/api/v1/query?query=count(count_over_time({cont
 
 5. loki是如何拉取并存储日志的
 
-![loki](loki.png)
+![loki](/images/simple-scalable-test-environment.png)
 
 6. 如何配置apiserver将审计日志写入固定的目录被loki采集
 
