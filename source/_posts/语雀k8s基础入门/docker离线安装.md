@@ -12,7 +12,24 @@ excerpt: 离线安装docker engine
 sticky: 1
 ---
 
-### 一、下载安装包
+### 方式一：导出rpm包或者deb包进行离线安装 - 推荐
+
+``` bash
+# rpm包导出
+$ yum -y reinstall --downloadonly --downloaddir=./ docker
+
+# 安装rpm包
+$ rpm -ivh ./*.rpm
+$ rpm -ivh package_name.rpm
+
+# deb包导出
+$ apt-get install dpkg-repack
+$ dpkg-repack ${package-name}
+```
+
+### 方式二：下载离线包并配置systemd
+
+1. 下载安装包
 
 ``` txt
 # docker离线安装包
@@ -24,7 +41,7 @@ Docker Machine: https://github.com/docker/machine/releases
 注意：离线安装包的下载可能比在线安装包的下载时间更长，建议选择适合自己网络和设备的安装方式。
 ```
 
-### 二、上传到linux服务器
+2. 上传到linux服务器
 
 ``` bash
 # 解压
@@ -34,7 +51,7 @@ $ tar xzvf /path/to/<FILE>.tar.gz
 $ sudo cp docker/* /usr/bin/
 ```
 
-### 三、加入systemctl服务
+3. 加入systemctl服务
 
 ``` bash
 $ vim /etc/systemd/system/docker.service
@@ -94,20 +111,6 @@ systemctl start docker
 systemctl status docker
 ```
 
-### 四、导出rpm包或者deb包进行离线安装 - 方式更加简单一些
-
-``` bash
-# rpm包导出
-$ yum -y reinstall --downloadonly --downloaddir=./ docker
-
-# 安装rpm包
-$ rpm -ivh ./*.rpm
-$ rpm -ivh package_name.rpm
-
-# deb包导出
-$ apt-get install dpkg-repack
-$ dpkg-repack ${package-name}
-```
 
 ### 参考资料
 

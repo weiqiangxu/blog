@@ -74,12 +74,16 @@ rules:
 ```
 
 ``` go
+// 源代码：
+// k8s.io/apiserver
+// pkg/audit/policy.EvaluatePolicyRule
 // 规则验证，自上而下，遇到匹配的规则返回当前的路由日志的处理策略
-func (p *policyRuleEvaluator) EvaluatePolicyRule(attrs authorizer.Attributes) auditinternal.RequestAuditConfig
+func (p *policyRuleEvaluator) EvaluatePolicyRule(attrs authorizer.Attributes)
+// 规则对象
+type audit.PolicyRule
 ```
 
 [apiserver handler request过滤器校验审计日志规则源码](https://github.com/kubernetes/apiserver/blob/v0.27.2/pkg/audit/policy/checker.go)
-
 [xuweiqiang's blog 如何配置静态pod apiserver开启审计日志](https://weiqiangxu.github.io/2023/05/23/k8s/kubernetes%E5%AE%A1%E8%AE%A1%E6%97%A5%E5%BF%97/)
 
 ### 三、日志写入策略
@@ -88,7 +92,10 @@ func (p *policyRuleEvaluator) EvaluatePolicyRule(attrs authorizer.Attributes) au
 
 ### 四、创建loki\promtail采集日志
 
-> 默认会采集标准输出的日志
+[xuweiqiang's blog 在k8s之中部署loki服务存储日志](https://weiqiangxu.github.io/2023/06/03/loki/%E5%9C%A8k8s%E5%88%9B%E5%BB%BAloki%E6%9C%8D%E5%8A%A1%E9%87%87%E9%9B%86%E6%97%A5%E5%BF%97/)
+
+[xuweiqiang's blog docker安装loki采集日志](https://weiqiangxu.github.io/2023/06/12/loki/docker%E5%AE%89%E8%A3%85loki%E9%87%87%E9%9B%86%E6%97%A5%E5%BF%97/)
+
 
 ### 五、已经搭建好审计日志的服务器
 
