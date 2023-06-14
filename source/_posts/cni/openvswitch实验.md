@@ -1,21 +1,21 @@
 ---
-title: k8s容器网络解决方案OVS
+title: openvswitch实验
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
   - openvswitch
 categories:
   - kubernetes
-date: 2023-06-02 16:56:12
+date: 2023-06-14 16:56:12
 excerpt: 在docker的环境下，如何用ovs创建的网桥接管容器之间的流量，并且验证ovs的一些功能如FlowTable\Tag\trunks等
 sticky: 1
 ---
 
-### 1. 实验环境准备
+### 一、实验环境准备
 
 [ovs实验基础环境](https://weiqiangxu.github.io/2023/06/14/cni/ovs实验基础环境/)
 
-### 2. ovs的flow table丢弃icmp数据包
+### 二、ovs的flow table丢弃icmp数据包
 
 ``` bash
 # 来体验一下流表规则的作用
@@ -52,7 +52,7 @@ ovs-ofctl del-flows ovs-br1 "in_port=veth1-ns4"
 ovs-ofctl del-flows ovs-br1
 ```
 
-### 2. ovs的Port mirroring端口镜像复制端口输入和输出流量至其他端口
+### 三、ovs的Port mirroring端口镜像复制端口输入和输出流量至其他端口
 
 ``` bash
 # 在上面的环境之中将ovs网桥ovs-br1上面的3个插口全部拔出
@@ -131,7 +131,7 @@ ovs-vsctl clear bridge ovs-br1 mirrors
 ovs-vsctl clear bridge ovs-br1 mirrors
 ```
 
-### 3. tag设置相同bridge下的不同vlan无法通信
+### 四、tag设置相同bridge下的不同vlan无法通信
 
 [ovs实验基础环境](https://weiqiangxu.github.io/2023/06/14/cni/ovs实验基础环境/)
 
@@ -189,8 +189,7 @@ ovs-ofctl del-flows ovs-br1 in_port=veth1-ns3
 ovs-ofctl del-flows ovs-br1 in_port=veth1-ns4
 ```
 
-
-### flood-vlans
+### 五、flood-vlans
 
 [ovs实验基础环境](https://weiqiangxu.github.io/2023/06/14/cni/ovs实验基础环境/)
 
@@ -273,7 +272,7 @@ ovs-vsctl clear port veth1-ns1 tag
 ```
 
 
-### 6. trunks
+### 六、trunks
 
 ``` bash
 # 设置 ns3 的对端网卡 veth1-ns3 
@@ -284,7 +283,7 @@ ovs-vsctl set Port veth1-ns3 trunks=[]
 
 ```
 
-### 7. Bonding
+### 七、Bonding
 
 
 [ovs实验基础环境](https://weiqiangxu.github.io/2023/06/14/cni/ovs实验基础环境/)
