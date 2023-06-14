@@ -139,52 +139,113 @@ ovs-vsctl show
 # 语法将 vlan 下的所有流量镜像输出到 output-port
 ovs-vsctl set Bridge <bridge> mirrors=@m -- --id=@<mirror> create Mirror name=<mirror_name> select-all=true select-vlan=<vlan_id> output-port=<mirror_port>
 
-
 # 创建一个名为“m1”的镜像，并将其名称分配给变量“@m”。 
 # 然后，它创建两个"id"，分别为“@veth1-ns1”和“@veth1-ns4”，这两个"id"指定了要镜像的端口
 # 接下来，命令使用这些"id"来设置镜像规则。
-# 它选择数据包的目标端口，并将其复制到输出端口“@veth1-ns4”
-# 同时选择“veth1-ns1”端口作为源地址。这意味着所有发送到“veth1-ns1”的数据包都将被复制到“veth1-ns4”。
+# 它选择数据包的目标端口，并将其复制到输出端口“@veth1-ns3”
+# 同时选择“veth1-ns1”端口作为源地址。这意味着所有发送到“veth1-ns1”的数据包都将被复制到“veth1-ns3”。
 ovs-vsctl -- set bridge br1 mirrors=@m \
           -- --id=@veth1-ns1 get Port veth1-ns1 \
-          -- --id=@veth1-ns4 get Port veth1-ns4 \
-          -- --id=@m create Mirror name=m1 select-dst-port=@veth1-ns1 select-src-port=@veth1-ns1 output-port=@veth1-ns4
+          -- --id=@veth1-ns2 get Port veth1-ns2 \
+          -- --id=@m create Mirror name=m1 select-dst-port=@veth1-ns1 select-src-port=@veth1-ns1 output-port=@veth1-ns3
 
 
 # select-dst-port用于匹配数据包的目的地端口，选择应该将数据包发送到哪个端口。
 # select-src-port用于匹配数据包的源端口，选择哪个端口接收数据包
 
-# 监听网卡 output-port 也就是 veth1-ns4
-tcpdump -nei veth1-ns4
+# 监听网卡 output-port 也就是 veth1-ns3
+tcpdump -nei veth1-ns3
 
-# ns1 ping ns3 , 查看流量是否 mirro 到 veth1-ns4
-docker exec -it ${ns1_id} ping ${ns3_ip}
+# ns1 ping ns2 , 查看流量是否 mirro 到 veth1-ns3
+docker exec -it ${ns1_id} ping ${ns2_ip}
 ```
 
 ``` bash
-# 流量 mirro 到 vlan 
-ovs-vsctl -- set bridge br1 mirrors=@m2 \
-          -- --id=@veth1-ns2 get Port veth1-ns2 \
-          -- --id=@m2 create Mirror name=m1 select-dst-port=@veth1-ns2 select-src-port=@veth1-ns2 output-vlan=110
+# 设置 Open vSwitch 网桥（bridge） ovs-br1 的镜像规则
+# 创建了一个名为 m1 的镜像规则，将 veth1-ns2 端口的流量作为镜像目标（select-dst-port），并将同样的流量作为镜像源（select-src-port）；
+# 为了将镜像流量和普通流量区分开来，还将镜像流量打上 VLAN 110 的标签（output-vlan）。
+ovs-vsctl -- set bridge ovs-br1 mirrors=@m2 \
+          -- --id=@veth1-ns1 get Port veth1-ns1 \
+          -- --id=@m2 create Mirror name=m1 select-dst-port=@veth1-ns2 select-src-port=@veth1-ns2 output-vlan=111
 
 
-#  创建br2 VLAN镜像，从110来的，output到VLAN 110
-ovs-vsctl -- set bridge br2 mirrors=@m \
+# 设置 Open vSwitch 网桥（bridge） br2 的镜像规则
+# 创建了一个名为 m3 的镜像规则，将选取 VLAN ID 为 110 的流量作为镜像源（select-vlan）
+# 并将同样的流量打上 VLAN 110 的标签作为镜像流量（output-vlan）
+# 将这个镜像规则赋值给 mirrors 属性，即将该规则应用于 ovs-br1 上。
+ovs-vsctl -- set bridge ovs-br1 mirrors=@m \
           -- --id=@m create Mirror name=m3 select-vlan=110 output-vlan=110
 
 
+# 1. 指定洪泛的VLAN ID，使bridge只会向这些VLAN上的所有端口广播，而不会向其他VLAN广播。
+# 2. 在多个VLAN之间提供隔离，从而限制数据包传播的范围。
+# 3. 支持多租户场景下的VLAN隔离，不同租户可以独立使用自己的VLAN。
+# 4. 防止恶意攻击者利用洪泛攻击来干扰网络的正常运行。
+#VLAN隔离和洪泛控制
 ovs-vsctl set bridge br1 flood-vlans=110
 
+# 监听网卡 veth1-ns4
+tcpdump -nei veth1-ns4
 
+# ns2 ping ns3
+docker exec -it ${ns2_id} ping <ns3_ip>
 ```
 
+``` bash
+# 环境清理
+ovs-vsctl clear bridge ovs-br1 mirrors
+ovs-vsctl clear bridge ovs-br1 mirrors
+```
 
 ### 6. tag设置相同bridge下的不同vlan无法通信
 
+``` bash
+# 在上面的环境之中将ovs网桥ovs-br1上面的3个插口全部拔出
+# ovs-vsctl del-port <bridge> <port>
+ovs-vsctl del-port ovs-br1 veth1-ns1
+ovs-vsctl del-port ovs-br1 veth1-ns2
+ovs-vsctl del-port ovs-br1 veth1-ns3
+
+# 重新将网卡插上并且打上tag
+ovs-vsctl add-port ovs-br1 veth1-ns1 -- set Port veth1-ns1 tag=110
+ovs-vsctl add-port ovs-br1 veth1-ns2 -- set Port veth1-ns2 tag=110
+ovs-vsctl add-port ovs-br1 veth1-ns3 -- set Port veth1-ns3 tag=111
+
+# 从 ns1 ping ns3
+docker exec -it ${ns1_id} ping <ns3_ip>
+```
+
+### 6. trunks && flood-vlans
+
+``` bash
+
+# 这句话的意思是将名称为"veth1-ns1"的端口设置为trunk端口
+# 允许通过VLAN ID为110和111的多个VLAN
+# 它的作用是在Open vSwitch中配置端口，使其能够处理来自多个VLAN的数据包
+ovs-vsctl set Port veth1-ns1 trunks=110,111
+
+# 不同tag(vlan)之间网络是否通
+docker exec -it ${ns1_id} ping <ns3_ip>
 
 
-### 6. trunks 将多个虚拟局域网（VLANs）互相隔离的通信链路连接在一起
-### 7. flood-vlans 泛洪控制不通vlan之间流量
+# 在Open vSwitch中设置名称为"ovs-br1"的网桥支持洪泛（flood）VLAN 110和111
+# 作用是在VLAN架构中使用洪泛技术向所有主机广播数据包
+# 由于洪泛可能会导致网络中的广播风暴，因此只有在局域网或者小规模网络中才应该使用
+# 洪泛技术可以使网络中所有的设备都能够接收到广播数据包，从而实现网络通信
+ovs-vsctl set bridge ovs-br1 flood-vlans=110,111
+
+
+# 不同tag(vlan)之间网络是否通
+docker exec -it ${ns1_id} ping <ns3_ip>
+```
+
+
+### Q&A
+
+- 开启洪泛和 MAC 学习什么关系
+
+   开启洪泛（Flood）是一种网络攻击手段，可以让网络中的所有数据包都被广播，从而导致网络拥塞甚至瘫痪。
+   禁止MAC学习是一种网络安全配置策略，可以限制网络中的MAC地址学习，防止网络中的恶意设备伪装成其他合法设备进行攻击。
 
 ### 相关文章
 
