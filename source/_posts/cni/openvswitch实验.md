@@ -279,8 +279,6 @@ ovs-vsctl clear port veth1-ns1 tag
 # 可以接收和发送 VLAN ID 为 110 的网络流量 （VLAN ID为100的也可以但是不会将将流量标记为 110）
 ovs-vsctl set Port veth1-ns3 trunks=110
 ovs-vsctl set Port veth1-ns3 trunks=[]
-
-
 ```
 
 ### 七、Bonding
