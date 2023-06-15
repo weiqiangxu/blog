@@ -7,19 +7,95 @@ tags:
   - docker
 categories:
   - openvswitch
-date: 2023-06-05 18:40:12
+date: 2023-06-15 18:40:12
 excerpt: ovs的qos的小实验
 sticky: 1
 ---
 
+### 1.准备linux环境
 
-### 1. 实验环境准备
+- [openvswitch如何安装](https://weiqiangxu.github.io/2023/06/02/cni/openvswitch%E5%AE%89%E8%A3%85/)
+- [docker离线安装](https://weiqiangxu.github.io/2023/04/18/%E8%AF%AD%E9%9B%80k8s%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/docker%E7%A6%BB%E7%BA%BF%E5%AE%89%E8%A3%85/)也可以直接使用yum等包管理工具在线安装
 
-[ovs实验基础环境](https://weiqiangxu.github.io/2023/06/14/cni/ovs实验基础环境/)
+### 2.准备镜像
 
-> OVS 的 bond 绑定多个物理网卡成一个逻辑网卡，可以提高网络的可靠性和带宽的实现
+``` dockerfile
+# alpine-ovs
+FROM alpine:3.16.0
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+apk add vim tcpdump iperf iproute2
+```
 
 ``` bash
+docker build -t alpine-ovs .
+```
+
+### 3.创建容器
+
+``` bash
+# 创建网络
+docker network  create --subnet=192.168.101.0/24 ovs-net
+
+# 创建容器
+docker run -it -d --net ovs-net --ip 192.168.101.2 --name ns2 alpine-ovs sh
+# 查看容器ns2在宿主机网卡的pair端口
+ifconfig | grep veth
+# 更改网卡端口名称
+ip link set down ${ns2_default_if} && ip link set ${ns2_default_if} name veth1-ns2 && ip link set  veth1-ns2 up
+
+docker run -it -d --net ovs-net --ip 192.168.101.3 --name ns3 alpine-ovs sh
+# 查看容器ns3在宿主机网卡的pair端口
+ifconfig | grep veth
+# 更改网卡端口名称
+ip link set down ${ns3_default_if} && ip link set ${ns3_default_if} name veth1-ns3 && ip link set  veth1-ns3 up
+
+docker run -it -d --net ovs-net --ip 192.168.101.4 --name ns4 alpine-ovs sh
+# 查看容器ns4在宿主机网卡的pair端口
+ifconfig | grep veth
+# 更改网卡端口名称
+ip link set down ${ns4_default_if} && ip link set ${ns4_default_if} name veth1-ns4 && ip link set  veth1-ns4 up
+
+docker run -it -d --net ovs-net --ip 192.168.101.5 --name ns5 alpine-ovs sh
+# 查看容器ns5在宿主机网卡的pair端口
+ifconfig | grep veth
+# 更改网卡端口名称
+ip link set down ${ns5_default_if} && ip link set ${ns5_default_if} name veth1-ns5 && ip link set  veth1-ns5 up
+```
+
+### 4.ovs建桥承接docker容器流量
+
+``` bash
+# 查看网桥
+# 会发现网桥后面有3个网络插口
+brctl show
+
+# 现在我们把这3个网卡从docker创建的网桥拔出来
+# brctl delif ${bridge_name} veth1-ns2 veth1-ns3 veth1-ns4 veth1-ns5
+brctl delif br-ec86ebf52532 veth1-ns2 veth1-ns3 veth1-ns4 veth1-ns5
+
+# 使用 ovs 创建的网桥
+ovs-vsctl add-br ovs-br1
+ovs-vsctl add-br ovs-br2
+
+# 将3个容器的对端网卡插入到 ovs网桥
+ovs-vsctl add-port ovs-br1 veth1-ns2
+ovs-vsctl add-port ovs-br1 veth1-ns3
+ovs-vsctl add-port ovs-br2 veth1-ns4
+ovs-vsctl add-port ovs-br2 veth1-ns5
+```
+
+### 5.查看当前ovs桥网络
+
+``` bash
+# 查看ovs的桥配置
+$ ovs-vsctl show
+```
+
+### 6.添加bond逻辑网卡
+
+``` bash
+# OVS 的 bond 绑定多个物理网卡成一个逻辑网卡，可以提高网络的可靠性和带宽的实现
 # 开启网卡
 ip link add tab1 type veth peer name peer-tab1
 ip link add tab2 type veth peer name peer-tab2
@@ -72,7 +148,27 @@ ovs-vsctl set Port bond2 bond_mode=balance-tcp
 
 ![bonding拓扑图示例](/images/bond.png)
 
-### 2. 验证qos对流量限流
+### 6.压测容器之间带宽
+
+``` bash
+# ns4 start iperf client
+docker exec -it ns4 iperf -s
+
+# ns3 ping ns4
+docker exec -it ns3 sh -c 'iperf -c 192.168.101.4 -p 5001 1 -t 20'
+
+# 输出的带宽测试结果
+iperf: ignoring extra argument -- 1
+------------------------------------------------------------
+Client connecting to 192.168.101.4, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.101.3 port 35702 connected with 192.168.101.4 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-20.01 sec  75.8 GBytes  32.6 Gbits/sec
+```
+
+### 7.验证qos对流量限流
 
 ``` bash
 # tap1-b2的网络接口上添加Traffic Control（TC）队列规则
@@ -89,7 +185,6 @@ tc class add dev peer-tab1 parent 1: classid 1:1 htb rate 100kbps ceil 100kbps
 # 采用htb算法进行流量控制，设定该类别的最大带宽为100kbps，
 # 但是该类别的最小保障带宽为30kbps，即使存在其他高优先级流量，该类别的带宽也不低于30kbps。
 tc class add dev peer-tab1 parent 1:1 classid 1:10 htb rate 30kbps ceil 100kbps
-
 tc class add dev peer-tab1 parent 1:1 classid 1:11 htb rate 10kbps ceil 100kbps
 tc class add dev peer-tab1 parent 1:1 classid 1:12 htb rate 60kbps ceil 100kbps
 tc class show dev peer-tab1
@@ -106,9 +201,9 @@ tc qdisc add dev peer-tab1 parent 1:12 handle 40: sfq perturb 10
 
 # 为名为peer-tab1的网络接口添加过滤器规则
 # 它将过滤器规则附加到1:0的父队列上，并设置过滤器规则的优先级为1
-# 它使用u32匹配模式，匹配源IP地址为192.168.101.3和目标端口号为9999且屏蔽掉后4位（即对65520取模的余数）
+# 它使用u32匹配模式，匹配源IP地址为192.168.101.3和目标端口号为5001且屏蔽掉后4位（即对65520取模的余数）
 # 并将匹配结果定向到子队列1:10上，这意味着所有匹配到该规则的流量都将进入子队列1:10中进行处理。
-tc filter add dev peer-tab1 protocol ip parent 1:0 prio 1 u32 match ip src 192.168.101.3 match ip dport 9999 0xfff0 flowid 1:10
+tc filter add dev peer-tab1 protocol ip parent 1:0 prio 1 u32 match ip src 192.168.101.3 match ip dport 5001 0xfff0 flowid 1:10
 
 
 # 在peer-tab1网卡上添加一个过滤器，指定该过滤器的协议为ip，父类别为1:0，
@@ -117,25 +212,103 @@ tc filter add dev peer-tab1 protocol ip parent 1:0 prio 1 u32 match ip src 192.1
 
 # 观察1:11流量
 watch tc -s class ls dev peer-tab1
-```
-
-``` bash
-# 容器删除
-docker rm ns4 -f 
-
-# 重建
-docker run -it -d --net ovs-net --ip 192.168.101.4 -p 9999:9999 --name ns4 alpine-ovs 
-ip link set down veth1f36d25 && ip link set veth1f36d25 name veth1-ns4 && ip link set  veth1-ns4 up
-ovs-vsctl del-port ovs-br2 veth1-ns4
-ovs-vsctl add-port ovs-br2 veth1-ns4
 
 # 压测速度
 # 在名为ns3的容器中运行命令
-# 命令是iperf客户端向IP地址为192.168.101.4，端口号为9999的服务器发送1个连接，并在20秒内进行带宽测试。
-docker exec -it ns3 sh -c 'iperf -c 192.168.101.4 -p 9999 1 -t 20'
+# 命令是iperf客户端向IP地址为192.168.101.4，端口号为5001的服务器发送1个连接，并在20秒内进行带宽测试。
+docker exec -it ns3 sh -c 'iperf -c 192.168.101.4 -p 5001 1 -t 20'
 ```
 
+``` bash
+ovs-vsctl list interface peer-tab1
+ovs-vsctl list interface peer-tab2
 
+# "peer-tab1"的网络接口的最大流入数据流量速率为1000字节/秒
+ovs-vsctl set interface peer-tab1 ingress_policing_rate=1000
+
+# "peer-tab1"的网络接口的最大流入数据流量峰值为1000字节
+ovs-vsctl set interface peer-tab1 ingress_policing_burst=1000
+ovs-vsctl set interface peer-tab2 ingress_policing_rate=1000
+ovs-vsctl set interface peer-tab2 ingress_policing_burst=1000
+```
+
+``` bash
+# 限速之后
+$ docker exec -it ns3 sh -c 'iperf -c 192.168.101.4 -p 5001 1 -t 20'
+
+
+iperf: ignoring extra argument -- 1
+------------------------------------------------------------
+Client connecting to 192.168.101.4, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.101.3 port 36444 connected with 192.168.101.4 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-26.17 sec  3.13 MBytes  1.00 Mbits/sec
+```
+
+``` bash
+# 取消限速
+ovs-vsctl set interface tap1-qos ingress_policing_burst=0
+ovs-vsctl set interface tap1-qos ingress_policing_rate=0
+ovs-vsctl list interface tap1-qos
+```
+
+### 8.Egress shaping分流
+
+``` bash
+ovs-vsctl list qos
+ovs-vsctl list queue
+ovs-ofctl show ovs-br1
+ovs-ofctl show ovs-br2
+```
+
+``` bash
+# 设置端口tap2-qos的QoS策略
+# 使用linux-htb类型的QoS策略，设置最大速率为10Gbps，并设置三个队列，分别为@q0、@q1、@q2
+# @q0的最小速率和最大速率均为30Mbps，@q1的最小速率和最大速率均为10Mbps，@q2的最小速率和最大速率均为60Mbps
+ovs-vsctl set port tap2-qos qos=@newqos -- \
+--id=@newqos create qos type=linux-htb other-config:max-rate=10000000000 queues=0=@q0,1=@q1,2=@q2 -- \
+--id=@q0 create queue other-config:min-rate=30000000 other-config:max-rate=30000000 -- \
+--id=@q1 create queue other-config:min-rate=10000000 other-config:max-rate=10000000 -- \
+--id=@q2 create queue other-config:min-rate=60000000 other-config:max-rate=60000000
+```
+
+``` bash
+# 配置流表规则
+ovs-ofctl add-flow ovs-br1 "in_port=1,nw_src=192.168.101.3 actions=enqueue:4:0"
+ovs-ofctl add-flow ovs-br1 "in_port=1,nw_src=192.168.101.4 actions=enqueue:4:1"
+ovs-ofctl add-flow ovs-br1 "in_port=3,nw_src=192.168.101.5 actions=enqueue:4:2"
+
+
+# 分别压测带宽下面的
+ns2 && ns3
+ns2 && ns4
+ns2 && ns5
+
+# 得出带宽大小比符合上面设置的QoS策略: 30Mbps:10Mbps:60Mbps
+3:1:6
+
+# 自动清理(推荐)
+ovs-vsctl -- --all destroy QoS -- --all destroy Queue
+
+# 手动清理
+ovs-vsctl clear port tap2-qos qos
+ovs-vsctl list qos
+ovs-vsctl destroy qos xxxx
+ovs-vsctl list queue
+ovs-vsctl destroy queue xxx
+ovs-vsctl destroy queue xxx
+ovs-vsctl destroy queue xxx
+ovs-vsctl list queue
+ovs-ofctl del-flows br2 && ovs-ofctl add-flow br2 "priority=0 actions=NORMAL"
+```
+
+### 9. 上述的拓扑图
+
+![Qos - bond逻辑网卡和tc过滤器](/images/experiment9_1.png)
+![Qos - Hierarchical Token Bucket令牌桶算法的qdisc](/images/experiment10_2.png)
+![ovs-qos - qos规则压测带宽](/images/experiment10_4.png)
 
 ### Q&A
 
@@ -156,5 +329,7 @@ docker exec -it ns3 sh -c 'iperf -c 192.168.101.4 -p 9999 1 -t 20'
   TC（Traffic Control）定义队列规则的作用是为了控制网络流量，防止网络拥塞，保证网络服务的质量和稳定性。通过设置队列规则，可以限制网络中各种流量（如数据包大小、传输速率等）的数量和优先级，以确保不同类型的流量能够有序地传输，并且不会对其他流量产生影响。这对于网络管理员来说是非常重要的管理工具，可以帮助管理员更好地控制网络流量，保证网络的正常运行。
 
 
-3. iperf如何使用
 
+### 相关资料
+
+[linux tc流量控制（一）：classless qdisc](https://zhuanlan.zhihu.com/p/449755341)

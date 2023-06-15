@@ -95,11 +95,20 @@ $ /sbin/modprobe openvswitch
 $ /sbin/lsmod | grep openvswitch
 ```
 
-4. Starting
+4. 添加环境变量并启动服务
 
 ``` bash
+# 方式一
+$ echo $PATH
 $ export PATH=$PATH:/usr/share/openvswitch/scripts
 $ ovs-ctl start
+```
+
+``` bash
+# 方式二
+$ echo "export PATH=$PATH:/usr/share/openvswitch/scripts" | tee -a ~/.bash_profile
+$ source ~/.bash_profile
+$ echo $PATH
 ```
 
 5. Test
