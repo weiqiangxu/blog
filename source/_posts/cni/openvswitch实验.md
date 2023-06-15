@@ -363,6 +363,33 @@ ovs-vsctl set Port bond2 bond_mode=balance-tcp
 ![bonding拓扑图示例](/images/bond.png)
 
 
+### 八、术语
+
+1. Bridge
+中文名称网桥，一个Bridge代表一个以太网交换机（Switch），一台主机中可以创建一个或多个Bridge，Bridge可以根据一定的规则，把某一个端口接收到的数据报文转发到另一个或多个端口上，也可以修改或者丢弃数据报文。
+
+2. Port
+    中文名称端口，需要注意的是它和TCP里面的端口不是同样的概念，它更像是物理交换机上面的插口，可以接水晶头的那种。Port隶属于Bridge，必须先添加了Bridge才能在Bridge上添加Port。Port有以下几种类型：
+    - Normal
+        用户可以把操作系统中已有的网卡添加到Open vSwitch上，Open vSwitch会自动生成一个同名的Port开处理这张网卡进和出的数据报文。
+        不过需要注意的是这种方式添加的Port不支持分配IP地址，如果之前网卡上配置的有IP，挂载到OVS上面之后将不可访问。此类型的Port常用于VLAN模式的多台物理主机相连的那个口，交换机一端属于Trunk模式。
+
+    - Internal
+        当Port的类型是Internal时，OVS会自动创建一个虚拟网卡（Interface），此端口收到的数据报文都会转发给这块网卡，从这块网卡发出的数据报文也会通过Port交给OVS处理。当OVS创建一个新的网桥时，会自动创建一个与网桥同名的Internal Port，同时也会创建一个与网桥同名的Interface，因此可以通过ip命令在操作系统中查看到这张虚拟网卡，但是状态是down的。
+    - Patch
+        Patch Port和veth pair功能相同，总是成双成对的出现，在其中一端收到的数据报文会被转发到另一个Patch Port上，就像是一根网线一样。Patch Port常用于连接两个Bridge，这样两个网桥就和一个网桥一样了。
+    - Tunnel
+      OVS 支持 GRE、VXLAN、STT、Geneve和IPsec隧道协议，这些隧道协议就是overlay网络的基础协议，通过对物理网络做的一层封装和扩展，解决了二层网络数量不足的问题，最大限度的减少对底层物理网络拓扑的依赖性，同时也最大限度的增加了对网络的控制。
+
+3. Interface
+   iface/接口，接口是OVS与操作系统交换数据报文的组件，一个接口即是操作系统上的一块网卡，这个网卡可能是OVS生成的虚拟网卡，也有可能是挂载在OVS上的物理网卡，操作系统上的虚拟网卡（TUN/TAP）也可以被挂载在OVS上。
+
+4. Controller
+    OpenFlow控制器，OVS可以接收一个或者多个OpenFlow控制器的管理，功能主要是下发流表，控制转发规则。
+
+5. Flow
+   流表是OVS进行数据转发的核心功能，定义了端口之间转发数据报文的规则，一条流表规则主要分为匹配和动作两部分，匹配部分决定哪些数据报文需要被处理，动作决定了匹配到的数据报文该如何处理。
+
 ### Q&A
 
 - 开启洪泛和 MAC 学习什么关系
@@ -374,3 +401,4 @@ ovs-vsctl set Port bond2 bond_mode=balance-tcp
 
 [基于openvswitch实现的openshit-sdn](https://zhuanlan.zhihu.com/p/37852626)
 [kubernetes 网络组件简介（Flannel & Open vSwitch & Calico）](https://blog.csdn.net/kjh2007abc/article/details/86751730)
+[Open vSwitch 入门实践（1）简介 - 关于术语写的很好](https://zhuanlan.zhihu.com/p/336487371)

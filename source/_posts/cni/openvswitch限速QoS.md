@@ -1,5 +1,5 @@
 ---
-title: ovs的qos什么
+title: openvswitch限速QoS
 index_img: /images/bg/network.png
 banner_img: /images/bg/computer.jpeg
 tags:
@@ -8,7 +8,7 @@ tags:
 categories:
   - openvswitch
 date: 2023-06-15 18:40:12
-excerpt: ovs的qos的小实验
+excerpt: ovs的qos的小实验，使用tc或者ovs-qos限速
 sticky: 1
 ---
 
@@ -276,6 +276,13 @@ ovs-vsctl set port tap2-qos qos=@newqos -- \
 
 ``` bash
 # 配置流表规则
+# OVS（Open vSwitch）的 ovs-br1 交换机上添加一条流表项
+# 具体的含义是，当收到输入端口为1（in_port=1）且源 IP 地址为192.168.101.3的数据包时
+# 将该数据包发往端口4（enqueue:4:0）
+# 并且将该数据包的 VLAN ID 设置为0
+# 也就是说，这条流表项告诉交换机
+# 将源 IP 地址为 192.168.101.3 的数据包发送到端口 4。
+# 这个命令的实际效果是实现了对特定源地址的流量控制，将该流量限制在特定的输出端口上。
 ovs-ofctl add-flow ovs-br1 "in_port=1,nw_src=192.168.101.3 actions=enqueue:4:0"
 ovs-ofctl add-flow ovs-br1 "in_port=1,nw_src=192.168.101.4 actions=enqueue:4:1"
 ovs-ofctl add-flow ovs-br1 "in_port=3,nw_src=192.168.101.5 actions=enqueue:4:2"
