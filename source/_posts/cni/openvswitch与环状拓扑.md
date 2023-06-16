@@ -8,7 +8,7 @@ tags:
 categories:
   - openvswitch
 date: 2023-06-15 18:40:12
-excerpt: openvswitch使用隧道GRE和VXLAN构建环状网络
+excerpt: openvswitch使用隧道GRE和VXLAN构建环状网络，认识广播风暴，使用STP消除环路
 sticky: 1
 ---
 

@@ -7,7 +7,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-06-05 18:40:12
-excerpt: 理解什么是CNI，k8s的网络模型是什么，实现的插件有哪些，相关的OVS又是什么
+excerpt: 理解什么是CNI，k8s的网络模型是什么，实现的插件有哪些，相关的openvswitch又是什么
 sticky: 1
 ---
 

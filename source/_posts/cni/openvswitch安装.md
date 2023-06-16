@@ -1,6 +1,6 @@
 ---
-title: OVS如何安装
-index_img: /images/bg/k8s.webp
+title: openvswitch安装
+index_img: /images/bg/network.png
 banner_img: /images/bg/5.jpg
 tags:
   - openvswitch

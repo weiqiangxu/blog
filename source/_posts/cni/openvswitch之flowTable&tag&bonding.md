@@ -1,6 +1,6 @@
 ---
-title: openvswitch实验
-index_img: /images/bg/k8s.webp
+title: openvswitch之flowTable&tag&bonding
+index_img: /images/bg/network.png
 banner_img: /images/bg/5.jpg
 tags:
   - openvswitch

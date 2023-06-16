@@ -1,5 +1,5 @@
 ---
-title: openvswitch实验环境.md
+title: openvswitch实验环境
 index_img: /images/bg/network.png
 banner_img: /images/bg/computer.jpeg
 tags:
@@ -7,7 +7,7 @@ tags:
   - docker
 categories:
   - openvswitch
-date: 2023-06-14 18:40:12
+date: 2021-03-14 18:40:12
 excerpt: 搭建doocker环境理解openvswitch的各个小功能
 sticky: 1
 ---

@@ -1,6 +1,6 @@
 ---
 title: openvswitch简介
-index_img: /images/bg/k8s.webp
+index_img: /images/bg/network.png
 banner_img: /images/bg/5.jpg
 tags:
   - openvswitch
