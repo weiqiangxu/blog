@@ -1,5 +1,5 @@
 ---
-title: Helm使用手册
+title: 制作helm包和自建Chart仓库
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
@@ -7,7 +7,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-06-01 16:28:12
-excerpt: 介绍如何使用image镜像制作helm包、如何更新、卸载，在k8s上的资源如何使用helm更好的维护
+excerpt: 介绍如何使用image镜像制作helm包，自建仓库，以及使用自建仓库部署
 sticky: 1
 hide: false
 ---
