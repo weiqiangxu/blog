@@ -15,7 +15,8 @@ sticky: 1
 
 ``` bash
 [root🐳 ~]# uname -a
-# Linux ming-computer 5.15.0-71-generic #78~20.04.1-Ubuntu SMP Wed Apr 19 11:26:48 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+# Linux ming-computer 5.15.0-71-generic #78~20.04.1-Ubuntu SMP Wed Apr 19 
+# 11:26:48 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
 
@@ -118,10 +119,32 @@ $ sudo ctr run --cni -t --rm docker.io/library/busybox:latest hello sh
 
 ### Q&A
 
-- 如何查看containerd的插件有哪些
+##### 1.如何查看containerd的插件有哪些
 
 ``` bash
 $ ctr plugin ls
+```
+
+##### 2.如何离线安装golang
+
+要在Linux系统上离线安装Golang，您可以按照以下步骤操作：
+1. 在具有Internet连接的计算机上下载[Golang二进制文件包（tar.gz或zip格式）](https://go.dev/dl/)
+2. 将下载的文件包复制到您的离线Linux计算机。您可以使用USB驱动器或其他外部存储设备完成此操作
+3. 在Linux计算机上解压缩文件包并将其移动到适当的位置，例如`/usr/local/bin`目录
+``` bash
+$ tar -C /usr/local -xzf go1.19.10.linux-arm64.tar.gz
+```
+4. 在`/etc/profile`文件中添加Golang环境变量。将以下行添加到文件底部，将`<install-dir>`替换为您的Golang安装目录：
+``` bash
+$ echo 'export PATH=$PATH:/usr/local/go/bin' | tee -a /etc/profile
+```
+5. 保存并关闭文件后，使用以下命令使配置更改生效：
+``` bash
+$ source /etc/profile
+```
+6. 验证Golang是否正确安装并可以使用：
+``` bash
+$ go version
 ```
 
 ### 相关文章
