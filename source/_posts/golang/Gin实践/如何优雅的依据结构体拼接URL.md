@@ -4,7 +4,7 @@ index_img: /images/bg/文章通用.png
 tags:
   - golang
 categories:
-  - go
+  - golang
 date: 2023-04-11 09:40:12
 excerpt: 使用结构体拼接URL请求路径，优化写法，提升代码质量
 ---
