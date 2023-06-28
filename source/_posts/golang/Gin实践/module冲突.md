@@ -12,27 +12,28 @@ excerpt: 记录一次包版本不兼容导致的冲突和解决办法
 ### 一、问题描述
 
 ``` bash
-bingokube-nvs/internal/vnetstore imports
-        gitlab.bingosoft.net/bingokube/client-go/tools/cache imports
-        k8s.io/apimachinery/pkg/util/clock: module k8s.io/apimachinery@latest found (v0.27.3), but does not contain package k8s.io/apimachinery/pkg/util/clock
+company-nvs/internal/vnetstore imports
+gitlab.company.net/company/client-go/tools/cache imports
+k8s.io/apimachinery/pkg/util/clock: 
+module k8s.io/apimachinery@latest found (v0.27.3),
+but does not contain package k8s.io/apimachinery/pkg/util/clock
 ```
 
-1. `gitlab.bingosoft.net/bingokube/client-go`的 `go.mod` 依赖的版本是`k8s.io/apimachinery v0.22.4`;
-2. `gitlab.bingosoft.net/bingokube/client-go/tools/cache` 依赖了 `package k8s.io/apimachinery/pkg/util/clock`;
+1. `gitlab.company.net/company/client-go`的 `go.mod` 依赖的版本是`k8s.io/apimachinery v0.22.4`;
+2. `gitlab.company.net/company/client-go/tools/cache` 依赖了 `package k8s.io/apimachinery/pkg/util/clock`;
 3. `k8s.io/client-go`依赖了`k8s.io/apimachinery@latest found (v0.27.3)`;
 4. `k8s.io/apimachinery@latest found (v0.27.3)`已经移除了包`package k8s.io/apimachinery/pkg/util/clock`;
-5. 执行`go mod tidy`之后自动引用了包`k8s.io/apimachinery@latest`作为两个包`k8s.io/client-go`和`gitlab.bingosoft.net/bingokube/client-go`的共同依赖;
+5. 执行`go mod tidy`之后自动引用了包`k8s.io/apimachinery@latest`作为两个包`k8s.io/client-go`和`gitlab.company.net/company/client-go`的共同依赖;
 
 
 ### 二、解决包冲突的方式
 
-1. 指定包`apimachinery`版本，看`k8s.io/client-go`和`bingokube/client-go`都兼容
+##### 1.指定包`apimachinery`版本，看`k8s.io/client-go`和`company/client-go`都兼容
 
 ``` bash
 # 手动指定版本依赖
 $ go mod edit -require k8s.io/apimachinery@v0.22.4
 ```
-
 
 ``` yml
 module new_kube
@@ -40,7 +41,7 @@ module new_kube
 go 1.20
 
 require (
-	gitlab.bingosoft.net/bingokube/client-go v0.22.21
+	gitlab.company.net/company/client-go v0.22.21
     // 手动指定的版本
 	k8s.io/apimachinery v0.22.4
 )
@@ -73,9 +74,9 @@ go mod tidy
 go clean -modcache -i <module>
 ```
 
-2. 更新`bingokube/client-go`依赖的`apimachinery`版本
+##### 2.更新`company/client-go`依赖的`apimachinery`版本
 
-就是更改`bingokube/client-go`的代码，让其兼容`apimachinery@latest`;
+就是更改`company/client-go`的代码，让其兼容`apimachinery@latest`;
 
 
 ### 相关文档
