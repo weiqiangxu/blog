@@ -76,3 +76,8 @@ go clean -modcache -i <module>
 2. 更新`bingokube/client-go`依赖的`apimachinery`版本
 
 就是更改`bingokube/client-go`的代码，让其兼容`apimachinery@latest`;
+
+
+### 相关文档
+
+[go mod tidy module x found, but does not contain package x](https://budougumi0617.github.io/2019/09/20/fix-go-mod-tidy-does-not-contain-package/)
