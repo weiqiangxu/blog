@@ -56,3 +56,27 @@ ssh -T git@gitlab.company.net
 go get gitlab.company.net/client-go@v0.22.21
 ```
 
+
+### Q&A
+
+##### 1. go get 404 not found
+
+``` bash
+# 异常信息
+reading https://mirrors.aliyun.com/goproxy/github.com/weiqiangxu/batchjob/@v/list: 404 Not Found
+
+# 1.私有库未设置，默认会去`https://pkg.go.dev`
+# 就是`go env | grep GOPROXY`查找
+# GOPRIVATE设为一个以逗号分隔的模式列表时
+# 避免从公共仓库下载私有模块
+# 假设GOPRIVATE的值设置为"example.com/private-project"，那么当执行go get example.com/private-project时
+# Go命令将会从私有仓库或者本地文件系统中查找并下载该模块，而不是从公共仓库中获取
+go env -w GOPRIVATE=gitlab.mycompany.net
+
+# 2.设置insecure
+# 控制Go语言的不安全操作，当设置为"1"时，Go语言将允许一些不安全的操作
+go env -w GOINSECURE=private.repo.com
+
+# 3.手动指定
+go get -inscure github.com/weiqiangxu/batchjob
+```
