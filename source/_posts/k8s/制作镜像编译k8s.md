@@ -204,6 +204,55 @@ $ ping docker.for.mac.host.internal
 $ docker -H tcp://192.168.65.2:2375 images
 ```
 
+
+- 如何使用github的Action(CI)拉取镜像k8s.gcr.io
+
+``` bash
+# 1.github新建项目
+# 2.在该项目的Action新建工作流
+# 3.在该项目的setting的secrets and variable添加DOCKER_PASSWORD用于登陆个人hub
+
+# 或者直接项目根目录
+$ mkdir -p .github/workflows
+$ touch .github/workflows/main.yml
+```
+
+``` yml
+# main.yml
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run a multi-line script
+        run: |
+          docker pull k8s.gcr.io/build-image/kube-cross:v1.21.0-go1.16.15-buster.0
+          docker tag k8s.gcr.io/build-image/kube-cross:v1.21.0-go1.16.15-buster.0 435861851/k8s.gcr.io:kube-cross-v1.21.0-go1.16.15-buster.0
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push to Docker Registry
+        run: |
+          docker push 435861851/k8s.gcr.io:kube-cross-v1.21.0-go1.16.15-buster.0
+```
+
 ### 相关资料
 
 [ENTRYPOINT 入口点](https://docker-practice.github.io/zh-cn/image/dockerfile/entrypoint.html)
+[如何用Github轻松拉取谷歌容器镜像](https://developer.aliyun.com/article/875641)
