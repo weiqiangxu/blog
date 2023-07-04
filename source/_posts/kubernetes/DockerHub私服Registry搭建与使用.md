@@ -12,7 +12,7 @@ excerpt: 安装docker-registry建私有镜像仓库
 sticky: 1
 ---
 
-1. 本地创建私服镜像目录
+### 1.本地创建私服镜像目录
 
 ``` bash
 $ mkdir ~/test
@@ -44,7 +44,7 @@ services:
 $ cd ~/test/docker-compose && docker-compose up -d
 ```
 
-2. 访问registy服务
+### 2.访问registy服务
 
 ``` bash
 # 访问输入用户名密码 
@@ -57,7 +57,7 @@ Password:
 Login Succeeded
 ```
 
-3. 添加私有库到docker配置
+### 3.添加私有库到docker配置
 
 ``` bash
 # /etc/docker/daemon.json or ~/.docker/daemon.json
@@ -93,7 +93,7 @@ $ curl -X GET -u'root:123456' http://localhost:5001/v2/devops/ovs-aline/tags/lis
 {"name":"devops/ovs-aline","tags":["v0.0.1"]}
 ```
 
-3. 开启web服务
+### 4.web服务提供registy可视化界面
 
 ``` bash
 $ docker inspect ${registry_id}
@@ -112,6 +112,7 @@ $ docker run -d -p 8080:8080 \
 # REGISTRY_BASIC_AUTH其实是一个base64
 # 对 `username:password` 进行base64 encode
 ```
+
 ### Q&A
 
 ##### 1.htpasswd是什么命令
@@ -135,7 +136,7 @@ $ telnet 127.0.0.1 5001
 
 ##### 5.docker registry的token 
 
-```` bash
+``` bash
 $ cat ~/.docker/config.json
 ```
 
