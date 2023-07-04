@@ -59,7 +59,7 @@ hide: true
 
 ### TCP SOCKET 状态表：
 
-```
+``` bash
 CLOSED: 关闭状态，没有连接活动
 LISTEN: 监听状态，服务器正在等待连接进入
 SYN_SENT: 已经发出连接请求，等待确认
@@ -87,7 +87,7 @@ sudo tcpdump port 80 -n
 curl www.baidu.com:80
 ```
 
-```
+``` bash
 # 显示ip而不是主机名
 -n
 
@@ -114,20 +114,20 @@ curl 127.0.0.1:9090
 ```
 
 ### 监听示范
-```
+``` bash
 # src 9292
 
 22:38:22.028257 IP 127.0.0.1.9292 > 127.0.0.1.50139: Flags [S.], seq 2936404470, ack 2399477565, win 65535, options [mss 16344,nop,wscale 6,nop,nop,TS val 2141525572 ecr 2939320578,sackOK,eol], length 0
 22:38:22.028287 IP 127.0.0.1.9292 > 127.0.0.1.50139: Flags [.], ack 1, win 6379, options [nop,nop,TS val 2141525572 ecr 2939320578], length 0
 ```
 
-```
+``` bash
 # dst 9292
 
 22:38:22.028149 IP 127.0.0.1.50139 > 127.0.0.1.9292: Flags [S], seq 2399477564, win 65535, options [mss 16344,nop,wscale 6,nop,nop,TS val 2939320578 ecr 0,sackOK,eol], length 0
 22:38:22.028278 IP 127.0.0.1.50139 > 127.0.0.1.9292: Flags [.], ack 2936404471, win 6379, options [nop,nop,TS val 2939320578 ecr 2141525572], length 0
 ```
-```
+``` bash
 # 三次握手示范
 
 client   Flags [S],seq 2399477564, win 65535                     [SYN报文] [发完之后clent状态是SYN-SENT]
@@ -143,21 +143,21 @@ client   Flags [.],ack 2936404471, win 6379                      [报文发送�
 
 ### close client
 
-```
+``` bash
 # dst 9292
 
 22:44:13.099483 IP 127.0.0.1.50943 > 127.0.0.1.9292: Flags [F.], seq 0, ack 1, win 6379, options [nop,nop,TS val 1048610910 ecr 2373676954], length 0
 22:44:13.099714 IP 127.0.0.1.50943 > 127.0.0.1.9292: Flags [.], ack 2, win 6379, options [nop,nop,TS val 1048610910 ecr 2373686619], length 0
 ```
 
-```
+``` bash
 # src 9292
 
 22:44:13.099535 IP 127.0.0.1.9292 > 127.0.0.1.50943: Flags [.], ack 2, win 6379, options [nop,nop,TS val 2373686619 ecr 1048610910], length 0
 22:44:13.099681 IP 127.0.0.1.9292 > 127.0.0.1.50943: Flags [F.], seq 1, ack 2, win 6379, options [nop,nop,TS val 2373686619 ecr 1048610910], length 0
 ```
 
-```
+``` bash
 # 四次挥手
 
 client   Flags [F.], seq 0, ack 1, win 6379
@@ -168,7 +168,7 @@ client   Flags [.], ack 2, win 6379
 
 
 ### 常用命令
-```
+``` bash
 whereis tcpdump
 ifconfig
 /usr/sbin/tcpdump -i eth0 -n -nn host 10.xx.xx.35
@@ -185,17 +185,16 @@ ls /proc/$pid/fd/  | wc -l
 
 
 ### 如何查看close wait连接数
-```
+``` bash
 netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
 ```
 
 
 ### tcp窗口大小
 
-```
+``` bash
 初始窗口大小为 65，535 字节
 ```
 
 [TCP窗口大小](https://learn.microsoft.com/zh-cn/troubleshoot/windows-server/networking/description-tcp-features#tcp-window-size)
-
 [面试官：换人！他连 TCP 这几个参数都不懂](https://mp.weixin.qq.com/s/fjnChU3MKNc_x-Wk7evLhg)
