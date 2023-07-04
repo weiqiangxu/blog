@@ -3,9 +3,9 @@ title: Docker组件介绍
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
-  - kubernetes
+  - docker
 categories:
-  - kubernetes
+  - docker
 date: 2023-04-18 18:40:12
 excerpt: 介绍docker内部构造
 sticky: 1
