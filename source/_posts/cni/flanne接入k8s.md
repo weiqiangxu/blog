@@ -7,7 +7,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-07-05 18:40:12
-excerpt: kubernetes网络解决方案flannel
+excerpt: kubernetes网络解决方案flannel如何使用，拓扑图理解
 sticky: 1
 ---
 
@@ -201,62 +201,47 @@ $ kubectl get endpoints x -n x
 
 ##### 1. 什么叫做直连路由
 
-直连路由是指目的地与源地址直接相连的路由。
-当一个数据包的目的地在同一个子网中时，它可以直接发送到目的地，而不需要通过任何中转设备或路由器。
-这是因为源地址与目的地地址在同一个子网中，它们在物理层或链路层上直接相连。
-在路由表中，直连路由会被表示为目的地地址与子网掩码的组合，并通过特定的网络接口发送数据。
-这种类型的路由对于在同一个局域网内进行通信非常重要，它可以避免将数据包发送到外部网络并返回，提高了网络性能和效率。
-例如，在上面的路由表中，10.16.200.0/21是一个直连路由，使用enp1s0接口发送数据。当要发送到10.16.200.0/21网络的数据包时，它可以直接通过enp1s0接口发送，而不需要经过其他路由器。
+1. 目的地与源地址直接相连的路由。
+2. 同一个子网中，可直发送到目的地，不需要任何中转设备或路由器。
+3. 在物理层或链路层上直接相连。
+4. 示例：`173.8.8.0/24 dev br2 proto kernel scope link src 173.8.8.1`因为本机网桥br2就是`inet 173.8.8.1`。
 
 ##### 2. ip route和route -n区别是什么
 
 `route -n`和`ip route`命令都是用于查看和管理系统的路由表，但有一些区别：
 1. 语法：`route -n`是基于`net-tools`软件包的命令，而`ip route`是基于`iproute2`软件包的命令。`iproute2`是较新的工具集，可以提供更多的功能和选项。
-2. 输出格式：`route -n`输出的路由表以人类可读的方式显示，其中包括目标网络、网关、子网掩码和接口等信息。而`ip route`命令的输出格式更为规范，以CIDR表示法显示网络和子网掩码，而不显示目标网络的广播地址。
-3. 高级功能：`ip route`命令提供了更多的高级功能，例如使用`ip route show table <table>`查看指定路由表的内容，使用`ip route add default via <gateway>`添加默认路由等。
-综上所述，`ip route`命令更推荐使用，因为它提供了更多功能，并且输出格式更为规范。但在某些老旧的系统上，可能只有`route -n`命令可用。
+2. `ip route`命令的输出格式更为规范，以CIDR表示法显示网络和子网掩码，而不显示目标网络的广播地址。
+3. `ip route`命令更推荐使用。
 
 
 ##### 3. flannel.1网卡接收到的流量会发给谁
 
-在flannel中，flannel.1网卡是用于虚拟网络通信的网络接口。
-当flannel.1网卡接收到流量时，它会将流量转发给flannel进程。
-flannel进程负责将流量封装并发送到其他节点上的flannel进程，以便在不同节点之间建立覆盖网络。
-这样，流量就可以在不同节点之间进行通信和传输。最终，流量会达到目标节点的flannel进程，并被解封装并交给目标节点上的网络接口进行处理。
+1. 在flannel中，flannel.1网卡是用于虚拟网络通信的网络接口。
+2. 当flannel.1网卡接收到流量时，它会将流量转发给flannel进程。
+3. flannel进程负责将流量封装并发送到其他节点上的flannel进程，以便在不同节点之间建立覆盖网络。
+4. 流量会达到目标节点的flannel进程，并被解封装并交给目标节点上的网络接口进行处理
 
 
 ##### 4. flannel.1接收到的流量不会根据iptable或者其他的转发吗
 
-Flannel在网络层提供覆盖网络的功能，它在节点之间建立虚拟网络，并通过隧道技术将数据包从源节点转发到目标节点。
-在这个过程中，Flannel不会根据iptables或其他转发规则对流量进行处理。
-具体来说，当一个容器发送网络请求时，发送的数据包会经过容器的网卡，在容器内部会根据iptables规则进行转发。
-然后，数据包会到达宿主机的Flannel网卡(flannel.1)。
-Flannel会根据自己的路由表，将数据包封装成特定的协议（如VXLAN或UDP），并通过UDP或者其他方式将数据包发送到目标节点的Flannel网卡。
-最后，目标节点的Flannel网卡将数据包解析，并将其传递给目标容器。
-因此，Flannel本身并不会对流量进行转发或过滤。如果您需要实现进一步的流量控制或转发策略，
-可以在节点上使用iptables等工具来配置相应的规则，或者使用其他的网络代理工具来辅助实现。
+1. Flannel不会根据iptables或其他转发规则对流量进行处理;
+2. Flannel通过隧道技术发送数据包;
+3. 容器发送网络请求时，数据包会经过容器的网卡（容器内部会根据iptable转发）然后数据包会到达宿主机的Flannel网卡(flannel.1)；
+4. Flannel.1收到数据会到flanneld，根据自己路由表，将数据包封装成特定的协议（如VXLAN或UDP），并通过UDP或者其他方式将数据包发送到目标节点的Flannel网卡；
 
 ##### 5. kube-proxy在flannel网络之中有什么用
 
-kube-proxy是Kubernetes集群中的一个组件，用于提供服务的负载均衡和网络代理功能。在flannel网络中，kube-proxy的作用主要有以下几个方面：
-
-1. 服务的负载均衡：Kubernetes的Service和其对应的多个Endpoint，使用kube-proxy依据配置的负载均衡策略将请求转发到相应的Pod实例上。
-
-2. 服务的代理转发：kube-proxy可以将集群外部的请求转发到内部的服务。它会为每个Service创建一个虚拟IP，并监听该IP上的请求，然后将请求转发到对应的Pod实例上。
-
-3. IPVS模式支持：flannel网络中，kube-proxy可以选择使用IPVS模式来进行负载均衡和代理转发。IPVS是Linux内核提供的一种高性能负载均衡技术，相比于默认的iptables模式，可以提供更高的性能和更细粒度的负载均衡策略。
-
-总而言之，kube-proxy在flannel网络中负责将服务的请求转发到正确的Pod实例上，实现负载均衡和网络代理的功能。
-
+1. 提供服务的负载均衡和网络代理功能;
+2. 负载均衡：Service和其对应的多个Endpoint使用kube-proxy；
+3. 网络代理：将集群外部的请求转发到内部的服务（kube-proxy为Service创建虚拟IP并监听该IP）；
+4. kube-proxy可以选择使用IPVS模式(比默认iptables性能更高)；
 
 ##### 6. kube-proxy 为每个Service创建一个虚拟IP是什么意思
 
-kube-proxy是Kubernetes集群中的一个组件，负责实现服务发现和负载均衡功能。
-当一个Service在Kubernetes中创建时，kube-proxy会为该Service创建一个虚拟IP（Virtual IP），这个虚拟IP是由kube-proxy自动生成的，用于代表该Service在集群内的访问地址。
-当Pod向Service发送请求时，请求会被转发到对应的虚拟IP上。
-kube-proxy会通过负载均衡算法将请求转发给后端实际运行的Pod，这样就实现了服务发现和负载均衡的功能。
-通过为每个Service创建一个虚拟IP，可以将后端Pod的变动与Service的访问地址解耦。
-即使后端Pod的数量或IP地址发生变化，Service的虚拟IP仍然保持不变，从而实现了对外提供稳定的服务访问地址的能力。
+1. kube-proxy负责实现服务发现和负载均衡功能。
+2. kube-proxy会为Service创建虚拟IP（Virtual IP），这个虚拟IP是由kube-proxy自动生成的，用于代表该Service在集群内的访问地址。
+3. pod访问svc域名时候会转发到该虚拟IP上，kube-proxy监听该IP并转发数据到svc的Endpoint；
+4. svc的虚拟IP可以实现后端Pod的变动与Service的访问地址解耦，Pod的变化不会影响到虚拟IP；
 
 ##### 7. ipvsadm -Ln是什么意思，flannel和ipvs什么关系
 
@@ -266,10 +251,10 @@ IPVS可以作为kube-proxy的一种模式来实现负载均衡和代理转发功
 
 ##### 8. flannel和kube-proxy是什么关系
 
-Flannel和kube-proxy是Kubernetes集群中两个不同的组件，各自负责不同的功能。
-Flannel是一个网络插件，用于在Kubernetes集群中创建和管理容器间的网络通信。它为每个Pod分配一个唯一的虚拟IP地址，并使用网络隔离技术（如VXLAN、UDP封装等）实现容器之间的通信。Flannel还负责将节点的主机网络连接起来，以便跨节点的Pod可以相互通信。
-kube-proxy是另一个重要的组件，它负责实现Kubernetes中的服务发现和负载均衡功能。kube-proxy为每个Service创建一个虚拟IP，并通过轮询、IPVS等负载均衡算法将请求转发给后端的Pod，实现服务的高可用和负载均衡。
-因此，Flannel和kube-proxy可以说是在Kubernetes集群中协同工作的两个组件，Flannel负责创建容器间的网络通信，而kube-proxy负责将服务的请求转发给正确的Pod。两者合作，共同构建一个高可用、可扩展的容器化应用环境。
+1. Flannel（容器间的网络通信）和kube-proxy（服务发现和负载均衡功能）
+3. Pod的IP分配：Flannel为每个Pod分配一个唯一的虚拟IP地址，并使用网络隔离技术（如VXLAN、UDP封装等）实现容器之间的通信。
+4. 跨节点通信：Flannel还负责将节点的主机网络连接起来，以便跨节点的Pod可以相互通信。
+5. kube-proxy在service上创建虚拟IP并监听，并负载均衡转发backend的Pod。
 
 
 ### 相关资料

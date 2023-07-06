@@ -6,7 +6,7 @@ tags:
   - ebpf
 categories:
   - kubernetes
-date: 2023-06-05 18:40:12
+date: 2023-07-05 18:40:12
 excerpt: 搭建集群使用cilium作为网络解决方案，理解eBPF在其中充当的角色、传统flannel下的集群的优缺点
 sticky: 1
 ---
