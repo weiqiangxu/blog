@@ -12,18 +12,23 @@ excerpt: 记录一次包版本不兼容导致的冲突和解决办法
 ### 一、问题描述
 
 ``` bash
+
+# 包company/client-go/cache与k8s.io/apimachinery@latest不兼容
+# 需要指定k8s.io/apimachinery的版本为旧版 (默认会指向最新版)
+# 并且k8s.io/api@latest也依赖了k8s.io/apimachinery@latest
+# 所以k8s.io也需要指定旧版
+
 company-nvs/internal/vnetstore imports
-gitlab.company.net/company/client-go/tools/cache imports
-k8s.io/apimachinery/pkg/util/clock: 
-module k8s.io/apimachinery@latest found (v0.27.3),
-but does not contain package k8s.io/apimachinery/pkg/util/clock
+company/client-go/cache imports
+	k8s.io/apimachinery/pkg/util/clock: 
+	module k8s.io/apimachinery@latest found (v0.27.3),
+	but does not contain package k8s.io/apimachinery/pkg/util/clock
 ```
 
-1. `gitlab.company.net/company/client-go`的 `go.mod` 依赖的版本是`k8s.io/apimachinery v0.22.4`;
-2. `gitlab.company.net/company/client-go/tools/cache` 依赖了 `package k8s.io/apimachinery/pkg/util/clock`;
-3. `k8s.io/client-go`依赖了`k8s.io/apimachinery@latest found (v0.27.3)`;
-4. `k8s.io/apimachinery@latest found (v0.27.3)`已经移除了包`package k8s.io/apimachinery/pkg/util/clock`;
-5. 执行`go mod tidy`之后自动引用了包`k8s.io/apimachinery@latest`作为两个包`k8s.io/client-go`和`gitlab.company.net/company/client-go`的共同依赖;
+
+![go module冲突](/images/conflict-package.png)
+
+> 解决问题的关键在于指定k8s.io/apimachinery和k8s.io/api的版本，但是很难找出k8s.io/api的版本问题
 
 
 ### 二、解决包冲突的方式
@@ -44,6 +49,7 @@ require (
 	gitlab.company.net/company/client-go v0.22.21
     // 手动指定的版本
 	k8s.io/apimachinery v0.22.4
+	k8s.io v0.22.4
 )
 
 // go mod tidy自动整理的依赖
@@ -73,6 +79,7 @@ go mod tidy
 # Go mod 的缓存是全局的，清理缓存可能会导致其他项目的构建时间增长
 go clean -modcache -i <module>
 ```
+
 
 ##### 2.更新`company/client-go`依赖的`apimachinery`版本
 

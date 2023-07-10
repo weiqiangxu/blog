@@ -73,3 +73,5 @@ L4层，也称为传输层，是OSI模型中的第四层。它负责在源主机
 [Cilium作为K8s网络的解决方案](https://mp.weixin.qq.com/s/WHoSyXMiaazxPhN9LXiwHg)
 [CNI基准：了解Cilium网络性能](https://cilium.io/blog/2021/05/11/cni-benchmark/)
 [https://docs.cilium.io/en/stable/](https://docs.cilium.io/en/stable/)
+[使用 eBPF 技术实现更快的网络数据包传输](https://atbug.com/accelerate-network-packets-transmission/)
+[追踪 Kubernetes 中的数据包 - 宝藏博主](https://atbug.com/tracing-network-packets-in-kubernetes/)

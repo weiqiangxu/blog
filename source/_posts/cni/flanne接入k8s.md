@@ -261,3 +261,5 @@ IPVS可以作为kube-proxy的一种模式来实现负载均衡和代理转发功
 
 - [Kubernetes（k8s）CNI（flannel）网络模型原理](https://mp.weixin.qq.com/s/18bMpQjXFodfegWH3xNeKQ)
 - [《蹲坑学K8S》之19-3：Flannel通信原理](https://baijiahao.baidu.com/s?id=1677418078665703072)
+- [ Kubernetes 网络模型和网络通信](https://atbug.com/deep-dive-k8s-network-mode-and-communication/)
+- [从 Flannel 学习 Kubernetes overlay 网络 - 写的非常好](https://atbug.com/cross-node-traffic-on-flannel-vxlan-network/)
