@@ -89,7 +89,12 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
 
 ``` json
 {
-  "insecure-registries" : [ "registry.company.net" ]
+  "insecure-registries" : [ "registry.company.net" ],
+  "debug": true,
+  "experimental": true,
+  "features": {
+    "buildkit": true
+  }
 }
 ```
 
