@@ -86,6 +86,26 @@ go clean -modcache -i <module>
 就是更改`company/client-go`的代码，让其兼容`apimachinery@latest`;
 
 
+##### 3.有时候无论怎么指定版本都无法生效
+
+``` bash
+# 比如明明指定版本 k8s.io/apimachinery v0.22.4
+# 但是 go mod tidy时候却是 k8s.io/apimachinery v0.27.4
+# 这是因为有其他包依赖了 @v0.27.4
+
+
+# 查看依赖关系
+$ go mod graph > a.txt
+
+# 有下面一行
+# 是因为api版本27.4依赖了apimachinery@v0.27.4
+k8s.io/api@v0.27.4 k8s.io/apimachinery@v0.27.4
+
+# 所以指定使用才可以解决问题
+k8s.io/api@v0.22.4
+```
+
+
 ### 相关文档
 
 - [go mod tidy module x found, but does not contain package x](https://budougumi0617.github.io/2019/09/20/fix-go-mod-tidy-does-not-contain-package/)
