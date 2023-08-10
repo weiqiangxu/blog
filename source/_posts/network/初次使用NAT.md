@@ -16,7 +16,7 @@ hide: true
 腾讯云服务器A上安装一个docker，运行一个Nginx服务，配置NAT可以通过公网IP直接访问到该容器内部网络
 
 
-docker run --net=none -itd --name busybox-test busybox
+docker run -itd --name nginx-test nginx
 docker exec busybox-test ip a
 
 
@@ -34,10 +34,24 @@ $ iptables -t nat -L
 $ iptables -t nat -A POSTROUTING -s 10.1.1.8 ! -o br-test -j SNAT --to-source 10.0.8.4
 
 
+
+
 # iptables -t nat -A PREROUTING -d <云服务器A的公网IP> -p tcp --dport <对外暴露的端口号> -j DNAT --to-destination <Nginx容器的IP地址>:80
 $ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8888 -j DNAT --to-destination 10.1.1.8:80
 
-$ iptables -t nat -A OUTPUT -d 10.1.1.8 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8888
+
+$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 10.0.8.4:9090
+$ iptables -t nat -A PREROUTING -d 0.0.0.0 -p tcp --dport 8989 -j DNAT --to-destination 10.0.8.4:9090
+$ iptables -t nat -A OUTPUT -d 172.17.0.2 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8989
+
+
+$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 192.168.0.100:9090
+
+$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 192.168.0.100:9090
+
+$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 172.17.0.2:80
+
+$ iptables -t nat -A OUTPUT -d 172.17.0.2 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8989
 
 
 $ iptables -t nat -nvL
@@ -49,6 +63,16 @@ $ ip netns exec test-nat tcpdump -nei eth0
 $ iptables -t nat -A PREROUTING -d 10.1.1.8 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8888
 
 ```
+
+``` bash
+[root@VM-8-4-centos ~]# iptables -t nat -nvL
+
+Chain PREROUTING (policy ACCEPT 1 packets, 28 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DNAT       tcp  --  *      *       0.0.0.0/0            10.0.8.4             tcp dpt:8989 to:10.0.8.4:9090
+```
+
+[http://43.138.41.53:8989/](http://43.138.41.53:8989/)
 
 3. 验证可以通讯
 
@@ -118,3 +142,14 @@ iptables -t nat -D OUTPUT 1
 请注意，删除规则后，iptables nat表的规则编号会重新调整。因此，如果你想要删除多个规则，最好使用`-L`命令查看规则编号的变化，并相应调整删除的规则编号。
 
 另外，上述命令需要使用root权限运行，或者在sudoers文件中有相应的权限设置。
+
+
+### 本机器 curl 10.0.8.4:8989 ，其中10.0.8.4是本机的网卡ip，是不是不会经过iptables
+
+是的，如果你在本机上使用curl命令访问IP地址为10.0.8.4的服务端口8989，那么这个请求不会经过iptables防火墙。
+
+iptables是Linux操作系统中的一个防火墙管理工具，它可以用来过滤、转发和修改进出系统的网络数据包。它的工作原理是基于规则集，可以根据用户配置的规则对数据包进行过滤和处理。
+
+如果你在本机上进行网络请求，请求的目标IP地址是本机的网卡IP地址，那么这个请求是走本机的网络协议栈直接发送和接收的，不会经过iptables的过滤。iptables主要针对通过本机的网络数据流量进行过滤和管理。
+
+需要注意的是，如果你在本机上使用curl命令访问的是本机的外部IP地址或者其他网络设备的IP地址，那么这个请求可能会经过iptables的过滤规则。具体是否经过iptables的过滤规则取决于你的iptables配置。
