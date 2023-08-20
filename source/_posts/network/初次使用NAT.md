@@ -6,150 +6,99 @@ tags:
   - network
 categories:
   - kubernetes
-date: 2023-08-09 15:50:12
-excerpt: 使用NAT
+date: 2023-08-20 15:50:12
+excerpt: 使用NAT实现数据转发其中包括DNAT和SNAT实验
 sticky: 1
 hide: true
 ---
 
+### 一、概念
 
-腾讯云服务器A上安装一个docker，运行一个Nginx服务，配置NAT可以通过公网IP直接访问到该容器内部网络
+##### 1.NAT
+
+NAT（网络地址转换）是一种网络技术，一般用于局域网和公网之间IP地址转换，常用iptables实现。
+
+##### 2.DNAT
+
+DNAT（目标网络地址转换）是NAT的一种形式，它将目标IP地址和端口转换为不同的IP地址和端口，通常用于将外部请求转发到内部网络中的特定服务器上。一般通过公网IP进来公网网卡的数据包更改目的ip或端口访问到内部服务。
+
+##### 3.SNAT
+
+SNAT（源网络地址转换）是NAT的另一种形式，它将发送方的IP地址和端口转换为不同的IP地址和端口。主要用于局域网内的多台设备通过同一个公共IP地址访问互联网时，可以使用SNAT将内部设备的源IP地址转换成公共IP地址。这样可以避免互联网上的服务器将响应发送回源IP地址时的冲突。
+
+### 二、配置DNAT规则让外部访问内部网络
 
 
-docker run -itd --name nginx-test nginx
-docker exec busybox-test ip a
+1. 购买腾讯云服务器A上安装一个docker，运行一个Nginx服务，配置DNAT可以使用公网IP访问Nginx服务.
 
+``` bash
+$ yum install -y docker
+$ systemctl start docker
+$ docker run -itd --name nginx-test nginx
+```
 
-要使用`ip`命令配置NAT规则，使得能够通过公网IP直接访问到云服务器A上运行的Nginx容器内部网络，需要进行以下步骤：
-
-1. 确保云服务器A已经安装了Docker，并运行了Nginx容器。
-
-2. 配置SNAT规则：
+2. 配置NAT使用公网IP与自定义端口可访问Nginx服务
 
 ``` bash
 # iptables查看NAT规则
 $ iptables -t nat -L
 
-# iptables -t nat -A POSTROUTING -s <Nginx容器的IP地址> ! -o docker0 -j SNAT --to-source <云服务器A的公网IP>
-$ iptables -t nat -A POSTROUTING -s 10.1.1.8 ! -o br-test -j SNAT --to-source 10.0.8.4
+# docker容器ip地址
+$ docker inspect nginx-test | grep IPAddress
 
-
-
-
-# iptables -t nat -A PREROUTING -d <云服务器A的公网IP> -p tcp --dport <对外暴露的端口号> -j DNAT --to-destination <Nginx容器的IP地址>:80
-$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8888 -j DNAT --to-destination 10.1.1.8:80
-
-
-$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 10.0.8.4:9090
-$ iptables -t nat -A PREROUTING -d 0.0.0.0 -p tcp --dport 8989 -j DNAT --to-destination 10.0.8.4:9090
-$ iptables -t nat -A OUTPUT -d 172.17.0.2 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8989
-
-
-$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 192.168.0.100:9090
-
-$ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 192.168.0.100:9090
-
+# 配置公网IP与8080端口请求转发到本机80端口
+# 10.0.8.4 <公网数据入口网卡IP> 8989 <公网端口号> to-destination <容器IP地址>:<容器端口>
 $ iptables -t nat -A PREROUTING -d 10.0.8.4 -p tcp --dport 8989 -j DNAT --to-destination 172.17.0.2:80
 
-$ iptables -t nat -A OUTPUT -d 172.17.0.2 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8989
+# 配置完成后可以通过腾讯云<公网IP>:8989访问到docker服务
+# 如何删除iptables规则
+$ iptables -t nat -D PREROUTING 1
+```
+
+### 三、配置SNAT从容器内部访问外网
 
 
+
+
+
+### 相关疑问
+
+
+##### 1.iptables常用命令
+
+``` bash
+# iptables查看NAT规则
+$ iptables -t nat -L
+
+# 查看iptables规则和其匹配次数
 $ iptables -t nat -nvL
-
-
-$ ip netns exec test-nat tcpdump -nei eth0
-
-
-$ iptables -t nat -A PREROUTING -d 10.1.1.8 -p tcp --dport 80 -j DNAT --to-destination 10.0.8.4:8888
-
 ```
 
-``` bash
-[root@VM-8-4-centos ~]# iptables -t nat -nvL
+##### 2.iptables的PREROUTING\POSTROUTING\OUTPUT分别干嘛的
 
-Chain PREROUTING (policy ACCEPT 1 packets, 28 bytes)
- pkts bytes target     prot opt in     out     source               destination         
-    0     0 DNAT       tcp  --  *      *       0.0.0.0/0            10.0.8.4             tcp dpt:8989 to:10.0.8.4:9090
-```
+iptables是一个用于Linux系统的防火墙工具，用于配置和管理网络数据包过滤规则。其中的PREROUTING、POSTROUTING和OUTPUT是iptables的三个不同的表，用于不同的数据包处理阶段。
 
-[http://43.138.41.53:8989/](http://43.138.41.53:8989/)
+- PREROUTING表: 进入路由系统的数据包。数据包路由之前进行处理，常用目标地址的修改、端口重定向等。
 
-3. 验证可以通讯
+- POSTROUTING表: 离开路由系统的数据包。数据包路由之后进行处理，常用源地址的修改等。常见的使用场景SNAT等。
 
-``` bash
-$ docker exec busybox-test nc -l -p 80
+- OUTPUT表: 本地产生的数据包。它在数据包从本地应用程序发送出去之前进行处理，可以对数据包进行一些操作，例如目标地址的修改、端口重定向等。常见的使用场景包括阻止/允许本地应用程序访问特定的目标地址/端口等。
 
-# 本机访问
-$ echo "hello" | nc 10.1.1.8 80
+综上所述，PREROUTING表用于处理进入路由系统的数据包，POSTROUTING表用于处理离开路由系统的数据包，OUTPUT表用于处理本地产生的数据包。
 
-$ echo "hello" | nc 10.0.8.4 8888
+##### 3.什么是静态NAT和动态NAT
 
-# 公网IP访问
-$ echo "hello" | nc 43.138.41.53 8888
-```
-这些命令将会：
+一个私有IP固定映射一个公有IP地址，提供内网服务器的对外访问服务是静态。动态NAT是私有IP映射地址池中的公有IP，映射关系是动态的，临时的。
 
-- 添加一条默认路由到名为"nginx"的路由表中，指向云服务器A的网关IP；
-- 添加一条规则，将从Nginx容器IP地址发送的流量路由到"nginx"路由表；
-- 添加一条默认路由到"nginx"路由表，指向云服务器A的网关IP；
-- 添加一条iptables的SNAT规则，将Nginx容器的IP地址的流量源地址转换成云服务器A的公网IP；
-- 添加一条iptables的DNAT规则，将外部访问云服务器A公网IP指定端口的流量目标地址转换成Nginx容器的IP地址。
-
-1. 保存配置：将以上配置保存到文件，以使其在重启后自动生效。
-
-``` bash
-sudo sh -c "iptables-save > /etc/iptables/rules.v4"
-```
-
-这条命令将iptables规则保存到`/etc/iptables/rules.v4`文件中。
-
-完成以上步骤后，就使用`ip`命令成功配置了NAT规则。现在可以通过云服务器A的公网IP和指定的端口号，直接访问到Nginx容器内部网络中运行的Nginx服务了。
-
-
-
-ip nat inside source表示转换IP包的源地址，当数据包从内部发往外部；或者转换IP包的目的地址，当数据包从外部传输到内部。
-Ip nat outside source表示转换IP包的源地址，当数据包从外部传输到内部；或者转换IP包的目的地址，当数据包从内部发往外部。
-
-
-静态NAT 一个私有IP固定映射一个公有IP地址，提供内网服务器的对外访问服务
-动态NAT 私有IP映射地址池中的公有IP，映射关系是动态的，临时的
-NAPT 私有IP地址和端口号与同一个公有地址加端口进行映射
-
-
-[网络地址转换--静态NAT](https://blog.csdn.net/weixin_42442713/article/details/80909546)
-
-
-### 如何删除iptables NAT规则
-
-要删除iptables nat规则，需要执行以下步骤：
-
-1. 首先，使用以下命令查看当前的iptables nat规则：
+##### 4.如何删除iptables NAT规则
 
 ```shell
-iptables -t nat -L
-```
-
-1. 找到要删除的规则，然后使用以下命令删除指定规则。假设要删除编号为1的规则，使用以下命令：
-```shell
+# 数字1是链的index索引
 iptables -t nat -D PREROUTING 1
 
 iptables -t nat -D OUTPUT 1
 ```
-其中，`PREROUTING`是iptables nat表的一个链，`1`是要删除规则的编号。
 
-1. 重复上述步骤，直到删除所有需要的规则。
+##### 5.本机器curl本机器网卡会经过iptables吗
 
-请注意，删除规则后，iptables nat表的规则编号会重新调整。因此，如果你想要删除多个规则，最好使用`-L`命令查看规则编号的变化，并相应调整删除的规则编号。
-
-另外，上述命令需要使用root权限运行，或者在sudoers文件中有相应的权限设置。
-
-
-### 本机器 curl 10.0.8.4:8989 ，其中10.0.8.4是本机的网卡ip，是不是不会经过iptables
-
-是的，如果你在本机上使用curl命令访问IP地址为10.0.8.4的服务端口8989，那么这个请求不会经过iptables防火墙。
-
-iptables是Linux操作系统中的一个防火墙管理工具，它可以用来过滤、转发和修改进出系统的网络数据包。它的工作原理是基于规则集，可以根据用户配置的规则对数据包进行过滤和处理。
-
-如果你在本机上进行网络请求，请求的目标IP地址是本机的网卡IP地址，那么这个请求是走本机的网络协议栈直接发送和接收的，不会经过iptables的过滤。iptables主要针对通过本机的网络数据流量进行过滤和管理。
-
-需要注意的是，如果你在本机上使用curl命令访问的是本机的外部IP地址或者其他网络设备的IP地址，那么这个请求可能会经过iptables的过滤规则。具体是否经过iptables的过滤规则取决于你的iptables配置。
+在本机上使用curl命令访问IP地址为本机网卡IP`10.0.8.4`的服务端口8989，那么这个请求不会经过iptables防火墙。iptables是Linux操作系统中的一个防火墙管理工具，在本机上进行网络请求，请求的目标IP地址是本机的网卡IP地址，那么这个请求是走本机的网络协议栈直接发送和接收的，不会经过iptables的过滤。iptables主要针对通过本机的网络数据流量进行过滤和管理。
