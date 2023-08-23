@@ -1,5 +1,5 @@
 ---
-title: 初次使用NAT
+title: NAT配置局域网访问公网和公网访问内部流量转发
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
@@ -7,9 +7,9 @@ tags:
 categories:
   - kubernetes
 date: 2023-08-20 15:50:12
-excerpt: 使用NAT实现数据转发其中包括DNAT和SNAT实验
+excerpt: 使用NAT实现数据转发其中包括DNAT和SNAT实验实现公网访问后转发到局域网的服务以及从内部网络命名空间配置SNAT访问公网服务
 sticky: 1
-hide: true
+hide: false
 ---
 
 ### 一、概念
