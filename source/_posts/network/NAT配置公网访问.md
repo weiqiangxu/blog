@@ -1,7 +1,7 @@
 ---
 title: NAT配置公网访问
-index_img: /images/bg/k8s.webp
-banner_img: /images/bg/5.jpg
+index_img: /images/bg/network.png
+banner_img: /images/bg/computer.jpeg
 tags:
   - network
 categories:
