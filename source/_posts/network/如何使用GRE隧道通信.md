@@ -7,7 +7,7 @@ tags:
 categories:
   - network
 date: 2023-07-02 18:40:12
-excerpt: 如何实现多vxlan并使用隧道实现通讯
+excerpt: 部署多个网络命名空间并使用GRE隧道通讯
 sticky: 1
 hide: true
 ---
