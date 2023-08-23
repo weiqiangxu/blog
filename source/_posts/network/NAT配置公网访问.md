@@ -1,5 +1,5 @@
 ---
-title: NAT配置局域网访问公网和公网访问内部流量转发
+title: NAT配置公网访问
 index_img: /images/bg/k8s.webp
 banner_img: /images/bg/5.jpg
 tags:
