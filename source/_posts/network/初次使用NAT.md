@@ -98,6 +98,17 @@ ip link set br-link up
 ```
 
 ``` bash
+# 检查ipv4转发
+sysctl net.ipv4.ip_forward
+
+# 打开ipv4转发
+sysctl -w net.ipv4.ip_forward=1
+```
+
+``` bash
+# 此时没有配置SNAT是无法通讯的
+ip netns exec container1 ping baidu.com
+
 # 测试容器之间网络互通
 # ip netns exec container1 ping <宿主机eth0>
 ip netns exec container1 ping 10.0.8.4
@@ -106,8 +117,7 @@ ip netns exec container1 ping 10.0.8.4
 ip netns exec container1 ping 10.1.1.7
 
 # iptables -t nat -A POSTROUTING -s 10.1.1.0/24 -o <宿主机外网接口> -j MASQUERADE
-# iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.1.1.5/24 -o br-link -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 10.1.1.0/24 -o eth0 -j MASQUERADE
 
 # 删除NAT规则
 iptables -t nat -D POSTROUTING 1
