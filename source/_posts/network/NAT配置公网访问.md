@@ -119,6 +119,9 @@ ip netns exec container1 ping 10.1.1.7
 # iptables -t nat -A POSTROUTING -s 10.1.1.0/24 -o <宿主机外网接口> -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 10.1.1.0/24 -o eth0 -j MASQUERADE
 
+# 或者(xx是服务器 IP)
+iptables -t nat -A POSTROUTING -s 10.1.1.0/24 -o eth0 -j SNAT --to-source x.x.x.x
+
 # 删除NAT规则
 iptables -t nat -D POSTROUTING 1
 iptables -t nat -nvL

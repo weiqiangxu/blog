@@ -43,7 +43,7 @@ vti：即虚拟隧道接口（Virtual Tunnel Interface），是 cisco 提出的�
 
 ##### 4.用途
 
-1. VPN连接：可以将tun设备配置为VPN客户端或服务器，并通过该设备在不同网络之间建立安全的隧道连接，实现远程访问或局域网间互通。
+1. VPN连接：可以将tun设备配置为VPN客户端或服务器，并通过该设备在不同网络之间建立安全的隧道连接，实现远程访问或局域网间互通。tun/tap设备最常用的场景是VPN，比较有名的项目有[vTun](https://vtun.sourceforge.net/)、[openVPN](https://openvpn.net/)。
 2. 隧道连接：可以将tun设备配置为网络隧道的一部分，用于将数据从一个网络传输到另一个网络，通常用于连接不同物理网络的互联，如通过互联网连接不同地区的局域网。
 3. 虚拟化网络：可以使用tun设备实现虚拟化网络，通过创建多个tun设备和对应的网络命名空间，可以将不同容器或虚拟机之间隔离的网络连接起来。
 4. 流量监控和过滤：可以使用tun设备来捕获传入和传出的网络流量，并进行流量监控或过滤，例如实现防火墙功能等。
@@ -51,67 +51,61 @@ vti：即虚拟隧道接口（Virtual Tunnel Interface），是 cisco 提出的�
 
 [tun-tap工作层图](/images/Tun-tap-osilayers-diagram.png)
 
-### 二、初始化环境
+##### 5.图解Tun与应用程序
 
-``` bash
-yum install -y bridge-utils
-ip netns add container1
-ip netns add container2
-ip netns list
-ip link add veth1 type veth peer name veth2
-ip link add veth3 type veth peer name veth4
-ip link set veth2 netns container1
-ip link set veth4 netns container2
-ip netns exec container1 ip addr add 10.1.1.5/24 dev veth2
-ip netns exec container1 ip link set veth2 up
-ip netns exec container1 ip route add default via 10.1.1.1
-ip netns exec container1 ip link set lo up
-ip netns exec container2 ip addr add 10.1.1.7/24 dev veth4
-ip netns exec container2 ip link set veth4 up
-ip netns exec container2 ip route add default via 10.1.1.1
-ip netns exec container2 ip link set lo up
-brctl addbr br-link
-brctl addif br-link veth1
-brctl addif br-link veth3
-ip link set veth1 up
-ip link set veth3 up
-ip addr add 10.1.1.1/24 dev br-link
-ip link set br-link up
-ip tuntap help
+```txt
++----------------------------------------------------------------+
+|                                                                |
+|  +--------------------+      +--------------------+            |
+|  | User Application A |      | User Application B |<-----+     |
+|  +--------------------+      +--------------------+      |     |
+|               | 1                    | 5                 |     |
+|...............|......................|...................|.....|
+|               ↓                      ↓                   |     |
+|         +----------+           +----------+              |     |
+|         | socket A |           | socket B |              |     |
+|         +----------+           +----------+              |     |
+|                 | 2               | 6                    |     |
+|.................|.................|......................|.....|
+|                 ↓                 ↓                      |     |
+|             +------------------------+                 4 |     |
+|             | Newwork Protocol Stack |                   |     |
+|             +------------------------+                   |     |
+|                | 7                 | 3                   |     |
+|................|...................|.....................|.....|
+|                ↓                   ↓                     |     |
+|        +----------------+    +----------------+          |     |
+|        |      eth0      |    |      tun0      |          |     |
+|        +----------------+    +----------------+          |     |
+|    10.32.0.11  |                   |   192.168.3.11      |     |
+|                | 8                 +---------------------+     |
+|                |                                               |
++----------------|-----------------------------------------------+
+                 ↓
+         Physical Network
 ```
 
-``` bash
-# 验证环境已经配置好
-# 检查ipv4转发
-sysctl net.ipv4.ip_forward
+> tun/tap设备的用处是将协议栈中的部分数据包转发给用户空间的应用程序，给用户空间的程序一个处理数据包的机会(数据压缩，加密)
 
-# 打开ipv4转发
-sysctl -w net.ipv4.ip_forward=1
 
-# 测试容器之间网络互通
-# ip netns exec container1 ping <宿主机eth0>
-ip netns exec container1 ping 10.0.8.4 -c 3
 
-# ip netns exec container1 ping <同交换机switch\bridge网段容器ip>
-ip netns exec container1 ping 10.1.1.7 -c 3
-```
+### 二、VPN
 
-### 三、配置TUN的IP隧道
+1. 创建Tun设备
 
 ``` bash
-# ip tuntap add dev tun1 mode tun
-ip netns exec container1 ip tuntap add dev tun1 mode tun
+# 虚拟机 1 作为服务端
+sudo ip tuntap add dev tun-server mode tun
+sudo ip addr add 172.16.1.1/24 dev tun-server
+sudo ip link set tun-server up
+gcc ./src/c/05-tun-tap/simpletun.c && sudo ./a.out -d -i tun-server -s
 
-# ip addr add <IP地址>/<子网掩码> dev tun0
-ip netns exec container1 ip addr add 172.16.0.6/24 dev tun1
 
-# ip link set dev tun1 up
-ip netns exec container1 ip link set dev tun1 up
-
-ip netns exec container1 ping 172.16.0.6 -c 3
-
-# 没有数据流经tun1
-ip netns exec container1 tcpdump -nei tun1
+# 虚拟机 2 作为客户端
+sudo ip tuntap add dev tun-client mode tun
+sudo ip addr add 172.16.1.2/24 dev tun-client
+sudo ip link set tun-client up
+gcc ./src/c/05-tun-tap/simpletun.c && sudo ./a.out -d -i tun-client -c 192.168.57.3
 ```
 
 ``` bash
@@ -150,7 +144,7 @@ func main() {
 	config := water.Config{
 		DeviceType: water.TUN,
 	}
-	config.Name = "tun1"
+	config.Name = "tun-client"
 
 	ifCe, err := water.New(config)
 	if err != nil {
@@ -209,12 +203,32 @@ ip netns exec container1 ping 127.0.0.1
 
 tcpdump 只能捕获进入它所在网络命名空间的接口的数据包，而无法捕获离开它所在网络命名空间的接口的数据包。
 
+- 命名空间的tun设备如何使用`github.com/songgao/water`监听
+
+创建并配置TUN设备：在命名空间中运行以下命令来创建和配置TUN设备：
+
+```shell
+# <namespace>是命名空间的名称
+# <devicename>是TUN设备的名称
+# <ipaddress>和<netmask>是TUN设备的IP地址和子网掩码
+# <gateway>是TUN设备的默认网关IP地址
+ip netns exec <namespace> ip tuntap add <devicename> mode tun
+ip netns exec <namespace> ip addr add <ipaddress>/<netmask> dev <devicename>
+ip netns exec <namespace> ip link set <devicename> up
+ip netns exec <namespace> ip route add default via <gateway>
+```
+
+编写的golang程序在默认命名空间中运行的应用程序。如果要在命名空间中运行该应用程序，请使用`ip netns exec <namespace>`来执行golang程序.
+
 ### 相关文档
 
-- [https://cizixs.com/2017/09/28/linux-vxlan/](https://cizixs.com/2017/09/28/linux-vxlan/)
-- [什么是 IP 隧道，Linux 怎么实现隧道通信？](https://cloud.tencent.com/developer/article/1432489)
 - [Tun/Tap接口使用指导](https://cloud.tencent.com/developer/article/1680749)
 - [云计算底层技术-虚拟网络设备(tun/tap,veth)](https://opengers.github.io/openstack/openstack-base-virtual-network-devices-tuntap-veth/)
 - [TUN接口有什么用？](https://www.baeldung.com/linux/tun-interface-purpose)
 - [Linux虚拟网络基础——tun](https://blog.csdn.net/weixin_39094034/article/details/103810351)
 - [Tun/Tap 接口教程](https://backreference.org/2010/03/26/tuntap-interface-tutorial/index.html)
+- [在go中使用TUN/TAP或如何编写VPN](https://nsl.cz/using-tun-tap-in-go-or-how-to-write-vpn/)
+- [https://github.com/kanocz/lcvpn](https://github.com/kanocz/lcvpn)
+- [Linux 网络虚拟化技术（五）隧道技术](https://www.rectcircle.cn/posts/linux-net-virual-05-tunnel/)
+- [Linux虚拟网络设备之tun/tap](https://segmentfault.com/a/1190000009249039)
+- [https://github.com/go-gost/gost](https://github.com/go-gost/gost)
