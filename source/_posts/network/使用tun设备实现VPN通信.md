@@ -135,6 +135,7 @@ package main
 
 import (
 	"log"
+	"os/exec"
 
 	"github.com/songgao/packets/ethernet"
 	"github.com/songgao/water"
@@ -148,8 +149,17 @@ func main() {
 
 	ifCe, err := water.New(config)
 	if err != nil {
-		log.Fatalf("err=%s", err)
+		log.Fatalf("new err=%s", err)
 	}
+
+	log.Printf("name=%s", ifCe.Name())
+	if err := exec.Command("ip", "link", "set", ifCe.Name(), "up").Run(); err != nil {
+		log.Fatalf("up err=%s", err)
+	}
+	if err := exec.Command("ip", "addr", "add", "10.0.42.1", "dev", ifCe.Name()).Run(); err != nil {
+		log.Fatalf("addr add err=%s", err)
+	}
+
 	var frame ethernet.Frame
 
 	for {
