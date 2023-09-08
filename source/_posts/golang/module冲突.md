@@ -9,7 +9,7 @@ date: 2023-03-12 09:40:12
 excerpt: 记录一次包版本不兼容导致的冲突和解决办法
 ---
 
-### 一、问题描述
+### 一、由于依赖包k8s.io/apimachinery@latest不兼容company/client-go/cache导致的冲突
 
 ``` bash
 
@@ -103,6 +103,31 @@ k8s.io/api@v0.27.4 k8s.io/apimachinery@v0.27.4
 
 # 所以指定使用才可以解决问题
 k8s.io/api@v0.22.4
+```
+
+
+#### 三、一些经验
+
+1. 直接依赖和间接依赖
+   
+``` bash
+# 没有 indirect 的是直接依赖，可以直接后面的version指定版本
+# 也可以通过 replace 指定版本
+# indirect 是间接依赖会跟随着直接依赖的包升级而升级间接依赖
+require (
+	github.com/bytedance/sonic v1.9.1 // indirect
+)
+```
+
+2. 如何找出直接依赖的包的位置
+
+> 项目代码直接全局走索
+
+3. 如何找出间接依赖的包的引用位置
+
+``` bash
+go mod why go.uber.org/multierr
+go mod graph
 ```
 
 
