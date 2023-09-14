@@ -6,7 +6,7 @@ tags:
   - network
 categories:
   - kubernetes
-date: 2023-08-09 15:50:12
+date: 2023-09-14 15:50:12
 excerpt: 什么是DHCP，如何分配静态IP
 sticky: 1
 hide: false
