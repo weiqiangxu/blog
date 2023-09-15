@@ -65,3 +65,18 @@ $ systemd-resolve --statistics
 ``` bash
 $ cat /etc/hosts
 ```
+
+### Q&A
+
+1. nameserver 114.114.114.114是什么来的
+
+114.114.114.114是中国电信运营商提供的公共的DNS服务器。DNS服务器用于转换域名（如www.google.com）和IP地址之间的对应关系，以便让计算机能够在互联网上进行通信。通过指定114.114.114.114作为DNS服务器，可以使用中国电信的DNS服务来解析域名。
+
+
+2. server 8.8.8.8
+
+`dns-nameservers 8.8.8.8`是用来指定DNS服务器的IP地址，其中8.8.8.8是Google提供的公共DNS服务器的IP地址。DNS服务器用于将域名解析为对应的IP地址。
+
+在Linux上，可以通过设置`dns-nameservers`来指定所使用的DNS服务器。在上述示例中，`dns-nameservers 8.8.8.8`表示使用Google的DNS服务器进行域名解析。
+
+在与`nameserver 114.114.114.114`的关系上，`nameserver 114.114.114.114`是指定的另一个DNS服务器的IP地址，由中国电信提供。不同的`nameserver`配置指定了不同的DNS服务器，用于解析域名。根据需要，可以根据实际情况选择使用不同的DNS服务器进行域名解析。
