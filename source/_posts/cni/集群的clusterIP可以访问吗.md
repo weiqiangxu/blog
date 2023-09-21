@@ -158,4 +158,4 @@ sticky: 1
     ```
 31. k8s的coredns如何安装使用，是必须的吗，如何可以将baidu.com指向某一个特定的ip
 32. ingress controller是干嘛的如何使用，跟Traefik什么关系 和[ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/)有什么关系
-33. 
+33. k8s的selector只认pod的metadata.labels是吗

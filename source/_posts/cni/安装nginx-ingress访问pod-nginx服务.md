@@ -17,32 +17,31 @@ sticky: 1
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-ingress
+ name: nginx-pod
+ labels:
+   app: nginx
 spec:
-  containers:
-  - name: nginx
-    image: nginx:1.14.2
-    ports:
-    - containerPort: 80
-```
+ containers:
+ - name: nginx-container
+   image: nginx:latest
 
-### 2. nginx service
+---
 
-```yml
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-ingress-service
+ name: nginx-service
 spec:
-  selector:
-    app.kubernetes.io/name: nginx-ingress
-  ports:
-    - protocol: TCP
-      port: 8989
-      targetPort: 80
+ selector:
+   app: nginx
+ ports:
+ - protocol: TCP
+   port: 80
+   targetPort: 80
+ type: ClusterIP
 ```
 
-### 3. ingress-nginx 
+### 2. ingress-nginx 
 
 [install-ingress-nginx.yaml](https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml)
 
@@ -64,7 +63,7 @@ $ helm upgrade --install ingress-nginx ingress-nginx \
 $ kubectl apply -f install-ingress-nginx.yaml
 ```
 
-### 4. 创建ingress yaml
+### 3. 创建ingress yaml
 
 ``` yaml
 apiVersion: networking.k8s.io/v1
@@ -84,7 +83,7 @@ spec:
           service:
             name: nginx-ingress-service
             port:
-              number: 8989
+              number: 80
 ```
 
 ``` bash
