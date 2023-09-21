@@ -73,19 +73,24 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  defaultBackend:
+    service:
+      name: nginx-service
+      port:
+        number: 8989
   ingressClassName: nginx-example
   rules:
   - http:
       paths:
-      - path: /testpath
+      - path: /server
         pathType: Prefix
         backend:
           service:
-            name: nginx-ingress-service
+            name: nginx-service
             port:
-              number: 80
+              number: 8989
 ```
 
-``` bash
+``` bash：q
 $ kubectl get service -n ingress-nginx
 ```
