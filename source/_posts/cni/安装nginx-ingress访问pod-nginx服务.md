@@ -80,9 +80,10 @@ spec:
         number: 8989
   ingressClassName: nginx-example
   rules:
-  - http:
+  - host: myapp.com
+    http:
       paths:
-      - path: /server
+      - path: /
         pathType: Prefix
         backend:
           service:
