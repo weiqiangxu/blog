@@ -7,7 +7,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-09-19 18:40:12
-excerpt: k8s网络模型相关
+excerpt: k8s相关问题汇总
 sticky: 1
 ---
 
