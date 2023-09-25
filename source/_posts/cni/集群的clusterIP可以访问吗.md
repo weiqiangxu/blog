@@ -188,3 +188,5 @@ sticky: 1
 
         总之，Controller Manager和Scheduler是Kubernetes核心组件，负责集群的自动化管理和任务调度，保证集群状态一致性和高效资源利用。
 
+38. k8s node的状态no-ready的时候如何解决问题，如何快速刷新这个node状态
+39. k8s的节点异常出现NodeHasSufficientMemory怎么解决
