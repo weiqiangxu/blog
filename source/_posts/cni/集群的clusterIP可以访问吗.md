@@ -159,3 +159,32 @@ sticky: 1
 31. k8s的coredns如何安装使用，是必须的吗，如何可以将baidu.com指向某一个特定的ip
 32. ingress controller是干嘛的如何使用，跟Traefik什么关系 和[ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/)有什么关系
 33. k8s的selector只认pod的metadata.labels是吗
+34. k8s 的高可用如何实现的
+   Master 节点的高可用：包括 Kubernetes API Server、etcd 存储、Controller Manager 和 Scheduler.
+   Node 节点的高可用：多个节点上运行相同的工作负载来实现冗余
+   容器的高可用：副本集 (ReplicaSet) 和水平自动扩缩容 (Horizontal Pod Autoscaling) 来确保容器的高可用性
+35. k8s的集群的Master节点高可用是如何实现的
+36. k8s的有状态应用有哪些，有状态指的是哪些状态
+        K8s（Kubernetes）的有状态应用指的是可以存储和维护数据状态的应用。与无状态应用不同，有状态应用需要保存一些持久化的数据，例如数据库中的数据、文件系统中的文件等。K8s中常见的有状态应用包括：
+        1. 数据库：如MySQL、PostgreSQL、MongoDB等。
+        2. 缓存系统：如Redis、Memcached等。
+        3. 文件存储系统：如Ceph、GlusterFS等。
+        4. 消息队列：如Kafka、RabbitMQ等。
+        5. 日志系统：如ELK（Elasticsearch、Logstash、Kibana）等。
+        6. 分布式文件系统：如HDFS（Hadoop Distributed File System）等。
+
+        这些有状态应用需要在容器中持久化存储数据，以便在容器重启或迁移时能够保留数据状态。K8s提供了一些机制来支持有状态应用的持久化存储需求，例如通过持久卷（Persistent Volume）和持久卷声明（Persistent Volume Claim）来实现数据的持久化存储和动态分配。
+
+37. k8s的Controller Manager 和 Scheduler分别是干嘛的，底层逻辑是什么
+        Kubernetes (k8s)的Controller Manager和Scheduler是Kubernetes的两个核心组件，负责集群的自动化管理和任务调度。
+
+        - Controller Manager（控制器管理器）：Kubernetes的Controller Manager负责运行各种控制器来监控集群的状态，并确保集群中期望的状态与实际状态保持一致。控制器包括Replication Controller、Deployment Controller、StatefulSet Controller、DaemonSet Controller等。Controller Manager通过定期与API服务器进行通信来获取集群状态，并根据需要创建、更新或删除相应的资源对象。
+
+        - Scheduler（调度器）：Kubernetes的Scheduler负责将新的Pod（容器组）分配到集群中的节点上。调度器基于一组配置策略以及集群资源的可用性信息，选择最合适的节点来运行新的Pod。调度器将Pod绑定到目标节点，并将任务分配给相关的工作节点上的Kubelet进行处理。Scheduler会考虑节点资源利用率、节点亲和性、Pod的资源需求等因素来进行调度决策。
+
+        底层逻辑如下：
+        - Controller Manager的底层逻辑通过监听API服务器上的事件，根据事件触发的规则，在集群中创建、更新或删除相应的资源对象，以确保集群状态保持一致。它还通过与API服务器进行定期通信来获取集群状态，并监控资源对象的健康状态。
+        - Scheduler的底层逻辑基于一组预先定义的策略，通过与API服务器进行通信获取集群状态以及每个节点的资源信息。Scheduler会评估Pod的资源需求和节点的可用资源情况，根据策略选择最合适的节点，并将Pod绑定到目标节点上。
+
+        总之，Controller Manager和Scheduler是Kubernetes核心组件，负责集群的自动化管理和任务调度，保证集群状态一致性和高效资源利用。
+
