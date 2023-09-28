@@ -37,6 +37,7 @@ services:
      - "traefik.http.services.nginx.loadbalancer.server.port=80"
    restart: always
 ```
+
 ```bash
 $ docker-compose up -d nginx
 
