@@ -59,13 +59,12 @@ $ vim /etc/hosts
 
 ```bash
 [root@VM-8-4-centos ~]# ls -l
-total 32
-00-account.yml
-00-role.yml
-01-role-binding.yml
-02-traefik-services.yml
-02-traefik.yml
-03-whoami-services.yml
-03-whoami.yml
-04-whoami-ingress.yml
+00-account.yml             # 创建账号
+00-role.yml                # 创建角色
+01-role-binding.yml        # 绑定账号角色
+02-traefik-services.yml    # 创建traefik服务
+02-traefik.yml             # traefik
+03-whoami-services.yml     # 创建测试用的服务
+03-whoami.yml              # 创建测试用的后端
+04-whoami-ingress.yml      # 给service绑定ingress
 ```
