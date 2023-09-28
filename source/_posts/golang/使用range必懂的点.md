@@ -5,9 +5,9 @@ tags:
   - golang
 categories:
   - golang
-date: 2023-04-11 09:40:12
+date: 2021-04-11 09:40:12
 excerpt: 使用range时候容易遗漏的点，就是range list之中的item地址是不可用的
-hide: true
+hide: false
 ---
 
 1. code
