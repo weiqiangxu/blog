@@ -57,40 +57,27 @@ $ sudo cp docker/* /usr/bin/
 $ vim /etc/systemd/system/docker.service
 ```
 
+> 下面安装的是docker 23.0.0
+
 ``` shell
 [Unit]
-Description=Docker Application Container Engine
-Documentation=https://docs.docker.com
-After=network-online.target firewalld.service
-Wants=network-online.target
-  
-[Service]
-Type=notify
-# the default is not to use systemd for cgroups because the delegate issues still
-# exists and systemd currently does not support the cgroup feature set required
-# for containers run by docker
-ExecStart=/usr/bin/dockerd --selinux-enabled=false --insecure-registry=127.0.0.1
-ExecReload=/bin/kill -s HUP $MAINPID
-# Having non-zero Limit*s causes performance problems due to accounting overhead
-# in the kernel. We recommend using cgroups to do container-local accounting.
-LimitNOFILE=infinity
-LimitNPROC=infinity
-LimitCORE=infinity
-# Uncomment TasksMax if your systemd version supports it.
-# Only systemd 226 and above support this version.
-#TasksMax=infinity
-TimeoutStartSec=0
-# set delegate yes so that systemd does not reset the cgroups of docker containers
-Delegate=yes
-# kill only the docker process, not all processes in the cgroup
-KillMode=process
-# restart the docker process if it exits prematurely
-Restart=on-failure
-StartLimitBurst=3
-StartLimitInterval=60s
-  
-[Install]
-WantedBy=multi-user.target
+  Description=Docker Application Container Engine
+  Documentation=https://docs.docker.com
+  After=network-online.target docker.socket
+  Wants=network-online.target
+
+  [Service]
+  Type=notify
+  ExecStart=/usr/bin/dockerd
+  ExecReload=/bin/kill -s HUP $MAINPID
+  KillMode=process
+  Restart=on-failure
+  ExecReload=/bin/kill -s HUP $MAINPID
+  LimitNOFILE=infinity
+  TimeoutStartSec=0
+
+  [Install]
+  WantedBy=multi-user.target
 ```
 
 ``` bash
