@@ -1,5 +1,5 @@
 ---
-title: 集群的clusterIP可以访问吗
+title: kubernetes基础问题
 index_img: /images/bg/network.png
 banner_img: /images/bg/computer.jpeg
 tags:
@@ -7,7 +7,7 @@ tags:
 categories:
   - kubernetes
 date: 2023-09-19 18:40:12
-excerpt: k8s相关问题汇总
+excerpt: 常见的k8s问题汇总巩固基础
 sticky: 1
 ---
 
