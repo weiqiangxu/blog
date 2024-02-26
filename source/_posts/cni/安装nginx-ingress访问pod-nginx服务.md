@@ -6,7 +6,7 @@ tags:
   - kubernetes
 categories:
   - kubernetes
-date: 2023-09-19 18:40:12
+date: 2023-01-19 18:40:12
 excerpt: 创建nginx-pod和相关service
 sticky: 1
 ---

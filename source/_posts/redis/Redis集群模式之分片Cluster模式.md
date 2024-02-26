@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 # Cluster模式
 
 [博客园cluster](https://www.cnblogs.com/jian0110/p/14002555.html)

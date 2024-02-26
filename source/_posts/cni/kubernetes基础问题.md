@@ -6,7 +6,7 @@ tags:
   - kubernetes
 categories:
   - kubernetes
-date: 2023-09-19 18:40:12
+date: 2023-01-19 18:40:12
 excerpt: 常见的k8s问题汇总巩固基础
 sticky: 1
 ---

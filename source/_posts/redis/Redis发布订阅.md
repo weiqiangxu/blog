@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 # 发布/订阅
 
 1. client订阅频道chat

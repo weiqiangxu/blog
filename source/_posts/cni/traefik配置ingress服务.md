@@ -6,7 +6,7 @@ tags:
   - kubernetes
 categories:
   - kubernetes
-date: 2023-09-19 18:40:12
+date: 2023-01-19 18:40:12
 excerpt: 在docker或者k8s集群内部安装traefik并且配置ingress访问内部服务
 sticky: 1
 ---

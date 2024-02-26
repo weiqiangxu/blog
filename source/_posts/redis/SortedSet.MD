@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 # 有序集合 sorted set
 
 ### 特点 

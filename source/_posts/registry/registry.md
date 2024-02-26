@@ -1,4 +1,16 @@
-# registry
+---
+title: registry
+index_img: /images/bg/k8s.webp
+banner_img: /images/bg/5.jpg
+tags:
+  - registry
+categories:
+  - kubernetes
+date: 2023-07-05 18:40:12
+excerpt: 了解registry仓库的安装和使用
+sticky: 1
+hiden: true
+---
 
 ```bash
 docker run -d -p 5005:5000 --restart=always --name registry registry:latest
@@ -22,7 +34,6 @@ curl http://localhost:5005/v2/_catalog
   ]
 }
 ```
-
 
 ```bash
 # 其他节点拉取镜像

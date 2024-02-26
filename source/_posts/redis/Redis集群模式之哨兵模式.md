@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 # 哨兵 redis-sentinel
 
 [InfoQ Redis集群](https://xie.infoq.cn/article/6c3500c66c3cdee3d72b88780)
