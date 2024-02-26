@@ -1,6 +1,7 @@
 ---
-hide: true
+hiden: true
 ---
+
 # 目录
 
 1. 简介

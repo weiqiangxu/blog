@@ -1,3 +1,7 @@
+---
+hiden: true
+---
+
 # bitmap位图
 
 (bitmap)[http://c.biancheng.net/redis/bitmap.html]

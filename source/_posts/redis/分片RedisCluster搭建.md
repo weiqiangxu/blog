@@ -1,5 +1,5 @@
 ---
-hide: true
+hiden: true
 ---
 # Redis集群模式搭建
 
