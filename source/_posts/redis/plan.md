@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 1. redis 01-28  xiaolincoding\java全栈\Redis入门指南

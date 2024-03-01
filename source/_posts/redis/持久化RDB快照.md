@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # RDB快照

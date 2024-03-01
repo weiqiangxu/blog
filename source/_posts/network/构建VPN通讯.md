@@ -9,7 +9,7 @@ categories:
 date: 2023-08-23 15:40:12
 excerpt: 详解什么是VPN并且使用Golang搭建VPN
 sticky: 1
-hiden: true
+hide: true
 ---
 
 ### 一、VPN通讯原理

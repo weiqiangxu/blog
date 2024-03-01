@@ -9,7 +9,7 @@ categories:
 date: 2023-07-05 18:40:12
 excerpt: 理解kube-proxy在Flannel网络之中充当什么角色，底层的负载均衡算法是如何实现，相关的Service如何使用该插件的。
 sticky: 1
-hiden: true
+hide: true
 ---
 
 

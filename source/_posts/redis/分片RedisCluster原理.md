@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 # 集群分片
 

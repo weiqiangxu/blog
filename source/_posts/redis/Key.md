@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # Reids 键 Key

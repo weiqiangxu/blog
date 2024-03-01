@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # List 列表

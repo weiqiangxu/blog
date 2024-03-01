@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # bitmap位图

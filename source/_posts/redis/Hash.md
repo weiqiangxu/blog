@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # Redis 哈希(hash)

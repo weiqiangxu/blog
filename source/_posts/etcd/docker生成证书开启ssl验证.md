@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # docker生成证书开启ssl验证

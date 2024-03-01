@@ -1,5 +1,5 @@
 ---
-hiden: true
+hide: true
 ---
 
 # 使用Redis搭建博客
