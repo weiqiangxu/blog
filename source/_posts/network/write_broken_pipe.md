@@ -82,7 +82,8 @@ CLOSING: 双方同时尝试关闭，等待对方确认
 ### netstat && ping
 
 ### mac tcpdump
-```
+
+```bash
 sudo tcpdump port 80 -n 
 curl www.baidu.com:80
 ```

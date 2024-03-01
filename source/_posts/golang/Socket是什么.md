@@ -19,7 +19,7 @@ socket套接字，应用层和传输层之间的抽象层，它把tcp\ip层的�
 
 ### 接口
 
-```
+```golang
 type server interface {
     bind
     listen
@@ -29,7 +29,7 @@ type server interface {
 }
 ```
 
-```
+```golang
 type client interface {
     connect
     send
@@ -39,16 +39,16 @@ type client interface {
 
 ### golang的net包提供的接口有
 
-```
+```golang
 Close(net.Conn)
 Reader(net.Conn)
 Write(net.Conn)
 
-net.Listen
-net.Listen.Accept
-net.Dial
-net.ListenUDP
-net.DialUDP
+net.Listen()
+net.Listen().Accept()
+net.Dial()
+net.ListenUDP()
+net.DialUDP()
 ```
 
 ### 本地端口假设是8080只能有一个server.Listener
@@ -58,7 +58,8 @@ net.DialUDP
 ### 一台Linux服务器最多能支撑多少个TCP连接
 
 ### 相关术语
-```
+
+```text
 TCP连接四元组是源IP地址、源端口、目的IP地址和目的端口
 
 ip最大是255.255.255.255 (4个8bit)（IPV4其实是个4字节的数据）
@@ -74,9 +75,9 @@ ip最大是255.255.255.255 (4个8bit)（IPV4其实是个4字节的数据）
 
 ### 操作系统对打开的文件数量有限制 socket too many open file
 
-
 ### socket会消耗系统内存，linux系统在多个位置都限制了可打开的文件描述符的数量
-```
+
+```text
 系统级fs.file-max
 用户级/etc/security/limits.conf
 进程级fs.nr_open
@@ -87,11 +88,14 @@ ip最大是255.255.255.255 (4个8bit)（IPV4其实是个4字节的数据）
 ### C10K并发处理万个连接的代名词
 
 ### 每个TCP连接需要的资源
+
 1. 内存
 2. CPU
 3. 端口号
 4. 文件描述符
 5. 线程
+
+### 相关文章
 
 [一台Linux服务器最多能支撑多少个TCP连接](https://blog.csdn.net/qq_16059847/article/details/116102880)
 
