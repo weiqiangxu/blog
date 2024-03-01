@@ -9,7 +9,7 @@ categories:
 date: 2023-07-05 18:40:12
 excerpt: 了解registry仓库的安装和使用
 sticky: 1
-hide: true
+hide: false
 ---
 
 ### 1.docker单机启动镜像服务

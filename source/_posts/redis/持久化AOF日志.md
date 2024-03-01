@@ -1,3 +1,7 @@
+---
+hide: true
+---
+
 ### AOF(Append Only File)日志
 
 ### 原理
