@@ -12,6 +12,7 @@ sticky: 1
 hide: true
 ---
 
+### 1.docker启动单机的chart仓库服务
 
 ```bash
 docker run --name=chartmuseum --restart=always -it -d \
@@ -22,6 +23,8 @@ docker run --name=chartmuseum --restart=always -it -d \
   chartmuseum/chartmuseum:v0.12.0
 ```
 
+### 2.使用helm工具添加chart仓库到本地
+
 ```bash
 # 在本地测试，如果helm客户端在其他机器，请修改localhost为指定ip
 $ helm repo add chartrepo http://localhost:8080
@@ -29,7 +32,6 @@ $ helm repo add chartrepo http://localhost:8080
 $ helm repo list
 NAME            URL
 chartrepo       http://localhost:8080
-
 
 # 我们创建并打包一个新的chart
 $ helm create test
@@ -56,6 +58,8 @@ type: application
 version: 0.1.0
 ```
 
+### 3. 查看chart仓库的helm包有哪些
+
 ```bash
 # 安装helm push 插件
 # helm plugin install https://github.com/chartmuseum/helm-push.git
@@ -69,3 +73,19 @@ version: 0.1.0
 NAME                               CHART VERSION  APP VERSION   DESCRIPTION
 chartmuseum/test                   0.1.0          1.16.0        A Helm chart for Kubernetes
 ```
+
+### 4.API接口
+
+```bash
+# 查询chart
+GET ${http}/api/charts
+
+# 下载chart
+GET ${http}/charts/${chart-name}.tgz
+
+# 上传chart
+POST ${http}/api/charts 
+{chart:${local_path/chart-name}.tgz}
+```
+
+> 手动拷贝chart包到`/charts`目录，charts仓库路径`STORAGE_LOCAL_ROOTDIR`有一个`index-cache.yaml`必须删除才会看到完整的chart包列表

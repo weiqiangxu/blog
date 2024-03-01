@@ -12,20 +12,25 @@ sticky: 1
 hide: true
 ---
 
+### 1.docker单机启动镜像服务
+
 ```bash
-docker run -d -p 5005:5000 --restart=always --name registry registry:latest
+$ docker run -d \
+  -p 5005:5000 --restart=always \
+  --name registry registry:latest
 ```
 
-
-[http://localhost:5005/v2/_catalog](http://localhost:5005/v2/_catalog)
+### 2.启动以后访问服务
 
 ```bash
 docker pull nginx:alpine
 
 docker tag nginx:alpine 127.0.0.1:5005/test/mynginx:v1
-```
 
-```bash
+# 推送镜像给单机镜像仓库
+docker push 127.0.0.1:5005/test/mynginx:v1
+
+# 访问registry服务
 curl http://localhost:5005/v2/_catalog
 
 {
@@ -34,6 +39,8 @@ curl http://localhost:5005/v2/_catalog
   ]
 }
 ```
+
+### 3.镜像拉取
 
 ```bash
 # 其他节点拉取镜像
