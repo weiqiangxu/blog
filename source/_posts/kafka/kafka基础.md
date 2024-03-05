@@ -26,4 +26,4 @@ hide: true
 [面试题系列：Kafka 夺命连环11问](https://mp.weixin.qq.com/s/SuALTpvI3IMPSja9pacJ7Q)
 [31个Kafka常见面试题（很全）](https://mp.weixin.qq.com/s/NrltMqfDvwlbb9F0rNx5wA)
 [架构师面试题系列之Kafka面试专题及答案（26题）](https://mp.weixin.qq.com/s/QfcyaR4EV0-JC-3kU-S9MA)
-
+[图解 kafka 架构与工作原理](https://zhuanlan.zhihu.com/p/442468709)
