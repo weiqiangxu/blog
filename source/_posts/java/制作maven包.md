@@ -1,12 +1,144 @@
 ---
-hide: true
+title: Maven包制作与使用
+tags:
+  - Maven
+categories:
+  - maven
+date: 2024-03-09 06:40:12
+index_img: /images/bg/computer.jpeg
+hide: false
 ---
 
 ### 1.IDEA创建一个Maven工具包
 
+```bash
+IDEA New Project
+Archetype maven-archetype-quickstart
+```
+
 ### 2.mvn命令创建一个Maven工具包
 
-### 3.将Maven工具包推送到本地仓库
+1. 命令行创建
+
+```bash
+# 初始化项目
+mvn archetype:generate \
+  -DgroupId=com.example \
+  -DartifactId=demo \
+  -Dversion=1.0.0
+```
+
+```xml
+<!-- 在pom.xml添加依赖 -->
+<dependency>
+  <groupId>junit</groupId>
+  <artifactId>junit</artifactId>
+  <version>4.13.2</version>
+  <scope>test</scope>
+</dependency>
+```
+
+2. 手动创建
+
+```bash
+mkdir my-project
+
+cd my-project
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>my.group</groupId>
+  <artifactId>my-artifact</artifactId>
+  <version>1.0.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.10.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M7</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+```
+
+```java
+package my.group.my-artifact;
+
+public class Calculator {
+
+  public static int add(int a, int b) {
+    return a + b;
+  }
+
+}
+```
+
+```java
+package my.group.my-artifact;
+
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class CalculatorTest {
+
+  @Test
+  public void testAdd() {
+    assertEquals(3, Calculator.add(1, 2));
+  }
+
+}
+```
+
+```bash
+mvn clean install
+```
+
+### 3.将Maven工具包推送到本地中央仓库
+
+1. 配置maven的settings.xml配置本地仓库的账号密码和地址
+
+```xml
+<!-- /Users/xuweiqiang/apache-maven-3.9.6/conf/settings.xml -->
+<!-- 配置仓库的账号密码 -->
+<servers>
+    <server>
+        <!--这是server的id 注意不是用户登陆的id-->
+        <!-- 该id与distributionManagement中repository元素的id相匹配 -->
+        <id>docker1</id>
+        <username>admin</username>
+        <password>123456</password>
+    </server>
+    </servers>
+```
+
+2. 在工具包的pom.xml配置本地中央仓库的地址
 
 ```xml
 <!-- 增加distributionManagement段和当前项目groupId同级 -->
@@ -23,29 +155,48 @@ hide: true
   </distributionManagement>
 ```
 
-```xml
-<!-- /Users/xuweiqiang/apache-maven-3.9.6/conf/settings.xml -->
-<!-- 配置仓库的账号密码 -->
-<servers>
-    <server>
-        <!--这是server的id 注意不是用户登陆的id-->
-        <!-- 该id与distributionManagement中repository元素的id相匹配 -->
-        <id>docker1</id>
-        <username>admin</username>
-        <password>123456</password>
-    </server>
-    </servers>
+```bash
+# 在工具项目路径(pom.xml同级目录)推送包到中央仓库
+$ mvn deploy
+```
+
+3. 也可以直接将包推送到本地仓库路径(不是本地nexus服务仓库)
+
+```bash
+# mvn install 用于将当前项目打包并安装到 Maven 本地仓库
+mvn install
+
+# 用于将本地 jar 包安装到 Maven 本地仓库（本地路径）
+mvn install:install-file \
+  -Dfile=target/demo-1.0.0.jar \
+  -DgroupId=com.example \
+  -DartifactId=demo \
+  -Dversion=1.0.0 \
+  -Dpackaging=jar
 ```
 
 ```bash
-# 推送包到中央仓库
-$ mvn deploy
+mvn archetype:generate \
+  -DgroupId=com.example \
+  -DartifactId=demo \
+  -Dversion=1.0.0
 ```
 
 ### 4.IDEA创建一个springboot工程
 
 ### 5.springboot使用Maven工具包
 
+```bash
+import my.group.my-artifact.Calculator;
+
+public class Main {
+
+  public static void main(String[] args) {
+    int result = Calculator.add(1, 2);
+    System.out.println(result);
+  }
+}
+```
 
 ### 相关知识
 
@@ -160,7 +311,6 @@ mvn deploy:deploy
 ```
 
 [https://search.maven.org/](https://search.maven.org/)搜索包`maven-deploy-plugin`可以看到有哪些版本
-
 
 ```bash
 maven-install-plugin: 将项目安装到本地仓库
