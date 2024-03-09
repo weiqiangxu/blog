@@ -186,15 +186,24 @@ mvn archetype:generate \
 
 ### 5.springboot使用Maven工具包
 
-```bash
-import my.group.my-artifact.Calculator;
+1. 使用的工具包的工程添加依赖
+2.    
 
-public class Main {
+```xml
+<dependency>
+    <groupId>com.example</groupId>
+    <artifactId>demo</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
 
-  public static void main(String[] args) {
-    int result = Calculator.add(1, 2);
-    System.out.println(result);
-  }
+```java
+import com.example.App;
+
+@RequestMapping("/get")
+@ResponseBody
+public Integer Get() {
+    return App.add(1,2);
 }
 ```
 
