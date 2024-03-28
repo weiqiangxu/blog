@@ -9,6 +9,7 @@ categories:
 date: 2024-01-19 18:40:12
 excerpt: 如何生成SSL证书并且应用于Nginx服务开启https
 sticky: 1
+hide: false
 ---
 
 ### 1.创建证书
@@ -29,7 +30,7 @@ $ cd cert
 # 生成自签名SSL证书（仅用于测试)
 $ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt
 
-# 以下输入不限制格式符合就可以
+# 格式符合即可
 # Country Name (2 letter code) []:01
 # State or Province Name (full name) []:1
 # Locality Name (eg, city) []:1
@@ -130,7 +131,8 @@ openssl req: 此命令告诉 OpenSSL 我们要使用请求子命令。
 -x509: 此选项指定我们要生成自签名证书，而不是证书签名请求 (CSR)。
 -nodes: 此选项告诉 OpenSSL 不要在证书本身中包含私钥信息。私钥将存储在单独的文件中。
 -days 365: 此选项将证书的有效期设置为 365 天（一年）。
--newkey rsa:2048: 此选项告诉 OpenSSL 生成一个新的 RSA 私钥，密钥大小为 2048 位。密钥将存储在由 -keyout 指定的文件中。
+-newkey rsa:2048: 此选项告诉 OpenSSL 生成一个新的 RSA 私钥，密钥大小为 2048 位
+          密钥将存储在由 -keyout 指定的文件中。
 -keyout nginx.key: 此选项指定生成私钥的文件名。在这种情况下，它将命名为 nginx.key。
 -out nginx.crt: 此选项指定生成自签名证书的文件名。在这种情况下，它将命名为 nginx.crt。
 ```
